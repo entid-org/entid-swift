@@ -31,7 +31,7 @@ requires a republication of the engine for every rules version.
 | Path | Role |
 |---|---|
 | `spec/spec.md` | The normative specification. It governs. |
-| `spec/ir.md` | The 61 opcodes, their operands and their semantics. |
+| `spec/ir.md` | The 63 opcodes, their operands and their semantics. |
 | `spec/features.md` | The 18 frozen capability IDs. |
 | `spec/rules.proto` | Schema of the rules bundle — the generator's input. |
 | `spec/conformance.proto` | Schema of the conformance corpus. |

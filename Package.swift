@@ -103,7 +103,11 @@ let package = Package(
         ),
         .testTarget(
             name: "BusinessIDGeneratorTests",
-            dependencies: ["BusinessIDGenerator"],
+            dependencies: [
+                "BusinessIDGenerator",
+                "BusinessIDWire",
+                .product(name: "SwiftProtobuf", package: "swift-protobuf"),
+            ],
             swiftSettings: strictSwiftSettings
         ),
         .testTarget(
