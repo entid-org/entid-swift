@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Fails when the dependency graph grows beyond what this package declares.
 
-The shipped library has no dependency. The generator has one, `swift-protobuf`,
-because it is the only target that decodes anything. A new edge appearing here
-is a supply chain change and has to be a deliberate one, so it fails the build
-until the allowlist below says otherwise.
+The `BusinessID` target has no dependency and links nothing. The generator has
+one, `swift-protobuf`, because it is the only target that decodes anything —
+and because SwiftPM resolves a whole manifest, a consumer fetches it even
+though nothing it builds links it. That makes the list below part of what a
+consumer inherits, so a new edge is a supply chain change and has to be a
+deliberate one: it fails the build until this allowlist says otherwise.
 """
 import json
 import sys

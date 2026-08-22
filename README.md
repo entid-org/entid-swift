@@ -63,8 +63,14 @@ is reported as what it is.
 Requires Swift 6.1. Declared for macOS 13+, iOS 16+, tvOS 16+ and watchOS 9+;
 CI builds and tests on macOS with the current toolchain and with Swift 6.1, and
 runs the whole test suite — the conformance corpus included — on an iOS
-simulator. The library has **no dependency at all**: no Protobuf, no HTTP, no
-UIKit, no AppKit.
+simulator.
+
+**The `BusinessID` library links nothing.** No Protobuf, no HTTP, no UIKit, no
+AppKit; the binary of a consumer carries none of them. SwiftPM does still
+*resolve* this package's whole manifest, so `swift-protobuf` is fetched into
+`.build/checkouts` — it belongs to `businessid-gen` and the conformance
+tooling, which are separate targets a consumer never builds and never links.
+`Tools/audit-dependencies.py` fails CI if a second name ever appears there.
 
 ## The four operations
 

@@ -114,3 +114,10 @@ changes no API is a patch of this package.
 The release workflow verifies the digests, regenerates from the attested bundle,
 requires the working tree to be unchanged by it, runs the whole corpus, and
 refuses to publish if anything is red.
+
+A Swift package is distributed as a git tag, not as an uploaded artefact: there
+is no binary to sign. What stands in for a signature is the tag itself, so
+release tags are signed (`git tag -s`) and protected, and the reproducibility
+claim is the regeneration step — the same attested bundle must produce the
+committed generated code byte for byte, or the tag ships rules nobody
+reviewed.

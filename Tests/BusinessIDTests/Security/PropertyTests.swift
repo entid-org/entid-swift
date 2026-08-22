@@ -79,28 +79,40 @@ struct PropertyTests {
         }
     }
 
-    @Test("Adding an accepted separator does not change the canonical value")
-    func separatorsAreTransparent() {
+    /// Where a definition removes a separator, it removes it everywhere.
+    ///
+    /// The rules decide which separators a kind accepts, so the test does not
+    /// assume: it asks the engine once, at one position, and then requires the
+    /// same answer at every other position. A canonicalizer that stripped a
+    /// separator only at the start — or only outside a prefix it recognises —
+    /// would pass a fixed example and fail here.
+    @Test("A separator a definition removes is removed at every position")
+    func separatorRemovalIsPositionIndependent() {
         var rng = Rng(seed: 0x5E9A)
-        let separators: [String] = [" ", "-", ".", "/", "\u{00A0}"]
-        for _ in 0..<2000 {
+        let separators = [" ", "-", ".", "/", "\u{00A0}"]
+
+        for _ in 0..<1500 {
             let kind = rng.element(Self.kinds)
-            let digits = (0..<rng.int(4...14)).map { _ in String(rng.int(0...9)) }.joined()
+            let digits = (0..<rng.int(6...12)).map { _ in String(rng.int(0...9)) }.joined()
             let base = engine.canonicalize(IdentifierInput(kind: kind, value: digits))
             guard base.status == .valid else { continue }
+            let separator = rng.element(separators)
 
-            var spaced = ""
-            for character in digits {
-                spaced.append(character)
-                if rng.int(0...2) == 0 { spaced += rng.element(separators) }
-            }
-            let decorated = engine.canonicalize(IdentifierInput(kind: kind, value: spaced))
-            guard decorated.status == .valid else { continue }
-            // Only where the definition's canonicalizer removes that separator;
-            // where it does not, the two values differ legitimately and the
-            // engine must simply not crash.
-            if decorated.canonicalValue != base.canonicalValue {
-                #expect(decorated.canonicalValue.count >= base.canonicalValue.count)
+            // Ask the rules whether this kind removes this separator at all.
+            let probe = engine.canonicalize(
+                IdentifierInput(kind: kind, value: String(digits.prefix(1)) + separator + digits.dropFirst())
+            )
+            guard probe.status == .valid, probe.canonicalValue == base.canonicalValue else { continue }
+
+            // It does. Then every other position must agree.
+            for cut in 1..<digits.count {
+                let index = digits.index(digits.startIndex, offsetBy: cut)
+                let decorated = String(digits[..<index]) + separator + String(digits[index...])
+                let result = engine.canonicalize(IdentifierInput(kind: kind, value: decorated))
+                #expect(
+                    result.canonicalValue == base.canonicalValue,
+                    Comment(rawValue: "\(kind.rawValue) \(decorated.debugDescription)")
+                )
             }
         }
     }
