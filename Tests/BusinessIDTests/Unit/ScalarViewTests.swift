@@ -102,6 +102,14 @@ struct ScalarViewTests {
         #expect(outer.slice(start: 1, end: 3).string == "BC")
         #expect(outer[0] == "A")
         #expect(outer.slice(start: 0, end: 6).isAbsent)
+
+        // The position one past the end is not a position. On a sub-slice the
+        // element is still there in the base array, and returning it would read
+        // outside the view while trapping nowhere.
+        #expect(outer[5] == nil)
+        #expect(outer[4] == "E")
+        #expect(!Predicates.charAtIn(outer, 5, literal("Y")))
+        #expect(Predicates.charAtIn(outer, 4, literal("E")))
     }
 }
 

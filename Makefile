@@ -70,8 +70,9 @@ verify-lock: ## Check every digest rules.lock attests
 
 .PHONY: docs
 docs: ## Build the DocC archive
-	$(SWIFT) package --allow-writing-to-directory .build/docs generate-documentation \
-		--target BusinessID --output-path .build/docs
+	xcodebuild docbuild -scheme BusinessID -destination 'generic/platform=macOS' \
+		-derivedDataPath .build/docc -quiet
+	@echo "archive: $$(find .build/docc -name '*.doccarchive' | head -1)"
 
 .PHONY: help
 help: ## List the targets

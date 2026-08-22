@@ -53,10 +53,21 @@ struct IntegerOpsTests {
             IntegerOps.weightedSum(
                 view("1234567"), weights: weights, alignment: .left, mapping: .digitValue) == 112
         )
-        // Only min(len, weights) positions pair.
+        // Only min(len, weights) positions pair, whichever side is shorter.
+        // A view shorter than the weight list:
         #expect(
             IntegerOps.weightedSum(
                 view("12345"), weights: weights, alignment: .left, mapping: .digitValue) == 80
+        )
+        // and a view longer than it, where the remaining positions of the view
+        // contribute nothing rather than reaching past the end of the weights.
+        #expect(
+            IntegerOps.weightedSum(
+                view("12"), weights: [3, 4], alignment: .left, mapping: .digitValue) == 11
+        )
+        #expect(
+            IntegerOps.weightedSum(
+                view("123456789"), weights: [3, 4], alignment: .left, mapping: .digitValue) == 11
         )
     }
 
@@ -70,6 +81,16 @@ struct IntegerOpsTests {
         #expect(
             IntegerOps.weightedSum(
                 view("12345"), weights: weights, alignment: .right, mapping: .digitValue) == 50
+        )
+        // A view longer than the weight list pairs from the right and leaves
+        // the leading positions unweighted.
+        #expect(
+            IntegerOps.weightedSum(
+                view("89"), weights: [3, 4], alignment: .right, mapping: .digitValue) == 60
+        )
+        #expect(
+            IntegerOps.weightedSum(
+                view("123456789"), weights: [3, 4], alignment: .right, mapping: .digitValue) == 60
         )
     }
 

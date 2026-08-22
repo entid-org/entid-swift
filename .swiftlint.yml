@@ -2,6 +2,7 @@
 # responsibility, so it is linted through the emitter's own tests instead.
 excluded:
   - .build
+  - Examples/BusinessIDConsumer/.build
   - Sources/BusinessID/Generated
   - Sources/BusinessIDWire/Generated
 

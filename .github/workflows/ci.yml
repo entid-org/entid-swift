@@ -1,0 +1,192 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  artefacts:
+    name: Artefacts match rules.lock
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Nothing is read from spec/ before this passes: rules.lock names a
+      # release and attests its content, and it is the only point of coupling
+      # between this engine and the specification repository.
+      - name: Verify every attested digest
+        run: ./Tools/verify-lock.sh
+
+  style:
+    name: Format and lint
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+      - name: swift-format
+        run: swift format lint --recursive --strict --parallel Sources Tests Package.swift
+      - name: SwiftLint
+        run: |
+          brew install swiftlint
+          swiftlint lint --strict --quiet
+
+  macos:
+    name: macOS (Swift ${{ matrix.swift }})
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        # The minimum this package supports and the current release. The
+        # generated code has to compile under both.
+        swift: ["6.0", "latest-stable"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: ${{ matrix.swift == '6.0' && '16.0' || 'latest-stable' }}
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .build
+          key: ${{ runner.os }}-spm-${{ matrix.swift }}-${{ hashFiles('Package.resolved', 'Package.swift') }}
+          restore-keys: ${{ runner.os }}-spm-${{ matrix.swift }}-
+      - name: Build debug
+        run: swift build
+      - name: Build release
+        run: swift build -c release
+      - name: Test
+        run: swift test
+
+  conformance:
+    name: Conformance (665 cases)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+      # The runner is the only program that reads an expected result; the testee
+      # never sees one. A partial run is not conformance, so the whole corpus
+      # runs or the job fails.
+      - name: Run the shared corpus through the testee
+        run: |
+          swift build --product businessid-testee
+          swift run businessid-conformance-runner --cases spec/businessid-conformance.binpb
+
+  generated:
+    name: Generated code is current
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+      # Regeneration is a maintainer's deliberate act, never a build step, so a
+      # stale committed file has to be a failure rather than a silent fixup.
+      - name: Recompile the bundle and compare
+        run: swift run businessid-gen --check
+      # The Protobuf code is regenerated with the exact plugin version the
+      # package resolves, so a difference here is a schema change and not a tool
+      # version drift.
+      - name: Protobuf code matches the schemas
+        run: |
+          brew install protobuf
+          VERSION=$(python3 -c "import json; print(next(p['state']['version'] \
+            for p in json.load(open('Package.resolved'))['pins'] \
+            if p['identity'] == 'swift-protobuf'))")
+          git clone --depth 1 --branch "$VERSION" \
+            https://github.com/apple/swift-protobuf.git .swift-protobuf-tool
+          swift build --package-path .swift-protobuf-tool -c release --product protoc-gen-swift
+          PATH="$PWD/.swift-protobuf-tool/.build/release:$PATH" make proto
+          git diff --exit-code -- Sources/BusinessIDWire/Generated
+
+  coverage:
+    name: Coverage gates
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+      - name: Measure
+        run: ./Tools/coverage.sh
+
+  ios:
+    name: iOS simulator
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+      # The shipped library avoids UIKit and AppKit entirely, and the point of
+      # this job is to keep it that way.
+      - name: Build and test on a simulator
+        run: |
+          DESTINATION=$(xcrun simctl list devices available --json \
+            | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; \
+                print(next(x['udid'] for k,v in d.items() if 'iOS' in k for x in v))")
+          xcodebuild test \
+            -scheme BusinessID \
+            -destination "id=$DESTINATION" \
+            -skipPackagePluginValidation \
+            -only-testing:BusinessIDTests \
+            | xcbeautify --renderer github-actions || \
+          xcodebuild test \
+            -scheme BusinessID \
+            -destination "id=$DESTINATION" \
+            -skipPackagePluginValidation \
+            -only-testing:BusinessIDTests
+
+  consumer:
+    name: A consumer package can depend on this one
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+      # Resolving by path is what a consumer does with a tag, minus the network.
+      # It proves the product name, the platforms and the public API are what a
+      # dependant sees.
+      - name: Build and run the example consumer
+        run: |
+          cd Examples/BusinessIDConsumer
+          swift build
+          swift run BusinessIDConsumer
+
+  fuzz-smoke:
+    name: Fuzz smoke
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+      - name: Short deterministic run
+        run: swift run -c release businessid-fuzz --seed ${{ github.run_number }} --rounds 20000
+
+  audit:
+    name: Dependency audit
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+      # The shipped library has no dependency at all. Anything resolved here
+      # belongs to the generator or to the conformance plumbing, and the list is
+      # short enough to read.
+      - name: Show and check the resolved graph
+        run: |
+          swift package resolve
+          swift package show-dependencies --format json | python3 Tools/audit-dependencies.py

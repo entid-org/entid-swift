@@ -1,0 +1,53 @@
+name: Scheduled
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  long-fuzz:
+    name: Long fuzz
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+      # A different seed each night, printed in the output, so a finding is
+      # reproducible from the log alone.
+      - name: Fuzz the decoder and the engine
+        run: swift run -c release businessid-fuzz --seed ${{ github.run_id }} --rounds 2000000
+
+  benchmarks:
+    name: Benchmarks
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+      - name: Measure
+        run: swift run -c release businessid-bench | tee benchmarks.txt
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: benchmarks
+          path: benchmarks.txt
+
+  mutation:
+    name: Targeted mutation of the checksums and bounds
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+      # No stable mutation testing tool exists for Swift packages, so the
+      # mutants are applied by hand to the places where an off-by-one would be
+      # invisible: the checksum arithmetic, the position comparisons and the
+      # bounds. Each one must make at least one test fail.
+      - name: Apply each mutant and require a failure
+        run: ./Tools/mutation.sh

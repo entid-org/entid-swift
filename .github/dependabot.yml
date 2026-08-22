@@ -1,0 +1,17 @@
+# Pins are SHAs, which do not update themselves. Without this, a correctly
+# pinned workflow quietly becomes a frozen one.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+
+  - package-ecosystem: "swift"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
