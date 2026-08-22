@@ -94,6 +94,19 @@ let package = Package(
             swiftSettings: strictSwiftSettings
         ),
 
+        // MARK: - Development tools, never products
+
+        .executableTarget(
+            name: "businessid-fuzz",
+            dependencies: ["BusinessID", "BusinessIDGenerator"],
+            swiftSettings: strictSwiftSettings
+        ),
+        .executableTarget(
+            name: "businessid-bench",
+            dependencies: ["BusinessID", "BusinessIDGenerator"],
+            swiftSettings: strictSwiftSettings
+        ),
+
         // MARK: - Tests
 
         .testTarget(

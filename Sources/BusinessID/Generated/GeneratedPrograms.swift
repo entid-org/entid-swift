@@ -2338,7 +2338,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 8)
         }
         func n2() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w0, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w0, alignment: .left, mapping: .digitValue)
         }
         func n3() -> IntegerValue {
             IntegerOps.modulo(n2(), modulus: 11)
@@ -2347,7 +2348,8 @@ enum GeneratedPrograms {
             n3() == Int64(10)
         }
         func n5() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w1, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w1, alignment: .left, mapping: .digitValue)
         }
         func n6() -> IntegerValue {
             IntegerOps.modulo(n5(), modulus: 11)
@@ -2382,7 +2384,9 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 12)
         }
         func n2() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w3, alignment: .left, mapping: .customAlphabet(GeneratedLiterals.t10))
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w3, alignment: .left,
+                mapping: .customAlphabet(GeneratedLiterals.t10))
         }
         func n3() -> IntegerValue {
             IntegerOps.modulo(n2(), modulus: 11)
@@ -2397,7 +2401,9 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 13)
         }
         func n7() -> IntegerValue {
-            IntegerOps.weightedSum(n6(), weights: GeneratedLiterals.w5, alignment: .left, mapping: .customAlphabet(GeneratedLiterals.t10))
+            IntegerOps.weightedSum(
+                n6(), weights: GeneratedLiterals.w5, alignment: .left,
+                mapping: .customAlphabet(GeneratedLiterals.t10))
         }
         func n8() -> IntegerValue {
             IntegerOps.modulo(n7(), modulus: 11)
@@ -2420,7 +2426,9 @@ enum GeneratedPrograms {
             subjectView()
         }
         func n1() -> IntegerValue {
-            IntegerOps.weightedSum(n0(), weights: GeneratedLiterals.w6, alignment: .left, mapping: .customAlphabet(GeneratedLiterals.t11))
+            IntegerOps.weightedSum(
+                n0(), weights: GeneratedLiterals.w6, alignment: .left,
+                mapping: .customAlphabet(GeneratedLiterals.t11))
         }
         func n2() -> IntegerValue {
             IntegerOps.modulo(n1(), modulus: 31)
@@ -2440,7 +2448,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 7)
         }
         func n2() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w7, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w7, alignment: .left, mapping: .digitValue)
         }
         func n3() -> IntegerValue {
             IntegerOps.modulo(n2(), modulus: 11)
@@ -2463,7 +2472,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 8)
         }
         func n2() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w9, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w9, alignment: .left, mapping: .digitValue)
         }
         func n3() -> IntegerValue {
             IntegerOps.modulo(n2(), modulus: 11)
@@ -2483,7 +2493,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 7)
         }
         func n2() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w10, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w10, alignment: .left, mapping: .digitValue)
         }
         func n3() -> IntegerValue {
             IntegerOps.modulo(n2(), modulus: 11)
@@ -2492,7 +2503,8 @@ enum GeneratedPrograms {
             n3() == Int64(10)
         }
         func n5() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w11, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w11, alignment: .left, mapping: .digitValue)
         }
         func n6() -> IntegerValue {
             IntegerOps.modulo(n5(), modulus: 11)
@@ -2763,7 +2775,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 7)
         }
         func n2() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w12, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w12, alignment: .left, mapping: .digitValue)
         }
         func n3() -> IntegerValue {
             IntegerOps.modulo(n2(), modulus: 11)
@@ -2809,7 +2822,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 14)
         }
         func n6() -> IntegerValue {
-            IntegerOps.weightedSum(n5(), weights: GeneratedLiterals.w14, alignment: .cycle, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n5(), weights: GeneratedLiterals.w14, alignment: .cycle, mapping: .digitValue)
         }
         func n7() -> IntegerValue {
             IntegerOps.modulo(n6(), modulus: 5)
@@ -2852,7 +2866,8 @@ enum GeneratedPrograms {
             subjectView()
         }
         func n1() -> IntegerValue {
-            IntegerOps.weightedSum(n0(), weights: GeneratedLiterals.w15, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n0(), weights: GeneratedLiterals.w15, alignment: .left, mapping: .digitValue)
         }
         func n2() -> IntegerValue {
             IntegerOps.modulo(n1(), modulus: 9)
@@ -2883,7 +2898,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 9)
         }
         func n2() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w16, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w16, alignment: .left, mapping: .digitValue)
         }
         func n3() -> IntegerValue {
             IntegerOps.modulo(n2(), modulus: 11)
@@ -2892,7 +2908,8 @@ enum GeneratedPrograms {
             n3() == Int64(10)
         }
         func n5() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w17, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w17, alignment: .left, mapping: .digitValue)
         }
         func n6() -> IntegerValue {
             IntegerOps.modulo(n5(), modulus: 11)
@@ -2924,7 +2941,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 10)
         }
         func n2() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w18, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w18, alignment: .left, mapping: .digitValue)
         }
         func n3() -> IntegerValue {
             IntegerOps.modulo(n2(), modulus: 11)
@@ -2947,7 +2965,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 8)
         }
         func n2() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w20, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w20, alignment: .left, mapping: .digitValue)
         }
         func n3() -> IntegerValue {
             IntegerOps.modulo(n2(), modulus: 11)
@@ -2973,7 +2992,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 1)
         }
         func n3() -> IntegerValue {
-            IntegerOps.weightedSum(n2(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n2(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n4() -> IntegerValue {
             IntegerOps.modulo(n3(), modulus: 11)
@@ -2994,7 +3014,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 2)
         }
         func n10() -> IntegerValue {
-            IntegerOps.weightedSum(n9(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n9(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n11() -> IntegerValue {
             IntegerOps.modulo(n10(), modulus: 11)
@@ -3015,7 +3036,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 3)
         }
         func n17() -> IntegerValue {
-            IntegerOps.weightedSum(n16(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n16(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n18() -> IntegerValue {
             IntegerOps.modulo(n17(), modulus: 11)
@@ -3036,7 +3058,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 4)
         }
         func n24() -> IntegerValue {
-            IntegerOps.weightedSum(n23(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n23(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n25() -> IntegerValue {
             IntegerOps.modulo(n24(), modulus: 11)
@@ -3057,7 +3080,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 5)
         }
         func n31() -> IntegerValue {
-            IntegerOps.weightedSum(n30(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n30(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n32() -> IntegerValue {
             IntegerOps.modulo(n31(), modulus: 11)
@@ -3078,7 +3102,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 6)
         }
         func n38() -> IntegerValue {
-            IntegerOps.weightedSum(n37(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n37(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n39() -> IntegerValue {
             IntegerOps.modulo(n38(), modulus: 11)
@@ -3099,7 +3124,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 7)
         }
         func n45() -> IntegerValue {
-            IntegerOps.weightedSum(n44(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n44(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n46() -> IntegerValue {
             IntegerOps.modulo(n45(), modulus: 11)
@@ -3120,7 +3146,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 8)
         }
         func n52() -> IntegerValue {
-            IntegerOps.weightedSum(n51(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n51(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n53() -> IntegerValue {
             IntegerOps.modulo(n52(), modulus: 11)
@@ -3141,7 +3168,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 9)
         }
         func n59() -> IntegerValue {
-            IntegerOps.weightedSum(n58(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n58(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n60() -> IntegerValue {
             IntegerOps.modulo(n59(), modulus: 11)
@@ -3181,7 +3209,8 @@ enum GeneratedPrograms {
             n0().slice(start: 0, end: 7)
         }
         func n2() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w7, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w7, alignment: .left, mapping: .digitValue)
         }
         func n3() -> IntegerValue {
             IntegerOps.modulo(n2(), modulus: 11)
@@ -3239,7 +3268,8 @@ enum GeneratedPrograms {
             n5().slice(start: 0, end: 8)
         }
         func n7() -> IntegerValue {
-            IntegerOps.weightedSum(n6(), weights: GeneratedLiterals.w0, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n6(), weights: GeneratedLiterals.w0, alignment: .left, mapping: .digitValue)
         }
         func n8() -> IntegerValue {
             IntegerOps.modulo(n7(), modulus: 11)
@@ -3248,7 +3278,8 @@ enum GeneratedPrograms {
             n8() == Int64(10)
         }
         func n10() -> IntegerValue {
-            IntegerOps.weightedSum(n6(), weights: GeneratedLiterals.w1, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n6(), weights: GeneratedLiterals.w1, alignment: .left, mapping: .digitValue)
         }
         func n11() -> IntegerValue {
             IntegerOps.modulo(n10(), modulus: 11)
@@ -3298,7 +3329,8 @@ enum GeneratedPrograms {
             n5().slice(start: 0, end: 7)
         }
         func n7() -> IntegerValue {
-            IntegerOps.weightedSum(n6(), weights: GeneratedLiterals.w7, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n6(), weights: GeneratedLiterals.w7, alignment: .left, mapping: .digitValue)
         }
         func n8() -> IntegerValue {
             IntegerOps.modulo(n7(), modulus: 11)
@@ -3327,7 +3359,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 8)
         }
         func n3() -> IntegerValue {
-            IntegerOps.weightedSum(n2(), weights: GeneratedLiterals.w9, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n2(), weights: GeneratedLiterals.w9, alignment: .left, mapping: .digitValue)
         }
         func n4() -> IntegerValue {
             IntegerOps.modulo(n3(), modulus: 11)
@@ -3350,7 +3383,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 8)
         }
         func n3() -> IntegerValue {
-            IntegerOps.weightedSum(n2(), weights: GeneratedLiterals.w22, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n2(), weights: GeneratedLiterals.w22, alignment: .left, mapping: .digitValue)
         }
         func n4() -> IntegerValue {
             IntegerOps.modulo(n3(), modulus: 10)
@@ -3408,7 +3442,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 7)
         }
         func n3() -> IntegerValue {
-            IntegerOps.weightedSum(n2(), weights: GeneratedLiterals.w12, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n2(), weights: GeneratedLiterals.w12, alignment: .left, mapping: .digitValue)
         }
         func n4() -> IntegerValue {
             IntegerOps.modulo(n3(), modulus: 11)
@@ -3475,7 +3510,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 9)
         }
         func n3() -> IntegerValue {
-            IntegerOps.weightedSum(n2(), weights: GeneratedLiterals.w25, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n2(), weights: GeneratedLiterals.w25, alignment: .left, mapping: .digitValue)
         }
         func n4() -> IntegerValue {
             IntegerOps.modulo(n3(), modulus: 97)
@@ -3501,7 +3537,8 @@ enum GeneratedPrograms {
             n0().slice(start: 2, end: 10)
         }
         func n2() -> IntegerValue {
-            IntegerOps.weightedSum(n1(), weights: GeneratedLiterals.w26, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n1(), weights: GeneratedLiterals.w26, alignment: .left, mapping: .digitValue)
         }
         func n3() -> IntegerValue {
             IntegerOps.modulo(n2(), modulus: 11)
@@ -3527,7 +3564,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 7)
         }
         func n3() -> IntegerValue {
-            IntegerOps.weightedSum(n2(), weights: GeneratedLiterals.w27, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n2(), weights: GeneratedLiterals.w27, alignment: .left, mapping: .digitValue)
         }
         func n4() -> IntegerValue {
             IntegerOps.modulo(n3(), modulus: 10)
@@ -3565,7 +3603,8 @@ enum GeneratedPrograms {
             n5().slice(start: 0, end: 8)
         }
         func n7() -> IntegerValue {
-            IntegerOps.weightedSum(n6(), weights: GeneratedLiterals.w28, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n6(), weights: GeneratedLiterals.w28, alignment: .left, mapping: .digitValue)
         }
         func n8() -> IntegerValue {
             IntegerOps.modulo(n7(), modulus: 11)
@@ -3643,7 +3682,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 10)
         }
         func n7() -> IntegerValue {
-            IntegerOps.weightedSum(n6(), weights: GeneratedLiterals.w18, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n6(), weights: GeneratedLiterals.w18, alignment: .left, mapping: .digitValue)
         }
         func n8() -> IntegerValue {
             IntegerOps.modulo(n7(), modulus: 11)
@@ -3672,7 +3712,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 6)
         }
         func n3() -> IntegerValue {
-            IntegerOps.weightedSum(n2(), weights: GeneratedLiterals.w29, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n2(), weights: GeneratedLiterals.w29, alignment: .left, mapping: .digitValue)
         }
         func n4() -> IntegerValue {
             IntegerOps.modulo(n3(), modulus: 37)
@@ -3698,7 +3739,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 8)
         }
         func n3() -> IntegerValue {
-            IntegerOps.weightedSum(n2(), weights: GeneratedLiterals.w20, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n2(), weights: GeneratedLiterals.w20, alignment: .left, mapping: .digitValue)
         }
         func n4() -> IntegerValue {
             IntegerOps.modulo(n3(), modulus: 11)
@@ -3724,7 +3766,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 8)
         }
         func n3() -> IntegerValue {
-            IntegerOps.weightedSum(n2(), weights: GeneratedLiterals.w28, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n2(), weights: GeneratedLiterals.w28, alignment: .left, mapping: .digitValue)
         }
         func n4() -> IntegerValue {
             IntegerOps.modulo(n3(), modulus: 11)
@@ -3750,7 +3793,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 9)
         }
         func n3() -> IntegerValue {
-            IntegerOps.weightedSum(n2(), weights: GeneratedLiterals.w31, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n2(), weights: GeneratedLiterals.w31, alignment: .left, mapping: .digitValue)
         }
         func n4() -> IntegerValue {
             IntegerOps.modulo(n3(), modulus: 11)
@@ -3776,7 +3820,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 8)
         }
         func n3() -> IntegerValue {
-            IntegerOps.weightedSum(n2(), weights: GeneratedLiterals.w20, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n2(), weights: GeneratedLiterals.w20, alignment: .left, mapping: .digitValue)
         }
         func n4() -> IntegerValue {
             IntegerOps.modulo(n3(), modulus: 11)
@@ -3805,7 +3850,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 1)
         }
         func n4() -> IntegerValue {
-            IntegerOps.weightedSum(n3(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n3(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n5() -> IntegerValue {
             IntegerOps.modulo(n4(), modulus: 11)
@@ -3826,7 +3872,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 2)
         }
         func n11() -> IntegerValue {
-            IntegerOps.weightedSum(n10(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n10(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n12() -> IntegerValue {
             IntegerOps.modulo(n11(), modulus: 11)
@@ -3847,7 +3894,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 3)
         }
         func n18() -> IntegerValue {
-            IntegerOps.weightedSum(n17(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n17(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n19() -> IntegerValue {
             IntegerOps.modulo(n18(), modulus: 11)
@@ -3868,7 +3916,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 4)
         }
         func n25() -> IntegerValue {
-            IntegerOps.weightedSum(n24(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n24(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n26() -> IntegerValue {
             IntegerOps.modulo(n25(), modulus: 11)
@@ -3889,7 +3938,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 5)
         }
         func n32() -> IntegerValue {
-            IntegerOps.weightedSum(n31(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n31(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n33() -> IntegerValue {
             IntegerOps.modulo(n32(), modulus: 11)
@@ -3910,7 +3960,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 6)
         }
         func n39() -> IntegerValue {
-            IntegerOps.weightedSum(n38(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n38(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n40() -> IntegerValue {
             IntegerOps.modulo(n39(), modulus: 11)
@@ -3931,7 +3982,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 7)
         }
         func n46() -> IntegerValue {
-            IntegerOps.weightedSum(n45(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n45(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n47() -> IntegerValue {
             IntegerOps.modulo(n46(), modulus: 11)
@@ -3952,7 +4004,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 8)
         }
         func n53() -> IntegerValue {
-            IntegerOps.weightedSum(n52(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n52(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n54() -> IntegerValue {
             IntegerOps.modulo(n53(), modulus: 11)
@@ -3973,7 +4026,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 9)
         }
         func n60() -> IntegerValue {
-            IntegerOps.weightedSum(n59(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n59(), weights: GeneratedLiterals.w21, alignment: .right, mapping: .digitValue)
         }
         func n61() -> IntegerValue {
             IntegerOps.modulo(n60(), modulus: 11)
@@ -4022,7 +4076,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 7)
         }
         func n3() -> IntegerValue {
-            IntegerOps.weightedSum(n2(), weights: GeneratedLiterals.w7, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n2(), weights: GeneratedLiterals.w7, alignment: .left, mapping: .digitValue)
         }
         func n4() -> IntegerValue {
             IntegerOps.modulo(n3(), modulus: 11)
@@ -4071,7 +4126,8 @@ enum GeneratedPrograms {
             n1().slice(start: 0, end: 9)
         }
         func n3() -> IntegerValue {
-            IntegerOps.weightedSum(n2(), weights: GeneratedLiterals.w25, alignment: .left, mapping: .digitValue)
+            IntegerOps.weightedSum(
+                n2(), weights: GeneratedLiterals.w25, alignment: .left, mapping: .digitValue)
         }
         func n4() -> IntegerValue {
             IntegerOps.modulo(n3(), modulus: 97)

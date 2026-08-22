@@ -53,7 +53,10 @@ file_length:
 
 identifier_name:
   min_length: 2
-  excluded: [id, of, to]
+  # `a` through `h` are the working variables FIPS 180-4 names in the SHA-256
+  # round function. Renaming them would make the implementation harder to check
+  # against the standard it implements.
+  excluded: [id, of, to, a, b, c, d, e, f, g, h]
 
 force_cast: error
 force_try: error

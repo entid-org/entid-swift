@@ -68,7 +68,11 @@ enum GeneratedLiterals {
     static let t59: [Unicode.Scalar] = Array("".unicodeScalars)
     static let t60: [Unicode.Scalar] = Array("US".unicodeScalars)
     static let t61: [Unicode.Scalar] = Array("CN".unicodeScalars)
-    static let p0: [[Unicode.Scalar]] = ["AC", "CE", "CS", "EN", "ES", "FC", "FE", "GE", "GN", "GS", "IC", "IP", "LP", "NA", "NC", "NF", "NI", "NL", "NO", "NP", "NR", "NV", "NZ", "OC", "OE", "PC", "R0", "RC", "RS", "SA", "SC", "SE", "SF", "SG", "SI", "SL", "SO", "SP", "SR", "SZ", "ZC"].map { Array($0.unicodeScalars) }
+    static let p0: [[Unicode.Scalar]] = [
+        "AC", "CE", "CS", "EN", "ES", "FC", "FE", "GE", "GN", "GS", "IC", "IP", "LP", "NA", "NC", "NF", "NI",
+        "NL", "NO", "NP", "NR", "NV", "NZ", "OC", "OE", "PC", "R0", "RC", "RS", "SA", "SC", "SE", "SF", "SG",
+        "SI", "SL", "SO", "SP", "SR", "SZ", "ZC",
+    ].map { Array($0.unicodeScalars) }
     static let p1: [[Unicode.Scalar]] = []
     static let p2: [[Unicode.Scalar]] = ["AT"].map { Array($0.unicodeScalars) }
     static let p3: [[Unicode.Scalar]] = ["BE"].map { Array($0.unicodeScalars) }
@@ -127,7 +131,12 @@ enum GeneratedLiterals {
     static let w21: [Int64] = [70, 50, 30, 20, 10, 70, 50, 30, 20]
     static let w22: [Int64] = [3, 7, 1, 3, 7, 1, 3, 7]
     static let w23: [Int64] = [0, 9, 8, 7, 6, 5, 4, 3, 2, 1]
-    static let w24: [Int64] = [12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40, 43, 46, 49, 52, 55, 58, 61, 64, 67, 70, 73, 76, 79, 82, 85, 88, 91, 94, 0, 3, 6, 9]
+    static let w24: [Int64] = [
+        12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84,
+        87, 90, 93, 96, 2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 50, 53, 56, 59, 62, 65,
+        68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40, 43, 46,
+        49, 52, 55, 58, 61, 64, 67, 70, 73, 76, 79, 82, 85, 88, 91, 94, 0, 3, 6, 9,
+    ]
     static let w25: [Int64] = [8, 7, 6, 5, 4, 3, 2, 10, 1]
     static let w26: [Int64] = [256, 128, 64, 32, 16, 8, 4, 2]
     static let w27: [Int64] = [9, 7, 3, 1, 9, 7, 3]

@@ -15,7 +15,13 @@ enum GeneratedRuleset {
     static let capabilities: [Int] = [1, 2, 3, 4, 5, 10, 11, 20, 21, 30, 31, 32, 33, 34, 35, 40, 41, 42]
     static let identifierCount = 94
     static let countryCount = 37
-    static let canonicalKinds: [IdentifierKind] = ["cegjegyzekszam", "cnpj", "codice_fiscale_impresa", "company_number", "corporate_number", "cro_number", "cui", "cvr", "duns", "eik", "ein", "enterprise_number", "eori", "euid", "firmenbuchnummer", "gemi", "handelsregisternummer", "he_number", "ico", "juridinio_asmens_kodas", "krs", "kvk", "lei", "maticna_stevilka", "mbr_number", "mbs", "nif", "nipc", "organisationsnummer", "rcs_number", "registracijas_numurs", "registrikood", "siren", "siret", "uscc", "vat", "y_tunnus"]
+    static let canonicalKinds: [IdentifierKind] = [
+        "cegjegyzekszam", "cnpj", "codice_fiscale_impresa", "company_number", "corporate_number",
+        "cro_number", "cui", "cvr", "duns", "eik", "ein", "enterprise_number", "eori", "euid",
+        "firmenbuchnummer", "gemi", "handelsregisternummer", "he_number", "ico", "juridinio_asmens_kodas",
+        "krs", "kvk", "lei", "maticna_stevilka", "mbr_number", "mbs", "nif", "nipc", "organisationsnummer",
+        "rcs_number", "registracijas_numurs", "registrikood", "siren", "siret", "uscc", "vat", "y_tunnus",
+    ]
 
     static let expansionProfile = "250 programs, 3069 instances, worst program 152 at 118"
 
@@ -26,7 +32,8 @@ enum GeneratedRuleset {
         case "cegjegyzekszam", "hu_cegjegyzekszam": 0
         case "cnpj", "br_cnpj": 1
         case "codice_fiscale_impresa", "it_codice_fiscale_impresa": 2
-        case "company_number", "company_registration_number", "crn", "gb_company_number", "uk_company_number": 3
+        case "company_number", "company_registration_number", "crn", "gb_company_number", "uk_company_number":
+            3
         case "corporate_number", "hojin_bango", "houjin_bangou", "jp_corporate_number": 4
         case "cro_number", "ie_cro_number": 5
         case "cui", "cif", "ro_cui": 6
@@ -109,7 +116,8 @@ enum GeneratedRuleset {
 
     /// Step 4: the pre-canonicalization program runs once on the raw value,
     /// before any country decision.
-    static func preCanonicalize(_ dispatcher: Int, _ v: inout [Unicode.Scalar], _ profile: ValidationProfile) {
+    static func preCanonicalize(_ dispatcher: Int, _ v: inout [Unicode.Scalar], _ profile: ValidationProfile)
+    {
         let c = CanonicalizationContext(profile: profile)
         switch dispatcher {
         case 0: GeneratedPrograms.canon9(&v, c)

@@ -1,5 +1,4 @@
 import BusinessIDGenerator
-import CryptoKit
 import Foundation
 
 /// `rules.lock`, the only point of coupling between this engine and the
@@ -41,9 +40,7 @@ struct RulesLock {
         guard let expected = digests["rules_sha256"], !expected.isEmpty else {
             throw Generate.GeneratorFailure(message: "rules.lock states no rules_sha256")
         }
-        let actual = SHA256.hash(data: Data(bytes))
-            .map { String(format: "%02x", $0) }
-            .joined()
+        let actual = SHA256.hexDigest(bytes)
         guard actual == expected else {
             throw Generate.GeneratorFailure(
                 message: "bundle digest \(actual) does not match the locked \(expected)"
