@@ -1,0 +1,10 @@
+# Generated code is committed so that building this package needs no network
+# and no access to the specification repository. Marking it keeps a rules
+# update from drowning a review in eleven thousand lines nobody wrote by hand;
+# the diff is still there for anyone who asks for it.
+Sources/BusinessID/Generated/** linguist-generated=true
+Sources/BusinessIDWire/Generated/** linguist-generated=true
+
+# The attested artefacts. They are inputs, never edited here.
+spec/*.binpb binary
+spec/*.jsonl -diff

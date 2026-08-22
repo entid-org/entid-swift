@@ -52,6 +52,18 @@ format-check: ## Fail on a formatting difference
 lint: ## Run SwiftLint strictly
 	swiftlint lint --strict --quiet
 
+.PHONY: ios
+ios: ## Run the suite on an iOS simulator, as CI does
+	@DESTINATION=$$(xcrun simctl list devices available --json \
+		| python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; \
+			print(next(x['udid'] for k,v in d.items() if 'iOS' in k for x in v))"); \
+	xcodebuild test -scheme BusinessID-Package -destination "id=$$DESTINATION" \
+		-only-testing:BusinessIDTests -only-testing:BusinessIDConformanceTests -quiet
+
+.PHONY: mutation
+mutation: ## Apply each targeted mutant and require a test to fail
+	./Tools/mutation.sh
+
 .PHONY: coverage
 coverage: ## Measure line coverage against its gates
 	./Tools/coverage.sh

@@ -41,30 +41,41 @@ jobs:
           swiftlint lint --strict --quiet
 
   macos:
-    name: macOS (Swift ${{ matrix.swift }})
+    name: macOS, current toolchain
     runs-on: macos-15
-    strategy:
-      fail-fast: false
-      matrix:
-        # The minimum this package supports and the current release. The
-        # generated code has to compile under both.
-        swift: ["6.0", "latest-stable"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
-          xcode-version: ${{ matrix.swift == '6.0' && '16.0' || 'latest-stable' }}
+          xcode-version: latest-stable
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .build
-          key: ${{ runner.os }}-spm-${{ matrix.swift }}-${{ hashFiles('Package.resolved', 'Package.swift') }}
-          restore-keys: ${{ runner.os }}-spm-${{ matrix.swift }}-
+          key: ${{ runner.os }}-spm-current-${{ hashFiles('Package.resolved', 'Package.swift') }}
+          restore-keys: ${{ runner.os }}-spm-current-
       - name: Build debug
         run: swift build
       - name: Build release
         run: swift build -c release
       - name: Test
         run: swift test
+
+  minimum-toolchain:
+    name: macOS, minimum toolchain (Swift 6.1)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The version the manifest declares, named explicitly rather than
+      # inferred from an Xcode release: the two move independently, and the
+      # README states what CI actually ran.
+      - uses: swift-actions/setup-swift@7ca6abe6b3b0e8b5421b88be48feee39cbf52c6a # v2.4.0
+        with:
+          swift-version: "6.1"
+      - name: Build and test
+        run: |
+          swift --version
+          swift build
+          swift test
 
   conformance:
     name: Conformance (665 cases)
@@ -130,22 +141,19 @@ jobs:
           xcode-version: latest-stable
       # The shipped library avoids UIKit and AppKit entirely, and the point of
       # this job is to keep it that way.
+      # The whole conformance corpus runs here too, in process. What a
+      # simulator cannot do is drive the testee as a subprocess, and that suite
+      # is compiled out rather than skipped at runtime.
       - name: Build and test on a simulator
         run: |
           DESTINATION=$(xcrun simctl list devices available --json \
             | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; \
                 print(next(x['udid'] for k,v in d.items() if 'iOS' in k for x in v))")
           xcodebuild test \
-            -scheme BusinessID \
+            -scheme BusinessID-Package \
             -destination "id=$DESTINATION" \
-            -skipPackagePluginValidation \
             -only-testing:BusinessIDTests \
-            | xcbeautify --renderer github-actions || \
-          xcodebuild test \
-            -scheme BusinessID \
-            -destination "id=$DESTINATION" \
-            -skipPackagePluginValidation \
-            -only-testing:BusinessIDTests
+            -only-testing:BusinessIDConformanceTests
 
   consumer:
     name: A consumer package can depend on this one

@@ -1,3 +1,9 @@
+// The testee is driven as a subprocess, which only the host platform can do.
+// The rest of the corpus runs in process and does run on a simulator, so the
+// engine itself is still exercised there — what is skipped is the framing, not
+// a conformance case.
+#if os(macOS)
+
 package import BusinessIDWire
 import Foundation
 import Testing
@@ -164,3 +170,5 @@ struct WireProtocolTests {
         #expect(outcome.executed == 665)
     }
 }
+
+#endif
