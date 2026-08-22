@@ -1,3 +1,4 @@
+import BusinessID
 package import BusinessIDWire
 import Foundation
 import Testing
@@ -27,14 +28,17 @@ struct ConformanceTests {
     @Test("The whole corpus passes")
     func wholeCorpus() throws {
         let runner = try ConformanceRunner(corpusPath: Self.corpusPath())
-        #expect(runner.corpus.rulesVersion == "2026.08.17")
-        #expect(runner.corpus.cases.count == 665)
+        // The corpus and the rules it was reviewed against carry the same
+        // business version; comparing them beats repeating a literal, which
+        // would go stale in one place and not the other.
+        #expect(runner.corpus.rulesVersion == BusinessIDEngine.default.rulesVersion)
+        #expect(runner.corpus.cases.count == 666)
 
         let outcome = try runner.run()
         for divergence in outcome.divergences.prefix(20) {
             Issue.record(Comment(rawValue: divergence.summary))
         }
-        #expect(outcome.executed == 665)
+        #expect(outcome.executed == 666)
         #expect(outcome.divergences.isEmpty)
     }
 
@@ -47,7 +51,7 @@ struct ConformanceTests {
         #expect(counts[.validate] == 614)
         #expect(counts[.validateFormat] == 3)
         #expect(counts[.validateChecksum] == 1)
-        #expect(counts[.loadRuleset] == 34)
+        #expect(counts[.loadRuleset] == 35)
     }
 
     /// A runner that reported no divergence because it compared nothing would
@@ -121,7 +125,7 @@ struct ConformanceTests {
         func desynchronized() throws {
             let divergences = try runMutated { response in response.caseID = "another-case" }
             #expect(divergences.allSatisfy { $0.field == "case_id" })
-            #expect(divergences.count == 665)
+            #expect(divergences.count == 666)
         }
     }
 }

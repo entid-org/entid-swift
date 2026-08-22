@@ -167,7 +167,7 @@ struct WireProtocolTests {
             Issue.record(Comment(rawValue: divergence.summary))
         }
         #expect(outcome.divergences.isEmpty)
-        #expect(outcome.executed == 665)
+        #expect(outcome.executed == 666)
     }
 }
 

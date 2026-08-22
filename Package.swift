@@ -125,7 +125,7 @@ let package = Package(
         ),
         .testTarget(
             name: "BusinessIDConformanceTests",
-            dependencies: ["BusinessIDConformance"],
+            dependencies: ["BusinessID", "BusinessIDConformance"],
             swiftSettings: strictSwiftSettings
         ),
     ]

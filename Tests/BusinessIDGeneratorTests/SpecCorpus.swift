@@ -42,3 +42,25 @@ enum SpecCorpus {
         try conformance().cases.filter { $0.operation == .loadRuleset }
     }
 }
+
+/// What `rules.lock` names, read rather than repeated.
+///
+/// A rules update touches one file. A test that repeated the version would go
+/// stale in one place and not another, and the mismatch would look like a
+/// defect of the engine.
+enum RulesLockFixture {
+    static let rulesVersion: String = field("rules_version") ?? ""
+
+    static func field(_ name: String) -> String? {
+        guard
+            let text = try? String(
+                contentsOf: SpecCorpus.root.appending(path: "rules.lock"), encoding: .utf8
+            )
+        else { return nil }
+        return
+            text
+            .split(separator: "\n")
+            .first { $0.hasPrefix("\(name) = ") }
+            .map { String($0.split(separator: "\"")[1]) }
+    }
+}

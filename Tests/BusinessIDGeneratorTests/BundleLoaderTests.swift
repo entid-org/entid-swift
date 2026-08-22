@@ -9,7 +9,7 @@ struct BundleLoaderTests {
     func publishedBundleLoads() throws {
         let bundle = try RuleBundleLoader.load(try SpecCorpus.rulesBundle())
         #expect(bundle.formatVersion == 1)
-        #expect(bundle.rulesVersion == "2026.08.17")
+        #expect(bundle.rulesVersion == RulesLockFixture.rulesVersion)
         #expect(
             bundle.requiredFeatures == [1, 2, 3, 4, 5, 10, 11, 20, 21, 30, 31, 32, 33, 34, 35, 40, 41, 42])
         #expect(bundle.sourceDigest.count == 32)
@@ -32,7 +32,7 @@ struct BundleLoaderTests {
     @Test("Every hostile bundle of the corpus is refused with the stated error")
     func hostileBundlesAreRefused() throws {
         let cases = try SpecCorpus.loaderCases()
-        #expect(cases.count == 34)
+        #expect(cases.count == 35)
 
         for testCase in cases {
             let observed: String

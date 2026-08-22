@@ -20,7 +20,10 @@ struct EngineTests {
 
     @Test("The engine reports the versions it was built from")
     func versions() {
-        #expect(engine.rulesVersion == "2026.08.17")
+        // The version itself is asserted against rules.lock in the packaging
+        // suite; here what matters is that it is well formed and non empty.
+        #expect(!engine.rulesVersion.isEmpty)
+        #expect(engine.rulesVersion.split(separator: ".").count == 3)
         #expect(engine.formatVersion == 1)
         #expect(engine.engineVersion == BusinessID.engineVersion)
 

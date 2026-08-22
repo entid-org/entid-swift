@@ -9,6 +9,24 @@ rules update that changes no API is a patch release here.
 
 ## [Unreleased]
 
+### Changed
+
+- Rules `2026.08.17` → `2026.08.18`. The bundle changed in one field, its
+  business version; no rule moved, and the regenerated code differs by the
+  single line that carries it.
+- `ir.md` settles two defects this engine reported. Check 15 now carries the
+  clause on a subject node built from the subject it defines, worded as this
+  engine already implemented it, and section 2 states that check 14 may run
+  after check 15. Neither changed an answer here.
+
+### Added
+
+- The corpus reaches 666 cases, 35 of them addressed to the generator, all
+  passing.
+- `SubjectNodeTests` isolates check 15's new clause from the capability its
+  fixture also omits, and covers an indirect circularity the fixture does not
+  reach. See `SPEC-ISSUES.md` open issue 1.
+
 ## [0.1.0]
 
 First engine. Rules `2026.08.17`, IR format version `1`.

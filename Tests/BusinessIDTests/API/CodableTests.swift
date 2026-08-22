@@ -62,7 +62,7 @@ struct CodableTests {
         #expect(expected.isSubset(of: Set(object.keys)))
         #expect(object["kind"] as? String == "siren")
         #expect(object["profile"] as? String == "compatible")
-        #expect(object["rulesVersion"] as? String == "2026.08.17")
+        #expect(object["rulesVersion"] as? String == BusinessIDEngine.default.rulesVersion)
     }
 
     @Test("An absent country and an absent message key are omitted, not empty")

@@ -106,6 +106,13 @@ the code, the commits and the documentation. Explain in the body what the change
 makes possible or prevents, not which files it touched — the diff already says
 that.
 
+**An artefact update is its own commit.** A change under `spec/` or to
+`rules.lock`, with the regeneration it implies, goes in a `chore(rules):` commit
+and nothing else goes in with it. This is not tidiness: a `git add -A` once swept
+a specification update into a commit whose message described a loader, and the
+change to the normative documents became invisible to anyone reading the log.
+Check `git status` before staging when `spec/` is in the tree.
+
 ## Releasing
 
 A release is a SemVer tag. `rulesVersion` is independent: a rules update that

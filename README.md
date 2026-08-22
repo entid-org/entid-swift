@@ -16,8 +16,8 @@ report.format.status     // .valid
 report.checksum.status   // .valid
 ```
 
-Rules version `2026.08.17`: **94 definitions across 37 countries**, 37 identifier
-kinds, and the full shared conformance corpus of **665 cases** passing.
+Rules version `2026.08.18`: **94 definitions across 37 countries**, 37 identifier
+kinds, and the full shared conformance corpus of **666 cases** passing.
 
 ## What this answers, and what it does not
 
@@ -188,12 +188,13 @@ this package provides a **testee**: a small executable that translates a request
 into a call of the public API and a result into a response.
 
 ```sh
-make conformance   # 665/665, zero divergences
+make conformance   # 666/666, zero divergences
 ```
 
-The thirty four `load_ruleset` cases address the generator rather than the
-engine: a truncated bundle or one carrying a call cycle must make generation
-fail. The rest address the engine over the wire protocol.
+The thirty five `load_ruleset` cases address the generator rather than the
+engine: a truncated bundle, one carrying a call cycle, or one whose subject node
+is built from the subject it defines must make generation fail. The rest address
+the engine over the wire protocol.
 
 ## Verifying the rules you got
 
