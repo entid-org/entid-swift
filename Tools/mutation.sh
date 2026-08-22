@@ -9,6 +9,28 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
+# A mutant left applied is worse than no mutation testing: the next build tests
+# a source nobody wrote. Interrupting the script — Ctrl-C, a timeout, a killed
+# terminal — used to leave one behind, so restoration is a trap rather than the
+# last line of the loop.
+restore() {
+  local leftover
+  while IFS= read -r leftover; do
+    [ -n "$leftover" ] || continue
+    mv -f "$leftover" "${leftover%.original}"
+    echo "restored ${leftover%.original}" >&2
+  done < <(find Sources Tests -name '*.original' 2>/dev/null)
+}
+trap restore EXIT INT TERM
+
+# Refuse to start on a dirty tree: the restoration below overwrites files, and
+# it must never overwrite work someone had not committed.
+if ! git diff --quiet -- Sources Tests 2>/dev/null; then
+  echo "Sources or Tests carry uncommitted changes; commit or stash them first" >&2
+  exit 2
+fi
+restore
+
 # Each mutant must change an answer. A mutant that cannot — padding by zero, a
 # bound moved where no value can land — is not evidence about the tests, so it
 # is not listed here: it would survive forever and say nothing.
@@ -66,7 +88,7 @@ PY
     echo "  killed   $file :: $from -> $to"
     killed=$((killed + 1))
   fi
-  mv "$file.original" "$file"
+  mv -f "$file.original" "$file"
 done
 
 total=$((killed + survived))
