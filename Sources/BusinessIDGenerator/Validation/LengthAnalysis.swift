@@ -46,7 +46,8 @@ enum LengthAnalysis {
                     case .customAlphabet: Int64((alphabet?.count ?? 1) - 1)
                     }
                 let largestWeight = weights.map { abs($0) }.max() ?? 0
-                let (perPosition, firstOverflow) = largestMapped.multipliedReportingOverflow(by: largestWeight)
+                let (perPosition, firstOverflow) = largestMapped.multipliedReportingOverflow(
+                    by: largestWeight)
                 let (total, secondOverflow) = perPosition.multipliedReportingOverflow(by: Int64(positions))
                 guard !firstOverflow, !secondOverflow, total >= 0 else {
                     throw reject("weighted_sum cannot be proved free of overflow")

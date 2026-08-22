@@ -1,6 +1,5 @@
-package import BusinessIDWire
-
 internal import BusinessIDTestee
+package import BusinessIDWire
 
 /// Re-exports the testee entry point for the runner's own tests.
 ///

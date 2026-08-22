@@ -35,9 +35,10 @@ struct PropertyTests {
     /// Code points chosen to reach the awkward parts: the frozen whitespace
     /// table, combining marks, an astral plane scalar, right-to-left marks and
     /// the separators canonicalization removes.
-    static let alphabet: [Unicode.Scalar] = Array(
-        "0123456789ABCDEFabcdef -./_".unicodeScalars
-    ) + ["\u{00A0}", "\u{FEFF}", "\u{3000}", "\u{0301}", "\u{200B}", "\u{202F}", "\u{200F}", "\u{1F600}"]
+    static let alphabet: [Unicode.Scalar] =
+        Array(
+            "0123456789ABCDEFabcdef -./_".unicodeScalars
+        ) + ["\u{00A0}", "\u{FEFF}", "\u{3000}", "\u{0301}", "\u{200B}", "\u{202F}", "\u{200F}", "\u{1F600}"]
 
     private func randomValue(_ rng: inout Rng) -> String {
         var scalars = String.UnicodeScalarView()
@@ -149,8 +150,10 @@ struct PropertyTests {
                     )
                 case .invalid:
                     #expect(
-                        [.empty, .invalidLength, .invalidCharacters, .invalidFormat, .invalidChecksum,
-                            .countryMismatch].contains(step.reasonCode)
+                        [
+                            .empty, .invalidLength, .invalidCharacters, .invalidFormat, .invalidChecksum,
+                            .countryMismatch,
+                        ].contains(step.reasonCode)
                     )
                 case .unsupported:
                     #expect(step.reasonCode != .ok)

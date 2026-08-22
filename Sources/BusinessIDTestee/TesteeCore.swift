@@ -1,7 +1,7 @@
-package import BusinessID
+internal import BusinessID
+internal import BusinessIDGenerator
 package import BusinessIDWire
 
-internal import BusinessIDGenerator
 internal import struct Foundation.Data
 
 /// Translates one conformance request into one call of the public API, and the

@@ -108,7 +108,8 @@ struct Generate {
 
         print("businessid-gen: rules \(bundle.rulesVersion), format \(bundle.formatVersion)")
         print("businessid-gen: \(bundle.definitions.count) definitions, \(bundle.dispatchers.count) kinds")
-        print("businessid-gen: capabilities \(bundle.requiredFeatures.map(String.init).joined(separator: " "))")
+        print(
+            "businessid-gen: capabilities \(bundle.requiredFeatures.map(String.init).joined(separator: " "))")
         print("businessid-gen: expansion \(bundle.expansion.summary)")
         print("businessid-gen: wrote \(files.map(\.name).joined(separator: ", ")) to \(outputPath)")
     }

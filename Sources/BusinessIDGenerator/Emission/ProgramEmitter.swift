@@ -196,7 +196,8 @@ struct ProgramEmitter {
         case .complement(let modulus):
             return "IntegerOps.complement(\(operand), modulus: \(modulus))"
         case .remainderMap(let values):
-            return "IntegerOps.remainderMap(\(operand), values: GeneratedLiterals.\(literals.name(integers: values)))"
+            let table = literals.name(integers: values)
+            return "IntegerOps.remainderMap(\(operand), values: GeneratedLiterals.\(table))"
         case .weightedSum(let weights, let alignment, let mapping, let alphabet):
             let alignmentCase =
                 switch alignment {

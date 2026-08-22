@@ -1,9 +1,8 @@
+package import BusinessIDWire
 import Foundation
 import Testing
 
 @testable import BusinessIDConformance
-
-package import BusinessIDWire
 
 /// The shared corpus, run in full.
 ///

@@ -1,6 +1,5 @@
-import Foundation
-
 package import BusinessIDWire
+import Foundation
 
 /// Reads the normative artefacts shipped under `spec/`.
 ///

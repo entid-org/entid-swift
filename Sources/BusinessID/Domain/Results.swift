@@ -50,8 +50,11 @@ public enum ReasonCode: String, Sendable, Hashable, Codable, CaseIterable {
 
 /// One validation level as the engine resolved it.
 public struct StepResult: Sendable, Hashable, Codable {
+    /// Which step this result belongs to.
     public let level: ValidationLevel
+    /// How the step concluded.
     public let status: StepStatus
+    /// Why it concluded that way.
     public let reasonCode: ReasonCode
     /// The key the rule carries, for a localized message the engine does not
     /// itself provide.
@@ -62,6 +65,7 @@ public struct StepResult: Sendable, Hashable, Codable {
     /// including when it declares none.
     public let messageKey: String?
 
+    /// Creates a step result.
     public init(
         level: ValidationLevel,
         status: StepStatus,
@@ -81,18 +85,31 @@ public struct StepResult: Sendable, Hashable, Codable {
 /// valid with a checksum that is unsupported is neither fully validated nor
 /// invalid. The named properties below say which question they answer.
 public struct ValidationReport: Sendable, Hashable, Codable {
+    /// The canonical kind once a dispatcher resolved, otherwise the token
+    /// the caller asked for, trimmed and lower cased.
     public let kind: IdentifierKind
     /// The raw string the caller supplied, unchanged.
     public let inputValue: String
+    /// The value after canonicalization, or the value canonicalization had
+    /// reached when it stopped.
     public let canonicalValue: String
+    /// The country of the selected target, or the normalized context when no
+    /// target was selected. A GLOBAL target keeps the context here.
     public let countryCode: String?
+    /// The profile that actually applied.
     public let profile: ValidationProfile
+    /// Business version of the rules that produced this result.
     public let rulesVersion: String
+    /// Structural version of the IR they were compiled from.
     public let formatVersion: Int
+    /// Version of this package. It is never compared between engines.
     public let engineVersion: String
+    /// The format step.
     public let format: StepResult
+    /// The checksum step.
     public let checksum: StepResult
 
+    /// Creates a report.
     public init(
         kind: IdentifierKind,
         inputValue: String,
@@ -137,18 +154,33 @@ public struct ValidationReport: Sendable, Hashable, Codable {
 /// value, proved a contradiction between an explicit country and a recognised
 /// prefix, or could not conclude.
 public struct CanonicalizationResult: Sendable, Hashable, Codable {
+    /// The canonical kind once a dispatcher resolved, otherwise the token
+    /// the caller asked for, trimmed and lower cased.
     public let kind: IdentifierKind
+    /// The raw string the caller supplied, unchanged.
     public let inputValue: String
+    /// The value after canonicalization, or the value canonicalization had
+    /// reached when it stopped.
     public let canonicalValue: String
+    /// The country of the selected target, or the normalized context when no
+    /// target was selected. A GLOBAL target keeps the context here.
     public let countryCode: String?
+    /// The profile that actually applied.
     public let profile: ValidationProfile
+    /// Business version of the rules that produced this result.
     public let rulesVersion: String
+    /// Structural version of the IR they were compiled from.
     public let formatVersion: Int
+    /// Version of this package. It is never compared between engines.
     public let engineVersion: String
+    /// How canonicalization concluded. Never `notRun`.
     public let status: StepStatus
+    /// Why it concluded that way.
     public let reasonCode: ReasonCode
+    /// The key the rule carries, absent before any rule assertion.
     public let messageKey: String?
 
+    /// Creates a canonicalization result.
     public init(
         kind: IdentifierKind,
         inputValue: String,
@@ -175,19 +207,26 @@ public struct CanonicalizationResult: Sendable, Hashable, Codable {
         self.messageKey = messageKey
     }
 
+    /// A definition was selected and both canonicalization phases ran.
     public var isSucceeded: Bool { status == .valid }
 }
 
 /// What a caller wants validated.
 public struct IdentifierInput: Sendable, Hashable, Codable {
+    /// The canonical kind once a dispatcher resolved, otherwise the token
+    /// the caller asked for, trimmed and lower cased.
+    /// Which family of identifier this is.
     public let kind: IdentifierKind
     /// Kept exactly as supplied. The engine never modifies it in place.
     public let value: String
     /// Optional context. When supplied, the ruleset's country canonicalization
     /// applies to it. A proved conflict between this and a recognised prefix
     /// produces `countryMismatch`.
+    /// The country of the selected target, or the normalized context when no
+    /// target was selected. A GLOBAL target keeps the context here.
     public let countryCode: String?
 
+    /// Creates an input.
     public init(kind: IdentifierKind, value: String, countryCode: String? = nil) {
         self.kind = kind
         self.value = value

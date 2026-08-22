@@ -78,7 +78,9 @@ struct ExpansionTests {
             IRNode(outputType: .string, inputs: [0], operation: .string(.sliceFrom(start: 1))),
             IRNode(outputType: .string, inputs: [1], operation: .string(.sliceFrom(start: 1))),
             IRNode(outputType: .boolean, inputs: [], operation: .predicate(.all)),
-            IRNode(outputType: .assertion, inputs: [3], operation: .assertion(.require(reason: .empty, messageKey: nil))),
+            IRNode(
+                outputType: .assertion, inputs: [3],
+                operation: .assertion(.require(reason: .empty, messageKey: nil))),
             IRNode(outputType: .assertion, inputs: [4], operation: .assertion(.sequence)),
         ]
         let program = IRProgram(

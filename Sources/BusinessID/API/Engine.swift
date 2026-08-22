@@ -24,6 +24,8 @@ public struct BusinessIDEngine: Sendable {
     /// exists so callers need not thread one through their own types.
     public static let `default` = BusinessIDEngine()
 
+    /// Creates an engine. It costs nothing: the rules are compiled into this
+    /// package, and an engine holds no state of its own.
     public init() {}
 
     // MARK: - Versions and capabilities

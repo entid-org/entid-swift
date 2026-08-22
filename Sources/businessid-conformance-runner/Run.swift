@@ -20,7 +20,8 @@ struct Run {
                 print(divergence.summary)
             }
             let passed = outcome.executed - Set(outcome.divergences.map(\.caseID)).count
-            print("conformance: \(passed)/\(outcome.executed) cases, \(outcome.divergences.count) divergences")
+            print(
+                "conformance: \(passed)/\(outcome.executed) cases, \(outcome.divergences.count) divergences")
             exit(outcome.isConformant ? 0 : 1)
         } catch {
             FileHandle.standardError.write(Data("conformance runner: \(error)\n".utf8))

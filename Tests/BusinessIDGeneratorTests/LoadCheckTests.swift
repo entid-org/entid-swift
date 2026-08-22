@@ -1,8 +1,9 @@
+package import BusinessIDWire
 import Testing
 
-@testable import BusinessIDGenerator
+import struct Foundation.Data
 
-package import BusinessIDWire
+@testable import BusinessIDGenerator
 
 /// One property per case, on the smallest ruleset that carries it.
 ///
@@ -11,7 +12,9 @@ package import BusinessIDWire
 /// single mutation is what the test is about.
 @Suite("Load checks")
 struct LoadCheckTests {
-    private func load(_ mutate: (inout BundleBuilder.Bundle) -> Void = { _ in }) throws -> Result<
+    private func load(
+        _ mutate: (inout BundleBuilder.Bundle) -> Void = { _ in }
+    ) throws -> Result<
         LoadedBundle, LoadError
     > {
         var bundle = BundleBuilder.minimal()
@@ -418,5 +421,3 @@ struct LoadCheckTests {
         #expect(throws: LoadError.self) { try RuleBundleLoader.load(bytes) }
     }
 }
-
-import struct Foundation.Data

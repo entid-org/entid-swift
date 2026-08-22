@@ -1,6 +1,6 @@
+internal import BusinessIDTestee
 package import BusinessIDWire
 
-internal import BusinessIDTestee
 internal import struct Foundation.Data
 internal import class Foundation.FileManager
 
@@ -60,8 +60,8 @@ package struct ConformanceRunner {
     /// Runs every case. A partial run, a skipped category or a case declared
     /// not applicable is not conformance.
     package func run(
-        transport: (Libbusinessid_Testee_V1_TesteeRequest) throws -> Libbusinessid_Testee_V1_TesteeResponse
-            = { TesteeCore.respond(to: $0) }
+        transport: (Libbusinessid_Testee_V1_TesteeRequest) throws -> Libbusinessid_Testee_V1_TesteeResponse =
+            { TesteeCore.respond(to: $0) }
     ) rethrows -> Outcome {
         var divergences: [Divergence] = []
         for testCase in corpus.cases {

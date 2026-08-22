@@ -89,7 +89,8 @@ package struct SwiftEmitter {
         out.line("static let rulesVersion = \(SwiftSource.quote(bundle.rulesVersion))")
         out.line("static let formatVersion = \(bundle.formatVersion)")
         out.line(
-            "static let capabilities: [Int] = [\(bundle.requiredFeatures.map(String.init).joined(separator: ", "))]"
+            "static let capabilities: [Int] = "
+                + "[\(bundle.requiredFeatures.map(String.init).joined(separator: ", "))]"
         )
         out.line("static let identifierCount = \(bundle.definitions.count)")
         out.line("static let countryCount = \(Set(bundle.definitions.compactMap(\.countryCode)).count)")
@@ -110,7 +111,8 @@ package struct SwiftEmitter {
         renderTargetCountry(into: &out, targets: targets, literals: &literals)
         renderDefinitionOfTarget(into: &out, targets: targets, definitionIndex: definitionIndex)
         renderDefaultProfile(into: &out)
-        renderCanonicalize(into: &out, targets: targets, definitionIndex: definitionIndex, literals: &literals)
+        renderCanonicalize(
+            into: &out, targets: targets, definitionIndex: definitionIndex, literals: &literals)
         renderFormat(into: &out)
         renderChecksum(into: &out)
 
@@ -204,7 +206,7 @@ package struct SwiftEmitter {
         out.line("static func countryTarget(_ dispatcher: Int, _ country: String) -> Int? {")
         out.push()
         out.line("switch dispatcher {")
-        for (index, _) in bundle.dispatchers.enumerated() {
+        for index in bundle.dispatchers.indices {
             let owned = targets.enumerated().filter { $0.element.dispatcher == index }
             let countries = owned.compactMap { entry -> (Int, String)? in
                 entry.element.target.countryCode.map { (entry.offset, $0) }
@@ -244,6 +246,14 @@ package struct SwiftEmitter {
         out.line()
     }
 
+    /// One accepted prefix and the target claiming it, ordered by descending
+    /// length so that the first match is the longest one.
+    private struct PrefixEntry {
+        let prefix: String
+        let target: Int
+        var length: Int { prefix.unicodeScalars.count }
+    }
+
     private func renderPrefixTargets(
         into out: inout SwiftSource,
         targets: [(dispatcher: Int, target: DispatchTarget)],
@@ -255,11 +265,11 @@ package struct SwiftEmitter {
         out.line("static func prefixTarget(_ dispatcher: Int, _ v: [Unicode.Scalar]) -> Int? {")
         out.push()
         out.line("switch dispatcher {")
-        for (index, _) in bundle.dispatchers.enumerated() {
-            var entries: [(length: Int, prefix: String, target: Int)] = []
+        for index in bundle.dispatchers.indices {
+            var entries: [PrefixEntry] = []
             for (target, entry) in targets.enumerated() where entry.dispatcher == index {
                 for prefix in entry.target.acceptedPrefixes {
-                    entries.append((prefix.unicodeScalars.count, prefix, target))
+                    entries.append(PrefixEntry(prefix: prefix, target: target))
                 }
             }
             guard !entries.isEmpty else { continue }
@@ -295,11 +305,11 @@ package struct SwiftEmitter {
             out.line("static func \(name)(_ dispatcher: Int) -> Int? {")
             out.push()
             out.line("switch dispatcher {")
-            for (index, _) in bundle.dispatchers.enumerated() {
-                let match = targets.enumerated().first {
-                    $0.element.dispatcher == index && predicate($0.element.target)
+            for index in bundle.dispatchers.indices {
+                let match = targets.indices.first {
+                    targets[$0].dispatcher == index && predicate(targets[$0].target)
                 }
-                if let match { out.line("case \(index): \(match.offset)") }
+                if let match { out.line("case \(index): \(match)") }
             }
             out.line("default: nil")
             out.line("}")

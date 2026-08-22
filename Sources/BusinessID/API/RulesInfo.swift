@@ -13,6 +13,7 @@ public struct RulesInfo: Sendable, Hashable, Codable {
     /// The canonical kinds this engine dispatches, sorted.
     public let kinds: [IdentifierKind]
 
+    /// Creates a description of the compiled rules.
     public init(
         rulesVersion: String,
         formatVersion: Int,

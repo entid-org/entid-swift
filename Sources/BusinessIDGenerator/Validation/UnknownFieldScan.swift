@@ -11,43 +11,43 @@ internal import BusinessIDWire
 /// has never heard of; reporting those as unknown fields would call a
 /// legitimate version gap a forged bundle.
 enum UnknownFieldScan {
+    /// The path of the first message carrying an unknown field, or `nil`.
     static func run(_ bundle: Libbusinessid_Ir_V1_RuleBundle) -> String? {
         if !bundle.unknownFields.data.isEmpty { return "RuleBundle" }
 
         for (index, definition) in bundle.identifiers.enumerated() {
-            if !definition.unknownFields.data.isEmpty { return "identifiers[\(index)]" }
-            for (sourceIndex, source) in definition.sources.enumerated() where
-                !source.unknownFields.data.isEmpty
-            {
-                return "identifiers[\(index)].sources[\(sourceIndex)]"
+            let path = "identifiers[\(index)]"
+            if !definition.unknownFields.data.isEmpty { return path }
+            for (sourceIndex, source) in definition.sources.enumerated() {
+                guard source.unknownFields.data.isEmpty else { return "\(path).sources[\(sourceIndex)]" }
             }
         }
 
         for (index, dispatcher) in bundle.dispatchers.enumerated() {
-            if !dispatcher.unknownFields.data.isEmpty { return "dispatchers[\(index)]" }
-            for (aliasIndex, alias) in dispatcher.countryAliases.enumerated() where
-                !alias.unknownFields.data.isEmpty
-            {
-                return "dispatchers[\(index)].country_aliases[\(aliasIndex)]"
+            let path = "dispatchers[\(index)]"
+            if !dispatcher.unknownFields.data.isEmpty { return path }
+            for (aliasIndex, alias) in dispatcher.countryAliases.enumerated() {
+                guard alias.unknownFields.data.isEmpty else {
+                    return "\(path).country_aliases[\(aliasIndex)]"
+                }
             }
-            for (targetIndex, target) in dispatcher.targets.enumerated() where
-                !target.unknownFields.data.isEmpty
-            {
-                return "dispatchers[\(index)].targets[\(targetIndex)]"
+            for (targetIndex, target) in dispatcher.targets.enumerated() {
+                guard target.unknownFields.data.isEmpty else { return "\(path).targets[\(targetIndex)]" }
             }
         }
 
         for (index, program) in bundle.programs.enumerated() {
-            if !program.unknownFields.data.isEmpty { return "programs[\(index)]" }
-            for (captureIndex, capture) in program.captures.enumerated() where
-                !capture.unknownFields.data.isEmpty
-            {
-                return "programs[\(index)].captures[\(captureIndex)]"
+            let path = "programs[\(index)]"
+            if !program.unknownFields.data.isEmpty { return path }
+            for (captureIndex, capture) in program.captures.enumerated() {
+                guard capture.unknownFields.data.isEmpty else {
+                    return "\(path).captures[\(captureIndex)]"
+                }
             }
             for (nodeIndex, node) in program.nodes.enumerated() {
-                if !node.unknownFields.data.isEmpty { return "programs[\(index)].nodes[\(nodeIndex)]" }
-                if let where_ = operationCarriesUnknownField(node.operation) {
-                    return "programs[\(index)].nodes[\(nodeIndex)].\(where_)"
+                if !node.unknownFields.data.isEmpty { return "\(path).nodes[\(nodeIndex)]" }
+                if let field = operationCarriesUnknownField(node.operation) {
+                    return "\(path).nodes[\(nodeIndex)].\(field)"
                 }
             }
         }

@@ -68,7 +68,7 @@ package enum Opcode: String, Sendable, Hashable, CaseIterable {
 
     // Checksum
     case checksumLuhn = "CHECKSUM_OP_KIND_LUHN"
-    case checksumISO7064Mod97_10 = "CHECKSUM_OP_KIND_ISO7064_MOD97_10"
+    case checksumIso7064Mod9710 = "CHECKSUM_OP_KIND_ISO7064_MOD97_10"
     case checksumCompareDigit = "CHECKSUM_OP_KIND_COMPARE_DIGIT"
     case checksumCompareSlice = "CHECKSUM_OP_KIND_COMPARE_SLICE"
     case checksumChoose = "CHECKSUM_OP_KIND_CHOOSE"
@@ -104,29 +104,29 @@ extension Opcode {
     package var outputType: ValueType {
         switch self {
         case .stringConstant, .stringValue, .stringSubject, .stringCountryCode, .stringSlice,
-             .stringSliceFrom, .stringSliceTo, .stringBeforeFirst, .stringAfterFirst,
-             .stringStripPrefix, .stringConcat:
+            .stringSliceFrom, .stringSliceTo, .stringBeforeFirst, .stringAfterFirst,
+            .stringStripPrefix, .stringConcat:
             .string
         case .integerDigitsToInteger, .integerModDigits, .integerWeightedSum, .integerModulo,
-             .integerComplement, .integerRemainderMap:
+            .integerComplement, .integerRemainderMap:
             .integer
         case .predicateIsEmpty, .predicateIsAbsent, .predicateEquals, .predicateLengthEq,
-             .predicateLengthIn, .predicateLengthBetween, .predicateAsciiDigits,
-             .predicateAsciiUpperLetters, .predicateAsciiAlphanumeric, .predicateAsciiCharset,
-             .predicateStartsWith, .predicateEndsWith, .predicatePrefixIn, .predicateCharAtIn,
-             .predicateContains, .predicateAll, .predicateAny, .predicateNot, .predicateProfileIs,
-             .predicateIntegerIs:
+            .predicateLengthIn, .predicateLengthBetween, .predicateAsciiDigits,
+            .predicateAsciiUpperLetters, .predicateAsciiAlphanumeric, .predicateAsciiCharset,
+            .predicateStartsWith, .predicateEndsWith, .predicatePrefixIn, .predicateCharAtIn,
+            .predicateContains, .predicateAll, .predicateAny, .predicateNot, .predicateProfileIs,
+            .predicateIntegerIs:
             .boolean
         case .canonicalSequence, .canonicalTrimWhitespace, .canonicalRemoveWhitespace,
-             .canonicalUppercaseASCII, .canonicalRemoveChars, .canonicalReplacePrefix,
-             .canonicalPrepend, .canonicalAppend, .canonicalInsert, .canonicalLeftPad,
-             .canonicalPrependCountryIfMissing, .canonicalWhen:
+            .canonicalUppercaseASCII, .canonicalRemoveChars, .canonicalReplacePrefix,
+            .canonicalPrepend, .canonicalAppend, .canonicalInsert, .canonicalLeftPad,
+            .canonicalPrependCountryIfMissing, .canonicalWhen:
             .canonicalizationStep
         case .assertionSequence, .assertionRequire, .callFormat:
             .assertion
-        case .checksumLuhn, .checksumISO7064Mod97_10, .checksumCompareDigit, .checksumCompareSlice,
-             .checksumChoose, .checksumWhen, .checksumAllChecks, .checksumAnyCheck,
-             .checksumUnsupported, .checksumCompareConstant, .callChecksum:
+        case .checksumLuhn, .checksumIso7064Mod9710, .checksumCompareDigit, .checksumCompareSlice,
+            .checksumChoose, .checksumWhen, .checksumAllChecks, .checksumAnyCheck,
+            .checksumUnsupported, .checksumCompareConstant, .callChecksum:
             .checksumOutcome
         }
     }
@@ -138,26 +138,26 @@ extension Opcode {
         let unbounded = Limits.maximumNodesPerProgram
         switch self {
         case .stringConstant, .stringValue, .stringSubject, .stringCountryCode,
-             .predicateProfileIs, .checksumUnsupported,
-             .canonicalTrimWhitespace, .canonicalRemoveWhitespace, .canonicalUppercaseASCII,
-             .canonicalRemoveChars, .canonicalReplacePrefix, .canonicalPrepend, .canonicalAppend,
-             .canonicalInsert, .canonicalLeftPad, .canonicalPrependCountryIfMissing:
+            .predicateProfileIs, .checksumUnsupported,
+            .canonicalTrimWhitespace, .canonicalRemoveWhitespace, .canonicalUppercaseASCII,
+            .canonicalRemoveChars, .canonicalReplacePrefix, .canonicalPrepend, .canonicalAppend,
+            .canonicalInsert, .canonicalLeftPad, .canonicalPrependCountryIfMissing:
             return OperandSpec()
 
         case .stringSlice, .stringSliceFrom, .stringSliceTo, .stringBeforeFirst, .stringAfterFirst,
-             .stringStripPrefix, .integerDigitsToInteger, .integerModDigits, .integerWeightedSum,
-             .predicateIsEmpty, .predicateIsAbsent, .predicateLengthEq, .predicateLengthIn,
-             .predicateLengthBetween, .predicateAsciiDigits, .predicateAsciiUpperLetters,
-             .predicateAsciiAlphanumeric, .predicateAsciiCharset, .predicateStartsWith,
-             .predicateEndsWith, .predicatePrefixIn, .predicateCharAtIn, .predicateContains,
-             .checksumLuhn, .checksumISO7064Mod97_10, .callFormat, .callChecksum:
+            .stringStripPrefix, .integerDigitsToInteger, .integerModDigits, .integerWeightedSum,
+            .predicateIsEmpty, .predicateIsAbsent, .predicateLengthEq, .predicateLengthIn,
+            .predicateLengthBetween, .predicateAsciiDigits, .predicateAsciiUpperLetters,
+            .predicateAsciiAlphanumeric, .predicateAsciiCharset, .predicateStartsWith,
+            .predicateEndsWith, .predicatePrefixIn, .predicateCharAtIn, .predicateContains,
+            .checksumLuhn, .checksumIso7064Mod9710, .callFormat, .callChecksum:
             return OperandSpec([.string])
 
         case .stringConcat:
             return OperandSpec(repeating: .string, count: Limits.concatOperandRange)
 
         case .integerModulo, .integerComplement, .integerRemainderMap, .predicateIntegerIs,
-             .checksumCompareConstant:
+            .checksumCompareConstant:
             return OperandSpec([.integer])
 
         case .predicateEquals:
@@ -199,22 +199,22 @@ extension Opcode {
         case .stringCountryCode:
             return [core, Capability.identifierDispatchV1]
         case .stringSlice, .stringSliceFrom, .stringSliceTo, .stringBeforeFirst, .stringAfterFirst,
-             .stringStripPrefix, .stringConcat, .predicateIsAbsent:
+            .stringStripPrefix, .stringConcat, .predicateIsAbsent:
             return [core, Capability.stringViewsV1]
 
         case .integerDigitsToInteger, .integerModDigits, .integerModulo, .integerComplement,
-             .integerRemainderMap:
+            .integerRemainderMap:
             return [core, Capability.checksumTristateV1]
         case .integerWeightedSum:
             return [core, Capability.checksumTristateV1, Capability.checksumWeightedV1]
 
         case .predicateIsEmpty, .predicateEquals, .predicateLengthEq, .predicateLengthIn,
-             .predicateLengthBetween, .predicateStartsWith, .predicateEndsWith, .predicatePrefixIn,
-             .predicateCharAtIn, .predicateContains, .predicateAll, .predicateAny, .predicateNot,
-             .assertionSequence, .assertionRequire:
+            .predicateLengthBetween, .predicateStartsWith, .predicateEndsWith, .predicatePrefixIn,
+            .predicateCharAtIn, .predicateContains, .predicateAll, .predicateAny, .predicateNot,
+            .assertionSequence, .assertionRequire:
             return [core, Capability.formatAssertionsV1]
         case .predicateAsciiDigits, .predicateAsciiUpperLetters, .predicateAsciiAlphanumeric,
-             .predicateAsciiCharset:
+            .predicateAsciiCharset:
             return [core, Capability.asciiAndWhitespaceV1]
         case .predicateProfileIs:
             return [core, Capability.profilesV1]
@@ -222,7 +222,7 @@ extension Opcode {
             return [core, Capability.checksumTristateV1, Capability.checksumIntegerPredicateV1]
 
         case .canonicalSequence, .canonicalRemoveChars, .canonicalReplacePrefix, .canonicalPrepend,
-             .canonicalAppend, .canonicalInsert, .canonicalLeftPad:
+            .canonicalAppend, .canonicalInsert, .canonicalLeftPad:
             return [core, Capability.canonicalizationBasicV1]
         case .canonicalTrimWhitespace, .canonicalRemoveWhitespace, .canonicalUppercaseASCII:
             return [core, Capability.asciiAndWhitespaceV1, Capability.canonicalizationBasicV1]
@@ -232,11 +232,11 @@ extension Opcode {
             return [core, Capability.canonicalizationConditionalV1]
 
         case .checksumCompareDigit, .checksumCompareSlice, .checksumChoose, .checksumWhen,
-             .checksumAllChecks, .checksumAnyCheck, .checksumUnsupported:
+            .checksumAllChecks, .checksumAnyCheck, .checksumUnsupported:
             return [core, Capability.checksumTristateV1]
         case .checksumLuhn:
             return [core, Capability.checksumTristateV1, Capability.checksumLuhnV1]
-        case .checksumISO7064Mod97_10:
+        case .checksumIso7064Mod9710:
             return [core, Capability.checksumTristateV1, Capability.checksumMod97V1]
         case .checksumCompareConstant:
             return [core, Capability.checksumTristateV1, Capability.checksumCompareConstantV1]

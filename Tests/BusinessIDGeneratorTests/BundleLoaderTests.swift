@@ -10,7 +10,8 @@ struct BundleLoaderTests {
         let bundle = try RuleBundleLoader.load(try SpecCorpus.rulesBundle())
         #expect(bundle.formatVersion == 1)
         #expect(bundle.rulesVersion == "2026.08.17")
-        #expect(bundle.requiredFeatures == [1, 2, 3, 4, 5, 10, 11, 20, 21, 30, 31, 32, 33, 34, 35, 40, 41, 42])
+        #expect(
+            bundle.requiredFeatures == [1, 2, 3, 4, 5, 10, 11, 20, 21, 30, 31, 32, 33, 34, 35, 40, 41, 42])
         #expect(bundle.sourceDigest.count == 32)
         #expect(bundle.programs.count == 250)
         #expect(bundle.definitions.count == 94)

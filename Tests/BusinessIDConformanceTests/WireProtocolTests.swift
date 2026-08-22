@@ -1,9 +1,8 @@
+package import BusinessIDWire
 import Foundation
 import Testing
 
 @testable import BusinessIDConformance
-
-package import BusinessIDWire
 
 /// The testee over the real wire, as a subprocess.
 ///
@@ -56,12 +55,13 @@ struct WireProtocolTests {
 
     static func frame(_ payload: [UInt8]) -> Data {
         let length = UInt32(payload.count)
-        return Data([
-            UInt8(truncatingIfNeeded: length),
-            UInt8(truncatingIfNeeded: length >> 8),
-            UInt8(truncatingIfNeeded: length >> 16),
-            UInt8(truncatingIfNeeded: length >> 24),
-        ] + payload)
+        return Data(
+            [
+                UInt8(truncatingIfNeeded: length),
+                UInt8(truncatingIfNeeded: length >> 8),
+                UInt8(truncatingIfNeeded: length >> 16),
+                UInt8(truncatingIfNeeded: length >> 24),
+            ] + payload)
     }
 
     static func unframe(_ data: Data) -> [[UInt8]] {

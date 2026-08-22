@@ -57,7 +57,8 @@ enum CapabilityUsage {
 
         let undeclared = used.subtracting(declared).sorted()
         guard undeclared.isEmpty else {
-            let detail = undeclared
+            let detail =
+                undeclared
                 .map { "\(Capability.name(of: $0)) (used by \(why[$0] ?? "the bundle"))" }
                 .joined(separator: ", ")
             throw .invalidRuleset("capability used without being declared: \(detail)")

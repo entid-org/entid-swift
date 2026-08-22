@@ -168,7 +168,7 @@ package enum ChecksumOp: Sendable, Hashable {
     package var opcode: Opcode {
         switch self {
         case .luhn: .checksumLuhn
-        case .iso7064Mod97Dash10: .checksumISO7064Mod97_10
+        case .iso7064Mod97Dash10: .checksumIso7064Mod9710
         case .compareDigit: .checksumCompareDigit
         case .compareSlice: .checksumCompareSlice
         case .choose: .checksumChoose

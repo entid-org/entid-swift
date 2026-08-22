@@ -29,7 +29,7 @@ let package = Package(
         .executable(name: "businessid-testee", targets: ["businessid-testee"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.38.1"),
+        .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.38.1")
     ],
     targets: [
         // MARK: - Shipped engine

@@ -82,7 +82,7 @@ struct CodableTests {
     @Test("An identifier kind serializes as its bare string")
     func kindIsAString() throws {
         let data = try JSONEncoder().encode(IdentifierKind("siren"))
-        #expect(String(decoding: data, as: UTF8.self) == "\"siren\"")
+        #expect(String(bytes: data, encoding: .utf8) == "\"siren\"")
         #expect(try JSONDecoder().decode(IdentifierKind.self, from: data) == IdentifierKind("siren"))
     }
 

@@ -1,5 +1,7 @@
 package import BusinessIDWire
 
+import struct Foundation.Data
+
 /// Builds a minimal bundle that passes every load check, so that a test can
 /// break exactly one thing and watch the right check refuse it.
 ///
@@ -125,11 +127,11 @@ enum BundleBuilder {
     /// Programs 1 (pre-canonicalization), 2 (canonicalization) and 3 (format);
     /// one GLOBAL definition of kind `test`; one dispatcher routing to it.
     static func minimal() -> Bundle {
-        var bundle = Bundle()
+        var bundle = Libbusinessid_Ir_V1_RuleBundle()
         bundle.formatVersion = 1
         bundle.rulesVersion = "2026.08.17"
         bundle.requiredFeatureIds = [1, 2, 3, 5, 20, 21, 30, 40]
-        bundle.sourceDigest = Data(repeating: 0xAB, count: 32)
+        bundle.sourceDigest = Data([UInt8](repeating: 0xAB, count: 32))
 
         bundle.programs = [
             program(
@@ -191,5 +193,3 @@ enum BundleBuilder {
         try bundle.serializedBytes()
     }
 }
-
-import struct Foundation.Data

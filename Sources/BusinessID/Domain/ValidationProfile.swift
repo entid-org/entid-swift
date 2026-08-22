@@ -23,8 +23,13 @@ public enum ValidationProfile: String, Sendable, Hashable, Codable, CaseIterable
 /// that default unreachable, because the engine could no longer tell a silent
 /// caller from one asking for `compatible`.
 public struct ValidationOptions: Sendable, Hashable {
+    /// Which variants to accept, or `nil` to let the selected definition
+    /// apply its own default.
     public var profile: ValidationProfile?
 
+    /// Creates options. Leaving `profile` at `nil` is not the same as asking
+    /// for ``ValidationProfile/compatible``: it is what lets a definition's own
+    /// default apply.
     public init(profile: ValidationProfile? = nil) {
         self.profile = profile
     }

@@ -88,7 +88,8 @@ struct NodeLowering {
     ) throws(LoadError) {
         let stray = present.subtracting(required).subtracting(optional)
         guard stray.isEmpty else {
-            throw reject("\(opcode.rawValue) carries stray parameter(s) \(stray.sorted().joined(separator: ", "))")
+            throw reject(
+                "\(opcode.rawValue) carries stray parameter(s) \(stray.sorted().joined(separator: ", "))")
         }
         let missing = required.subtracting(present)
         guard missing.isEmpty else {
@@ -525,7 +526,7 @@ struct NodeLowering {
             try requireParameters(.checksumLuhn, present: present, required: [], optional: key)
             return .luhn(messageKey: try checkedMessageKey(payload.hasMessageKey, payload.messageKey))
         case .iso7064Mod9710:
-            try requireParameters(.checksumISO7064Mod97_10, present: present, required: [], optional: key)
+            try requireParameters(.checksumIso7064Mod9710, present: present, required: [], optional: key)
             return .iso7064Mod97Dash10(
                 messageKey: try checkedMessageKey(payload.hasMessageKey, payload.messageKey)
             )
@@ -544,7 +545,8 @@ struct NodeLowering {
             let start = try checkedIndex(payload.start, "start")
             let end = try checkedIndex(payload.end, "end")
             guard Limits.provableDigitsRange.contains(end - start) else {
-                throw reject("compare_slice spans \(end - start) code points, outside \(Limits.provableDigitsRange)")
+                throw reject(
+                    "compare_slice spans \(end - start) code points, outside \(Limits.provableDigitsRange)")
             }
             return .compareSlice(
                 start: start,

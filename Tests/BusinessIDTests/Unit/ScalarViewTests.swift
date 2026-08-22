@@ -92,7 +92,7 @@ struct ScalarViewTests {
     @Test("Concatenation keeps operand order")
     func concatenation() {
         #expect(ScalarView.concatenating([view("FR"), view("09"), view("12")]).string == "FR0912")
-        #expect(ScalarView.concatenating([]).string == "")
+        #expect(ScalarView.concatenating([]).string.isEmpty)
     }
 
     @Test("A view slices its own coordinates, not the base array's")

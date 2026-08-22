@@ -1,4 +1,5 @@
 internal import BusinessIDWire
+
 internal import struct Foundation.Data
 
 /// The twenty five load checks of `ir.md` section 10, in the order they are
@@ -140,7 +141,8 @@ package enum RuleBundleLoader {
             // 9. node count within the per program and total limits.
             guard raw.nodes.count <= Limits.maximumNodesPerProgram else {
                 throw .invalidRuleset(
-                    "program \(raw.id) holds \(raw.nodes.count) nodes, beyond \(Limits.maximumNodesPerProgram)"
+                    "program \(raw.id) holds \(raw.nodes.count) nodes, beyond "
+                        + "\(Limits.maximumNodesPerProgram)"
                 )
             }
             totalNodes += raw.nodes.count

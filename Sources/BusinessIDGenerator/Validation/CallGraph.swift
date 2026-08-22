@@ -27,10 +27,11 @@ enum CallGraph {
                     )
                 }
                 let callee = programs[calleeIndex]
-                let expected: ProgramKind = switch call {
-                case .format: .format
-                case .checksum: .checksum
-                }
+                let expected: ProgramKind =
+                    switch call {
+                    case .format: .format
+                    case .checksum: .checksum
+                    }
                 guard callee.kind == expected else {
                     throw LoadError.invalidRuleset(
                         "program \(programs[index].id) calls program \(callee.id) as a "

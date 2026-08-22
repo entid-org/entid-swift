@@ -20,7 +20,7 @@ enum ChecksumOps {
             total += digit
             doubling.toggle()
         }
-        return total % 10 == 0 ? .valid : .invalid(messageKey)
+        return total.isMultiple(of: 10) ? .valid : .invalid(messageKey)
     }
 
     /// ISO 7064 modulo 97-10. Every ASCII letter expands to its base 36 decimal
