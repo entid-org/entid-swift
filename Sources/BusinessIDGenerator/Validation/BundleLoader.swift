@@ -178,6 +178,18 @@ package enum RuleBundleLoader {
                 guard nodes[index].outputType == .string else {
                     throw .invalidRuleset("program \(raw.id) subject node does not produce a string")
                 }
+                // `subject()` is what the subject node produces, so a subject
+                // node that reads `subject()` defines it in terms of itself.
+                // `ir.md` does not state this; it is reported upstream in
+                // SPEC-ISSUES.md. An engine that emits the subject node as a
+                // function would recur forever, and an interpreter would
+                // exhaust its budget, so no reading of the IR makes it usable.
+                if let offender = firstSubjectRead(from: index, in: nodes) {
+                    throw .invalidRuleset(
+                        "program \(raw.id) subject node reads subject() at node \(offender), "
+                            + "which defines it in terms of itself"
+                    )
+                }
                 subject = index
             }
             guard raw.captures.count <= Limits.maximumCapturesPerFormat else {
@@ -209,6 +221,18 @@ package enum RuleBundleLoader {
             )
         }
         return programs
+    }
+
+    /// The first node of the subtree rooted at `index` that reads `subject()`.
+    private static func firstSubjectRead(from index: Int, in nodes: [IRNode]) -> Int? {
+        var stack = [index]
+        var seen: Set<Int> = []
+        while let current = stack.popLast() {
+            guard seen.insert(current).inserted else { continue }
+            if case .string(.subject) = nodes[current].operation { return current }
+            stack.append(contentsOf: nodes[current].inputs)
+        }
+        return nil
     }
 
     /// Check 11, operand types.
