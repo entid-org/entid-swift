@@ -50,28 +50,53 @@ struct SHA256Tests {
         )
     }
 
-    @Test("Every artefact rules.lock attests digests to the value it states")
-    func attestedArtefacts() throws {
-        let attested: [(String, String)] = [
-            ("businessid-rules.binpb", "rules_sha256"),
-            ("businessid-conformance.binpb", "conformance_sha256"),
-            ("rules.proto", "rules_proto_sha256"),
-            ("conformance.proto", "conformance_proto_sha256"),
-            ("testee.proto", "testee_proto_sha256"),
-            ("ir.md", "ir_doc_sha256"),
-            ("features.md", "features_doc_sha256"),
-        ]
+    /// Every `*_sha256` field of `rules.lock`, mapped to the file it attests.
+    ///
+    /// The mapping is checked against the lock rather than trusted, because the
+    /// defect this guards against is a digest nobody verifies:
+    /// `conformance_jsonl_sha256` did not exist until `2026.08.26`, the JSONL
+    /// shipped unattested, and the engine tests cite its case ids as
+    /// provenance. A ninth field added upstream must fail here until it is
+    /// mapped, instead of being silently skipped.
+    static let attested: [String: String] = [
+        "rules_sha256": "businessid-rules.binpb",
+        "conformance_sha256": "businessid-conformance.binpb",
+        "conformance_jsonl_sha256": "businessid-conformance.jsonl",
+        "rules_proto_sha256": "rules.proto",
+        "conformance_proto_sha256": "conformance.proto",
+        "testee_proto_sha256": "testee.proto",
+        "ir_doc_sha256": "ir.md",
+        "features_doc_sha256": "features.md",
+    ]
+
+    static func lockFields() throws -> [String: String] {
         let lock = try String(
             contentsOf: SpecCorpus.root.appending(path: "rules.lock"), encoding: .utf8
         )
-        for (file, field) in attested {
-            let expected =
-                lock
-                .split(separator: "\n")
-                .first { $0.hasPrefix("\(field) = ") }
-                .map { $0.split(separator: "\"")[1] }
+        var fields: [String: String] = [:]
+        for line in lock.split(separator: "\n") where line.hasSuffix("\"") {
+            let parts = line.split(separator: "\"")
+            guard parts.count == 2, let name = parts[0].split(separator: " ").first else { continue }
+            fields[String(name)] = String(parts[1])
+        }
+        return fields
+    }
+
+    @Test("The lock states no digest this test does not verify")
+    func everyDigestIsCovered() throws {
+        let stated = Set(try Self.lockFields().keys.filter { $0.hasSuffix("_sha256") })
+        #expect(
+            stated == Set(Self.attested.keys),
+            Comment(rawValue: "unmapped: \(stated.subtracting(Self.attested.keys).sorted())")
+        )
+    }
+
+    @Test("Every artefact rules.lock attests digests to the value it states")
+    func attestedArtefacts() throws {
+        let fields = try Self.lockFields()
+        for (field, file) in Self.attested.sorted(by: { $0.key < $1.key }) {
             #expect(
-                SHA256.hexDigest(try SpecCorpus.specFile(file)) == expected.map(String.init),
+                SHA256.hexDigest(try SpecCorpus.specFile(file)) == fields[field],
                 Comment(rawValue: file)
             )
         }
