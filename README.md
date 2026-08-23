@@ -16,7 +16,7 @@ report.format.status     // .valid
 report.checksum.status   // .valid
 ```
 
-Rules version `2026.08.23`: **94 definitions across 37 countries**, 37 identifier
+Rules version `2026.08.25`: **94 definitions across 37 countries**, 37 identifier
 kinds, and the full shared conformance corpus of **666 cases** passing.
 
 ## What this answers, and what it does not
@@ -194,7 +194,7 @@ to the commit `rules.lock` records under `source_commit` — the same commit as
 the corpus, so a corpus can never be judged by another release's comparator:
 
 ```sh
-make conformance   # rules 2026.08.23: 666 cases, 666 matched, 0 differed
+make conformance   # rules 2026.08.25: 666 cases, 666 matched, 0 differed
 ```
 
 which is
