@@ -17,6 +17,25 @@ struct ChecksumOpsTests {
         #expect(ChecksumOps.luhn(view("1230"), messageKey: nil) == .valid)
     }
 
+    /// The reduction of a doubled digit, on the only digit that exercises it.
+    ///
+    /// `digit -= 9` fires when doubling overflows nine, and doubling reaches
+    /// exactly ten for one digit and no other: five. Every value above used a
+    /// doubled digit of four or less, so the comparison could have been written
+    /// `> 10` and nothing would have noticed. The whole corpus notices, but the
+    /// corpus is the runner's to execute, not this suite's, and a primitive
+    /// should not need six hundred cases to pin one subtraction.
+    @Test("Luhn reduces a doubled five, which is the only digit that reaches ten")
+    func luhnReducesADoubledFive() {
+        // "59": 9 unchanged, 5 doubled to 10 and reduced to 1, sum 10.
+        // Without the reduction the sum is 19, and the answer flips.
+        #expect(ChecksumOps.luhn(view("59"), messageKey: nil) == .valid)
+        // "50": 0 unchanged, 5 doubled and reduced to 1, sum 1.
+        // Without the reduction the sum is 10, and the answer flips the other
+        // way — so both directions are pinned, not just one.
+        #expect(ChecksumOps.luhn(view("50"), messageKey: "k") == .invalid("k"))
+    }
+
     @Test("Luhn rejects with invalid_checksum and carries the declared key")
     func luhnInvalid() {
         #expect(ChecksumOps.luhn(view("19"), messageKey: "k") == .invalid("k"))
