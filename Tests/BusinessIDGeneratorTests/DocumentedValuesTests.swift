@@ -77,10 +77,12 @@ struct DocumentedValuesTests {
     func citedCasesExist(_ document: String) throws {
         let corpus = try Self.corpus()
         for cited in try Self.matches(Self.caseIDPattern, in: try Self.text(document)) {
-            // Backticks also hold file names and identifier kinds; only a token
-            // the corpus could plausibly have issued is asserted, which is one
-            // ending in a number.
-            guard cited.split(separator: "-").last?.allSatisfy(\.isNumber) == true else { continue }
+            // Backticks also hold file names, tool names and encodings. Every
+            // one of the 666 case ids ends in a group of three to five digits,
+            // measured, so that is the shape asserted — `utf-8` and
+            // `businessid-gen` are not case ids and must not be looked up.
+            let tail = cited.split(separator: "-").last ?? ""
+            guard tail.count >= 3, tail.allSatisfy(\.isNumber) else { continue }
             #expect(
                 corpus.classificationByID[cited] != nil,
                 Comment(rawValue: "\(document) cites \(cited), which the corpus does not carry")
