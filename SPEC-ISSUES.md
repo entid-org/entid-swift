@@ -21,6 +21,64 @@ the record is below.
 
 Kept for the record, because each one changed what this engine does.
 
+### The JSONL shipped with no digest — settled in `2026.08.26`
+
+`rules.lock` attested seven artefacts. `spec/businessid-conformance.jsonl` was
+not one of them, and it is the file this engine's tests cite case ids from when
+they quote a value: `EngineTests` names the case above every literal, and the
+rule in `CONTRIBUTING.md` is that a real value comes from the corpus or from an
+issuer, never from memory. A drift between the JSONL and the attested `.binpb`
+would have left those citations pointing at the wrong case with nothing
+noticing — `verify-lock.sh` had nothing to compare.
+
+Measured before reporting: the vendored JSONL was, and is, byte identical to the
+release. The defect was the absence of a check, not a drift.
+
+`rules.lock` now carries `conformance_jsonl_sha256`, taken on the decompressed
+bytes that land in `spec/` rather than on the published archive, and `spec.md`
+documents the field.
+
+Measured here after the fix: appending one byte to the JSONL makes
+`verify-lock.sh` fail and exit 1. `SHA256Tests` derives its list from the lock
+rather than repeating it, so a ninth digest fails the suite until it is mapped —
+the same defect one level up. And `DocumentedValuesTests` now rests on the
+JSONL, which is only defensible because the digest exists.
+
+A note on reading the new field: `conformance_jsonl_sha256` is unchanged between
+`2026.08.25` and `2026.08.26` while `conformance_sha256` moved. That is not a
+stale file. The JSONL is the reviewed source and carries no rules version — the
+generated `.binpb` injects one into every expected report — so a version only
+bump changes the binary and not the source. Verified against the `2026.08.26`
+release archive, byte for byte.
+
+### `spec.md` permitted embedding the bundle — settled in `2026.08.26`
+
+Found while the digest above was being documented, not by this engine, and
+recorded here because it is the more serious of the two. `spec.md` said, in the
+section describing `rules.lock`, that an engine MAY embed the bundle if it
+chooses to interpret it — which `engine.md` section 1.2 forbids outright and
+which this package's `PackagingTests` has always asserted against. It survived
+four audits because every mechanical guard read `engine.md` and the per language
+contracts and stopped there.
+
+Nothing changed here: this engine never embedded the bundle, and the packaging
+suite already refused a `.binpb` under `Sources/`, a `resources:` clause and any
+mention of `SwiftProtobuf` in the shipped library.
+
+### Check 16 names the operation categories — settled in `2026.08.26`
+
+`ir.md` section 10 listed check 16 as "accepted root per kind", while section 2
+also gives each kind its accepted operation categories, and said nothing about
+where that clause runs. Two engines answered differently on the same bytes: one
+ran the categories in its per-node pass, ahead of the arithmetic bounds at check
+13. Check 16 now names them, "both as section 2 states them".
+
+Measured here: this loader already enforced the categories exhaustively, inside
+`ProgramShape`, which runs after the per-program pass — so it answered check 13
+first, as section 10 orders. `LoadCheckTests` now pins it on a node that breaks
+both at once, and the assertion was watched failing against a loader with the
+bound removed, which reports the category instead.
+
 ### `loader-left-pad-length-026` refused by two checks its name is not about — settled in `2026.08.25`
 
 The fixture put a `CANONICALIZATION_OP_KIND_LEFT_PAD` node inside the **format**

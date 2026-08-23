@@ -20,7 +20,7 @@ rules update that changes no API is a patch release here.
 ### Changed
 
 - Conformance is now the upstream runner's verdict:
-  `rules 2026.08.25: 666 cases, 666 matched, 0 differed`. `make conformance`
+  `rules 2026.08.26: 666 cases, 666 matched, 0 differed`. `make conformance`
   runs it. A Go toolchain in CI is the only new prerequisite, and it is a build
   tool: nothing about it enters the published package or its dependencies.
 - The tests that proved the deleted comparator was not vacuous are kept and
@@ -28,9 +28,10 @@ rules update that changes no API is a patch release here.
   not read the corpus, does not interpret an expectation, and does not behave
   differently depending on which case it was handed.
 
-- Rules `2026.08.17` → `2026.08.18` → `2026.08.22` → `2026.08.23` → `2026.08.25`.
-  Each bundle changed in its business version alone; no rule moved, and the
-  regenerated code differs by the one line that carries the version.
+- Rules `2026.08.17` → `2026.08.18` → `2026.08.22` → `2026.08.23` → `2026.08.25`
+  → `2026.08.26`. Each bundle changed in its business version alone; no rule
+  moved, and the regenerated code differs by the one line that carries the
+  version.
 - `ir.md` settled two defects this engine reported in `2026.08.18`: check 15
   now carries the clause on a subject node built from the subject it defines,
   worded as this engine already implemented it, and section 2 states that check
@@ -44,6 +45,19 @@ rules update that changes no API is a patch release here.
   decoding the payload rather than trusting the description. Each is now refused
   by exactly the check its name is about: the slice bound, check 15's subject
   node clause, and check 14's instance count.
+- **Coverage no longer gates the code emitted from the bundle.** `engine.md`
+  section 12.2 now says the thresholds cover hand written code, and that the
+  emitted code's coverage measures the corpus rather than the engine: gating on
+  it would fail a faultless engine on a corpus gap, and the only way back to
+  green would be to lower the threshold. Three numbers are printed, two gated.
+  Removing 19879 emitted lines from the denominator moved the published figures
+  down: hand written library 97.73% (was 99.25% with the emitted code folded
+  in), hand written package 96.99% (was 98.92%), emitted rule code 99.31%.
+- The README and the example consumer state that every identifier they print is
+  synthetic and name the conformance case it comes from, which `engine.md`
+  section 12.2.1 now requires. A synthetic value proves an algorithm; a real one
+  proves a rule describes what a register issues, and a README demonstrates
+  neither register nor company.
 - `TesteeHonestyTests` invents every request it sends. `engine.md` section 11.3
   now states the five observable properties and closes with the constraint the
   suite was breaking: a proof that the testee never opens the corpus, built out
@@ -56,6 +70,23 @@ rules update that changes no API is a patch release here.
   carried.
 
 ### Added
+
+- **`rules.lock` carries an eighth digest, `conformance_jsonl_sha256`.** The
+  JSONL shipped under `spec/` with nothing attesting it while the engine tests
+  cite its case ids as provenance, so a drift would have passed unseen.
+  `verify-lock.sh` verifies it, and `SHA256Tests` now derives its list from the
+  lock instead of repeating it: a ninth field added upstream fails the suite
+  until it is mapped, rather than being silently skipped.
+- `DocumentedValuesTests` reads `README.md` and the example consumer and
+  requires every identifier printed there to be a synthetic corpus value and
+  every case id cited to exist. It rests on the JSONL, which is only worth
+  resting on now that a digest attests it.
+- `LoadCheckTests` pins the order of `ir.md` section 10 on a node that breaks
+  check 13 and check 16 at once: thirteen answers. Two engines disagreed here
+  because one ran the operation categories in the per-node pass; since
+  `2026.08.26` check 16 names the categories, so which check answers is stated
+  rather than incidental.
+
 
 - `EncodingTests` pins `ReasonCode.invalidEncoding` natively, as `ir.md`
   section 5 step 1 now requires: Swift's `String` admits neither an invalid
