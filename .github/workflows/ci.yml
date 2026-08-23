@@ -78,7 +78,7 @@ jobs:
           swift test
 
   conformance:
-    name: Conformance (665 cases)
+    name: Conformance (shared corpus)
     runs-on: macos-15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -145,9 +145,11 @@ jobs:
           xcode-version: latest-stable
       # The shipped library avoids UIKit and AppKit entirely, and the point of
       # this job is to keep it that way.
-      # The whole conformance corpus runs here too, in process. What a
-      # simulator cannot do is drive the testee as a subprocess, and that suite
-      # is compiled out rather than skipped at runtime.
+      #
+      # Only the library suite runs here. Conformance is judged by the runner
+      # from the specification repository, which drives the testee as a
+      # subprocess — something a simulator cannot do — so it runs on macOS and
+      # nowhere else.
       - name: Build and test on a simulator
         run: |
           DESTINATION=$(xcrun simctl list devices available --json \
@@ -156,8 +158,7 @@ jobs:
           xcodebuild test \
             -scheme BusinessID-Package \
             -destination "id=$DESTINATION" \
-            -only-testing:BusinessIDTests \
-            -only-testing:BusinessIDConformanceTests
+            -only-testing:BusinessIDTests
 
   consumer:
     name: A consumer package can depend on this one
