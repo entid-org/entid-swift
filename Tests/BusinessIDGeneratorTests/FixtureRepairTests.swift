@@ -114,6 +114,12 @@ struct FixtureRepairTests {
                 }
             }
         },
+        Repair(caseID: "loader-left-pad-length-026", what: "bring the pad length inside the slice bound") {
+            mutateCanonicalizations(&$0) { operation in
+                guard operation.kind == .leftPad else { return }
+                operation.length = 4096
+            }
+        },
         Repair(caseID: "loader-modulus-out-of-range-021", what: "use a modulus in range") {
             mutateIntegers(&$0) { operation in
                 guard operation.kind == .modDigits else { return }
@@ -249,39 +255,22 @@ struct FixtureRepairTests {
         #expect(error?.engineErrorName != nil)
     }
 
-    /// `loader-left-pad-length-026` does not have the property, and this states
-    /// what was measured rather than leaving it to a comment.
+    /// The named defect is a slice bound, so this asserts which check refused
+    /// the fixture rather than settling for `invalid_ruleset`, which every
+    /// structural check produces.
     ///
-    /// The fixture puts a `LEFT_PAD` canonicalization node inside the *format*
-    /// program and roots the format program at it. That is two check 16
-    /// violations on top of the length its name is about, so an engine that
-    /// never implemented the slice bound on `left_pad` refuses the fixture
-    /// anyway and passes the case for the wrong reason.
-    ///
-    /// It cannot be repaired in place either: the demo bundle's only
-    /// canonicalization program is also the dispatcher's pre-canonicalizer,
-    /// which is restricted to five steps that do not include `LEFT_PAD`, so the
-    /// step has no legal home in this bundle. Reported upstream.
-    ///
-    /// This test fails the day the fixture is fixed, which is the signal to
-    /// move it into the table above.
-    @Test("The left_pad fixture is refused for its length, and for two other things")
-    func leftPadFixtureCarriesASecondDefect() throws {
-        let base = try Self.payload("loader-left-pad-length-026")
-
-        // As shipped, the named defect is what this loader reports.
-        let shipped = try #require(try Self.outcome(base))
-        #expect(shipped.reason.contains("length 4097 is outside"))
-
-        // Repair only that, and the bundle is still refused — by the program
-        // shape, which an engine without any `left_pad` bound also reaches.
-        var repaired = base
-        Self.mutateCanonicalizations(&repaired) { operation in
-            guard operation.kind == .leftPad else { return }
-            operation.length = 4096
-        }
-        let afterRepair = try #require(try Self.outcome(repaired))
-        #expect(afterRepair.reason.contains("format program roots at an assertion SEQUENCE"))
+    /// The fixture used to carry the `LEFT_PAD` step inside the *format*
+    /// program and root that program at it — two check 16 violations on top of
+    /// the length its name is about, so an engine that never implemented the
+    /// slice bound refused it anyway and passed the case for the wrong reason.
+    /// Since `2026.08.25` the step lives in a canonicalization program of its
+    /// own, referenced by the definition and rooted in a `SEQUENCE`, and the
+    /// repair above is what proves the length is now the only defect left.
+    @Test("The left_pad fixture is refused by the slice bound its name is about")
+    func leftPadFixtureIsRefusedForItsLength() throws {
+        let error = try #require(try Self.outcome(try Self.payload("loader-left-pad-length-026")))
+        #expect(error.engineErrorName == "invalid_ruleset")
+        #expect(error.reason.contains("length 4097 is outside"))
     }
 
     @Test("Every fixture that admits a repair is covered, and the rest are named")
@@ -304,8 +293,6 @@ struct FixtureRepairTests {
             "loader-stray-when-branch-022",
             "loader-unbounded-digits-to-integer-020",
             "loader-type-mismatch-012",
-            // Measured, not assumed: see `leftPadFixtureCarriesASecondDefect`.
-            "loader-left-pad-length-026",
             // The defect is a relationship between two declarations.
             "loader-orphan-definition-016",
             "loader-duplicate-prefix-017",
