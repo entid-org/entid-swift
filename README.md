@@ -16,7 +16,7 @@ report.format.status     // .valid
 report.checksum.status   // .valid
 ```
 
-Rules version `2026.08.22`: **94 definitions across 37 countries**, 37 identifier
+Rules version `2026.08.23`: **94 definitions across 37 countries**, 37 identifier
 kinds, and the full shared conformance corpus of **666 cases** passing.
 
 ## What this answers, and what it does not
@@ -155,8 +155,14 @@ await withTaskGroup(of: ValidationReport.self) { group in
   without being processed, reported as `unsupported`/`inputTooLong` — a safety
   bound, never a business verdict.
 
-`ReasonCode.invalidEncoding` exists in the registry and is unreachable through
-this API: a Swift `String` is always well formed Unicode.
+`ReasonCode.invalidEncoding` stays in the registry and is unreachable through
+this API. Every engine pins that step with a native test naming the malformed
+form its own string type admits — an invalid byte where strings are bytes, an
+unpaired surrogate where they are UTF-16 code units. Swift's `String` admits
+neither: `String(bytes:encoding:)` refuses an invalid byte, `String(decoding:)`
+repairs it to U+FFFD, and `Unicode.Scalar(0xD800)` is `nil`. Adding a
+byte-oriented entry point that existed only to reach the branch would widen the
+public API to serve a reason code rather than a caller.
 
 ## Registry lookup: not in this version
 
@@ -182,14 +188,36 @@ make help        # every task CI runs
 
 ## Conformance
 
-Conformance is not a suite rewritten in Swift. The corpus ships with the
-specification, a runner is the only program that reads an expected result, and
-this package provides a **testee**: a small executable that translates a request
-into a call of the public API and a result into a response.
+Conformance is not a suite rewritten in Swift, and it is not this package's
+verdict to give. The **runner** comes from the specification repository, pinned
+to the commit `rules.lock` records under `source_commit` — the same commit as
+the corpus, so a corpus can never be judged by another release's comparator:
 
 ```sh
-make conformance   # 666/666, zero divergences
+make conformance   # rules 2026.08.23: 666 cases, 666 matched, 0 differed
 ```
+
+which is
+
+```sh
+go run github.com/libbusinessid/spec/cmd/conformance-runner@<source_commit> \
+  -corpus spec/businessid-conformance.binpb -- .build/debug/businessid-testee
+```
+
+A Go toolchain in CI is the only prerequisite. It is a build tool: nothing about
+it enters the published package or its dependencies.
+
+What this package writes is the **testee** — an executable that reads requests,
+calls the public API and writes responses — and the tests proving it does not
+cheat. It does not read the corpus, does not interpret an expected result, and
+does not behave differently depending on which case it was handed; each of those
+is a test, both by reading its source and by observing it answer identically
+from a directory holding no corpus, under a borrowed case identifier, and in a
+shuffled order.
+
+There is deliberately no comparator here. An engine that judges its own results
+can declare itself conformant by comparing too weakly — forgetting a field, or
+treating an absent field as an empty one.
 
 The thirty five `load_ruleset` cases address the generator rather than the
 engine: a truncated bundle, one carrying a call cycle, or one whose subject node

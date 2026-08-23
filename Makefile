@@ -17,10 +17,18 @@ build: ## Build debug and release with warnings as errors
 test: ## Run every test
 	$(SWIFT) test
 
+# The runner comes from the specification repository and nowhere else, pinned
+# to the commit rules.lock records — the same commit as the corpus, so a corpus
+# can never be judged by another release's comparator. An engine that wrote its
+# own comparator could declare itself conformant by comparing too weakly.
+SOURCE_COMMIT := $(shell sed -n 's/^source_commit = "\(.*\)"/\1/p' rules.lock)
+RUNNER := github.com/libbusinessid/spec/cmd/conformance-runner@$(SOURCE_COMMIT)
+
 .PHONY: conformance
-conformance: ## Run the shared corpus through the testee
+conformance: ## Run the shared corpus through the testee, judged by the spec runner
 	$(SWIFT) build --product businessid-testee
-	$(SWIFT) run businessid-conformance-runner --cases $(SPEC)/businessid-conformance.binpb
+	go run $(RUNNER) -corpus $(SPEC)/businessid-conformance.binpb -- \
+		$$($(SWIFT) build --product businessid-testee --show-bin-path)/businessid-testee
 
 .PHONY: generate
 generate: ## Compile the rule bundle to Swift

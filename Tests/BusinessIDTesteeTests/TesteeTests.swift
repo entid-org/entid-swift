@@ -3,8 +3,6 @@ import Testing
 
 import struct Foundation.Data
 
-@testable import BusinessIDConformance
-
 /// The testee's own edges: the requests the protocol allows but the corpus
 /// never sends.
 ///
@@ -123,24 +121,4 @@ struct TesteeTests {
         #expect(load.engineError == "invalid_ruleset")
     }
 
-    @Test("An unreadable corpus is reported rather than treated as empty")
-    func unreadableCorpus() {
-        #expect(throws: ConformanceRunner.Failure.self) {
-            _ = try ConformanceRunner(corpusPath: "/nonexistent/businessid-conformance.binpb")
-        }
-    }
-
-    @Test("A response of the wrong shape is a divergence")
-    func wrongShapeIsADivergence() throws {
-        let runner = try ConformanceRunner(corpusPath: ConformanceTests.corpusPath())
-        let divergences = try runner.run { request in
-            var response = Libbusinessid_Testee_V1_TesteeResponse()
-            response.caseID = request.caseID
-            // Answering every case with a canonicalization, whatever was asked.
-            response.result = .canonicalization(Libbusinessid_Testee_V1_ObservedCanonicalization())
-            return response
-        }.divergences
-        #expect(divergences.count >= 600)
-        #expect(divergences.contains { $0.field == "result" })
-    }
 }

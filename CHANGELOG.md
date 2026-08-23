@@ -9,9 +9,26 @@ rules update that changes no API is a patch release here.
 
 ## [Unreleased]
 
+### Removed
+
+- **The conformance runner written in this repository.** The real one comes
+  from the specification repository, pinned to the commit `rules.lock` records
+  under `source_commit`, and `spec.md` section 8.7 always forbade an engine to
+  judge its own results. It was written here for want of a line saying where to
+  get it; that line now exists.
+
 ### Changed
 
-- Rules `2026.08.17` → `2026.08.18` → `2026.08.22`. Each bundle changed in its
+- Conformance is now the upstream runner's verdict:
+  `rules 2026.08.23: 666 cases, 666 matched, 0 differed`. `make conformance`
+  runs it. A Go toolchain in CI is the only new prerequisite, and it is a build
+  tool: nothing about it enters the published package or its dependencies.
+- The tests that proved the deleted comparator was not vacuous are kept and
+  re-aimed at the testee, which `engine.md` section 11.3 now requires: it does
+  not read the corpus, does not interpret an expectation, and does not behave
+  differently depending on which case it was handed.
+
+- Rules `2026.08.17` → `2026.08.18` → `2026.08.22` → `2026.08.23`. Each bundle changed in its
   business version alone; no rule moved, and the regenerated code differs by
   the one line that carries the version.
 - `ir.md` settled two defects this engine reported in `2026.08.18`: check 15
@@ -29,6 +46,13 @@ rules update that changes no API is a patch release here.
 
 ### Added
 
+- `EncodingTests` pins `ReasonCode.invalidEncoding` natively, as `ir.md`
+  section 5 step 1 now requires: Swift's `String` admits neither an invalid
+  byte nor an unpaired surrogate, so the branch is unreachable through this API
+  and no byte-oriented entry point is added to reach it.
+- `TesteeHonestyTests` checks the testee's source with comments stripped, and
+  observes it answering identically from a directory holding no corpus, under
+  forty borrowed case identifiers, and in a shuffled order.
 - `FixtureRepairTests` states the property every hostile fixture should have:
   repair the defect its name carries — repair, not erase — and the bundle
   loads. Seventeen of the thirty five loader fixtures are covered; the rest are

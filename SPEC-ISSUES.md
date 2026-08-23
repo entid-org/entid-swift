@@ -49,37 +49,43 @@ check answers at each stage, so this engine's compliance does not rest on the
 ambiguity. That test fails the day the fixture is fixed, which is the signal to
 move it into the repair table with the others.
 
-### 2. `invalid_encoding` is unreachable through a Swift `String` API
-
-`ir.md` section 5 step 1 refuses an input that is not valid UTF-8 with
-`unsupported`/`invalid_encoding`. A Swift `String` is always well formed
-Unicode, and `TesteeRequest.input` is a proto3 `string`, which is also always
-valid UTF-8 on the wire. The corpus still contains no `invalid_encoding` case.
-
-**Followed:** the reason code exists in the public registry and is documented as
-unreachable from this API. Adding a byte-oriented entry point purely to reach it
-would widen the public surface for a case the protocol cannot deliver. If `spec`
-wants the branch exercised, the testee protocol needs a bytes field.
-
-### 3. The conformance runner is not among the artefacts
-
-`spec.md` section 8.7 and `PROVENANCE.md` place the runner in the specification
-repository and instruct engines not to write their own suite. The files copied
-under `spec/` carry the corpus and the protocol schema but no runner.
-
-**Followed: the instruction, as closely as the artefacts allow.** A runner lives
-in this repository under `Sources/BusinessIDConformance`, strictly separated
-from the testee: it is the only code that reads an expected result, the testee
-never sees one, and neither reaches the shipped library. Its comparison is
-proved non-vacuous by cases that alter one field of one response and require the
-divergence to be reported. It should be replaced by the reference runner as soon
-as that is published.
-
 ---
 
 ## Settled upstream
 
 Kept for the record, because each one changed what this engine does.
+
+### Where the conformance runner comes from — settled in `2026.08.23`
+
+`spec.md` section 8.7 forbade an engine to judge its own results, and none of
+the five contracts said where the runner comes from. No release existed, `spec/`
+carried none, and two engines wrote a comparator rather than stop.
+
+`spec.md` section 8.7, `engine.md` section 11.1 and `engine-swift.md` now give
+the command, pinned to the commit `rules.lock` records under `source_commit` —
+the same commit as the corpus.
+
+This engine's comparator is deleted. Conformance is now the runner's verdict:
+`rules 2026.08.23: 666 cases, 666 matched, 0 differed`. The tests that proved
+the comparator was not vacuous are kept and re-aimed: they now prove the testee
+does not cheat, which `engine.md` section 11.3 requires. That property is
+checked by reading the testee's source with comments stripped, and by observing
+it answer identically from a directory holding no corpus, under forty borrowed
+case identifiers, and in a shuffled order.
+
+### `invalid_encoding` cannot be a conformance case — settled in `2026.08.23`
+
+`ir.md` section 5 step 1 now states it: a proto3 `string` is valid UTF-8 by
+definition, and there is no portable malformed value to carry. Each engine pins
+the step with a native test naming the malformed form its own string type
+admits, and an engine whose string type admits none documents that instead of
+widening its public API to reach the branch.
+
+Swift is the third case, and `Tests/BusinessIDTests/API/EncodingTests.swift`
+pins it: `String(bytes:encoding:)` refuses an invalid byte,
+`String(decoding:as:)` repairs it to U+FFFD, `Unicode.Scalar(0xD800)` is `nil`,
+and the engine reports `invalidEncoding` for none of the awkward inputs that can
+be built. A guard also asserts no corpus case asks for the reason.
 
 ### The `subject_node` fixture, and check 25 counting it — settled in `2026.08.22`
 

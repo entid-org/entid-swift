@@ -85,13 +85,17 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
           xcode-version: latest-stable
-      # The runner is the only program that reads an expected result; the testee
-      # never sees one. A partial run is not conformance, so the whole corpus
-      # runs or the job fails.
+      # The runner comes from the specification repository, pinned to the
+      # commit rules.lock records — the same commit as the corpus. It is a
+      # build tool: nothing about it enters the published package or its
+      # dependencies. An engine that judged its own results could declare
+      # itself conformant by comparing too weakly.
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: false
       - name: Run the shared corpus through the testee
-        run: |
-          swift build --product businessid-testee
-          swift run businessid-conformance-runner --cases spec/businessid-conformance.binpb
+        run: make conformance
 
   generated:
     name: Generated code is current

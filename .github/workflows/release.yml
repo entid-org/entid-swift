@@ -37,10 +37,12 @@ jobs:
           swift build -c release
           swift test
 
-      - name: The whole conformance corpus
-        run: |
-          swift build --product businessid-testee
-          swift run businessid-conformance-runner --cases spec/businessid-conformance.binpb
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+          cache: false
+      - name: The whole conformance corpus, judged by the spec runner
+        run: make conformance
 
       - name: Coverage gates
         run: ./Tools/coverage.sh

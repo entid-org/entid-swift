@@ -62,7 +62,13 @@ let package = Package(
             swiftSettings: strictSwiftSettings
         ),
 
-        // MARK: - Conformance plumbing (never shipped)
+        // MARK: - The testee (never shipped)
+        //
+        // The conformance runner is not here and never will be. It comes from
+        // the specification repository, pinned to the commit `rules.lock`
+        // records, so that a corpus is never judged by a comparator an engine
+        // wrote for itself. What this package provides is the testee, and the
+        // tests proving it does not cheat.
 
         .target(
             name: "BusinessIDTestee",
@@ -77,20 +83,6 @@ let package = Package(
         .executableTarget(
             name: "businessid-testee",
             dependencies: ["BusinessIDTestee"],
-            swiftSettings: strictSwiftSettings
-        ),
-        .target(
-            name: "BusinessIDConformance",
-            dependencies: [
-                "BusinessIDTestee",
-                "BusinessIDWire",
-                .product(name: "SwiftProtobuf", package: "swift-protobuf"),
-            ],
-            swiftSettings: strictSwiftSettings
-        ),
-        .executableTarget(
-            name: "businessid-conformance-runner",
-            dependencies: ["BusinessIDConformance"],
             swiftSettings: strictSwiftSettings
         ),
 
@@ -124,8 +116,13 @@ let package = Package(
             swiftSettings: strictSwiftSettings
         ),
         .testTarget(
-            name: "BusinessIDConformanceTests",
-            dependencies: ["BusinessID", "BusinessIDConformance"],
+            name: "BusinessIDTesteeTests",
+            dependencies: [
+                "BusinessID",
+                "BusinessIDTestee",
+                "BusinessIDWire",
+                .product(name: "SwiftProtobuf", package: "swift-protobuf"),
+            ],
             swiftSettings: strictSwiftSettings
         ),
     ]

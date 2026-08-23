@@ -26,6 +26,17 @@ make check         # everything a pull request must pass
 configurations, the tests, the whole conformance corpus and the stale-generated
 check. If it is green locally it will be green in CI.
 
+## Never write a comparator
+
+The conformance runner comes from the specification repository, pinned to the
+commit `rules.lock` records. `make conformance` runs it. An engine that judges
+its own results can declare itself conformant by comparing too weakly —
+forgetting a field, or treating an absent field as an empty one — and this
+repository once carried such a comparator for want of knowing the real one was
+a `go run` away.
+
+What belongs here is the testee, and the tests proving it does not cheat.
+
 ## Test driven, in that order
 
 The failing test comes first, then the fix. This is not a style preference: a
