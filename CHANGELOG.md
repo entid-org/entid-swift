@@ -85,6 +85,12 @@ rules update that changes no API is a patch release here.
   It now repairs the subject node instead.
 - An interrupted `Tools/mutation.sh` left a mutant applied. Restoration is a
   trap, and the script refuses to start on a dirty tree.
+- Luhn's reduction of a doubled digit was no longer pinned by a unit test. The
+  mutation gate caught it: `digit > 9` and `digit > 10` differ for one digit
+  only — five, whose double reaches exactly ten — and every Luhn case in the
+  suite used a doubled digit of four or less. The corpus covered it until the
+  in-repository runner was deleted and the corpus left `swift test`. Mutation
+  score back to 14/14.
 - The iOS job could not have passed. Deleting the in-repository conformance
   runner left `-only-testing:BusinessIDConformanceTests` naming a target that no
   longer exists, and left `BusinessIDTesteeTests` — which drives a subprocess —
