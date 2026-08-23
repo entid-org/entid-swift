@@ -62,8 +62,10 @@ is reported as what it is.
 
 Requires Swift 6.1. Declared for macOS 13+, iOS 16+, tvOS 16+ and watchOS 9+;
 CI builds and tests on macOS with the current toolchain and with Swift 6.1, and
-runs the whole test suite — the conformance corpus included — on an iOS
-simulator.
+runs the library suite on an iOS simulator. The conformance corpus is not run
+there: the runner drives the testee as a subprocess, which a simulator has no
+`Process` for, so that target is compiled out anywhere but macOS rather than
+skipped at run time.
 
 **The `BusinessID` library links nothing.** No Protobuf, no HTTP, no UIKit, no
 AppKit; the binary of a consumer carries none of them. SwiftPM does still
