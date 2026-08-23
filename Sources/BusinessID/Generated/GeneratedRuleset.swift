@@ -12,7 +12,7 @@
 // compiler on `Int` and are unreachable.
 
 enum GeneratedRuleset {
-    static let rulesVersion = "2026.08.25"
+    static let rulesVersion = "2026.08.26"
     static let formatVersion = 1
     static let capabilities: [Int] = [1, 2, 3, 4, 5, 10, 11, 20, 21, 30, 31, 32, 33, 34, 35, 40, 41, 42]
     static let identifierCount = 94
