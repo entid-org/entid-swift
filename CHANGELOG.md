@@ -11,21 +11,41 @@ rules update that changes no API is a patch release here.
 
 ### Changed
 
-- Rules `2026.08.17` → `2026.08.18`. The bundle changed in one field, its
-  business version; no rule moved, and the regenerated code differs by the
-  single line that carries it.
-- `ir.md` settles two defects this engine reported. Check 15 now carries the
-  clause on a subject node built from the subject it defines, worded as this
-  engine already implemented it, and section 2 states that check 14 may run
-  after check 15. Neither changed an answer here.
+- Rules `2026.08.17` → `2026.08.18` → `2026.08.22`. Each bundle changed in its
+  business version alone; no rule moved, and the regenerated code differs by
+  the one line that carries the version.
+- `ir.md` settled two defects this engine reported in `2026.08.18`: check 15
+  now carries the clause on a subject node built from the subject it defines,
+  worded as this engine already implemented it, and section 2 states that check
+  14 may run after check 15. `engine.md` and `engine-swift.md` settled three
+  more in the same release and two in `2026.08.22`. None changed an answer here.
+- The corpus reaches 666 cases, 35 of them addressed to the generator.
+- `loader-subject-node-circular-037` now declares `CAPTURES_AND_CALLS_V1`, so
+  the case isolates check 15's clause instead of also being refused by check 25.
+- Check 25 now names which construct reaches for `CAPTURES_AND_CALLS_V1`,
+  `Program.captures` or `Program.subject_node`, because deriving the capability
+  from either alone lets the other through — the defect the reference loader
+  carried.
 
 ### Added
 
-- The corpus reaches 666 cases, 35 of them addressed to the generator, all
-  passing.
-- `SubjectNodeTests` isolates check 15's new clause from the capability its
-  fixture also omits, and covers an indirect circularity the fixture does not
-  reach. See `SPEC-ISSUES.md` open issue 1.
+- `FixtureRepairTests` states the property every hostile fixture should have:
+  repair the defect its name carries — repair, not erase — and the bundle
+  loads. Seventeen of the thirty five loader fixtures are covered; the rest are
+  named with the reason no repair is definable.
+- That property found `loader-left-pad-length-026` on its first run: the
+  fixture puts a canonicalization node in a format program and roots the
+  program at it, so an engine with no `left_pad` bound passes the case anyway.
+  Reported upstream as `SPEC-ISSUES.md` open issue 1.
+
+### Fixed
+
+- `SubjectNodeTests` no longer proves its point by clearing `subject_node`.
+  Erasing the construct removed the circularity and the missing capability
+  together, so the test passed against the fixture it was written to accuse.
+  It now repairs the subject node instead.
+- An interrupted `Tools/mutation.sh` left a mutant applied. Restoration is a
+  trap, and the script refuses to start on a dirty tree.
 
 ## [0.1.0]
 

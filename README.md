@@ -16,7 +16,7 @@ report.format.status     // .valid
 report.checksum.status   // .valid
 ```
 
-Rules version `2026.08.18`: **94 definitions across 37 countries**, 37 identifier
+Rules version `2026.08.22`: **94 definitions across 37 countries**, 37 identifier
 kinds, and the full shared conformance corpus of **666 cases** passing.
 
 ## What this answers, and what it does not

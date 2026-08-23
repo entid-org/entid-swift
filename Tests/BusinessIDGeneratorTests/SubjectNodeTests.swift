@@ -5,13 +5,11 @@ import Testing
 
 /// Check 15's clause on a subject node built from the subject it defines.
 ///
-/// No program of the published bundle declares a `subject_node`, so the only
-/// thing that exercises this clause is the corpus fixture — and the fixture
-/// carries a second invalidity, which means passing its case does not prove the
-/// clause is implemented. These cases isolate it.
+/// The corpus fixture now isolates the clause, so the base case is covered by
+/// `FixtureRepairTests`: repairing the circularity makes the bundle load. What
+/// remains here is what the fixture does not reach.
 @Suite("Circular subject node")
 struct SubjectNodeTests {
-    /// The corpus fixture, decoded so that one field at a time can be changed.
     static func fixture() throws -> Libbusinessid_Ir_V1_RuleBundle {
         let payload = try SpecCorpus.loaderCases()
             .first { $0.id == "loader-subject-node-circular-037" }
@@ -20,86 +18,32 @@ struct SubjectNodeTests {
         )
     }
 
-    static func load(_ bundle: Libbusinessid_Ir_V1_RuleBundle) throws -> Result<Void, LoadError> {
+    static func load(_ bundle: Libbusinessid_Ir_V1_RuleBundle) throws -> LoadError? {
         let bytes: [UInt8] = try bundle.serializedBytes()
         do {
             _ = try RuleBundleLoader.load(bytes)
-            return .success(())
+            return nil
         } catch {
-            return .failure(error)
+            return error
         }
     }
 
-    @Test("The corpus fixture is refused, and by the subject node clause of check 15")
-    func fixtureIsRefusedForTheStatedReason() throws {
-        // The expected error the runner compares is `invalid_ruleset`, which
-        // several checks can produce. This asserts which one did.
-        guard case .failure(let error) = try Self.load(try Self.fixture()) else {
-            Issue.record("the fixture was accepted")
-            return
-        }
+    @Test("The fixture is refused by the subject node clause, not by something else")
+    func refusedForTheStatedReason() throws {
+        // The error the runner compares is `invalid_ruleset`, which every
+        // structural check produces. This asserts which one did.
+        let error = try #require(try Self.load(try Self.fixture()))
         #expect(error.engineErrorName == "invalid_ruleset")
         #expect(error.reason.contains("subject node reads subject()"))
         #expect(error.reason.contains("defines it in terms of itself"))
     }
 
-    /// The fixture omits `CAPTURES_AND_CALLS_V1`, whose frozen content includes
-    /// `Program.subject_node`, so check 25 refuses it too. An engine that never
-    /// implemented the check 15 clause still passes the conformance case — for
-    /// the wrong reason. Declaring the capability removes that second
-    /// objection and leaves the circularity alone.
-    @Test("With the capability declared, the circularity is the only objection left")
-    func circularityAloneIsRefused() throws {
-        var bundle = try Self.fixture()
-        bundle.requiredFeatureIds = [1, 2, 3, 5, 10, 11, 20, 21, 30, 31, 40, 41]
-
-        guard case .failure(let error) = try Self.load(bundle) else {
-            Issue.record("a circular subject node was accepted")
-            return
-        }
-        #expect(error.reason.contains("subject node reads subject()"))
-    }
-
-    @Test("Everything else in the fixture is a ruleset this generator stands behind")
-    func theRestOfTheFixtureIsValid() throws {
-        // Without this, the case above would prove nothing: a fixture refused
-        // for some unrelated reason would satisfy it just as well.
-        var bundle = try Self.fixture()
-        bundle.requiredFeatureIds = [1, 2, 3, 5, 10, 11, 20, 21, 30, 31, 40, 41]
-        bundle.programs[1].clearSubjectNode()
-
-        if case .failure(let error) = try Self.load(bundle) {
-            Issue.record(Comment(rawValue: "the fixture is invalid beyond its subject node: \(error)"))
-        }
-    }
-
-    @Test("A subject node that does not read the subject it defines is accepted")
-    func wellFoundedSubjectIsAccepted() throws {
-        var bundle = try Self.fixture()
-        bundle.requiredFeatureIds = [1, 2, 3, 5, 10, 11, 20, 21, 30, 31, 40, 41]
-
-        // Replace the circular node with one built from `value()`, which is the
-        // canonical value and not the subject being defined.
-        var value = Libbusinessid_Ir_V1_StringOperation()
-        value.kind = .value
-        var node = Libbusinessid_Ir_V1_Node()
-        node.outputType = .string
-        node.stringOperation = value
-        bundle.programs[1].nodes[6] = node
-
-        if case .failure(let error) = try Self.load(bundle) {
-            Issue.record(Comment(rawValue: "a well founded subject node was refused: \(error)"))
-        }
-    }
-
     @Test("The circularity is caught through a chain, not only through a direct read")
     func indirectCircularityIsRefused() throws {
+        // The fixture reads `subject()` one level below the subject node. A
+        // check that inspected only the subject node itself would pass it and
+        // still recurse forever on this.
         var bundle = try Self.fixture()
-        bundle.requiredFeatureIds = [1, 2, 3, 5, 10, 11, 20, 21, 30, 31, 40, 41]
-
-        // node 6 already reads node 0; add node 7 reading node 6 and point the
-        // subject at 7. The read is now two levels down, which a check that
-        // only inspected the subject node itself would miss.
         var slice = Libbusinessid_Ir_V1_StringOperation()
         slice.kind = .sliceFrom
         slice.start = 0
@@ -110,32 +54,55 @@ struct SubjectNodeTests {
         bundle.programs[1].nodes.append(node)
         bundle.programs[1].subjectNode = 7
 
-        guard case .failure(let error) = try Self.load(bundle) else {
-            Issue.record("an indirectly circular subject node was accepted")
-            return
-        }
+        let error = try #require(try Self.load(bundle))
         #expect(error.reason.contains("subject node reads subject()"))
     }
 
+    /// `features.md` section 11 lists `Program.subject_node` among the frozen
+    /// content of `CAPTURES_AND_CALLS_V1`, so a bundle declaring one uses that
+    /// capability and must declare it.
+    ///
+    /// This is the defect the reference loader carried: it derived the
+    /// capability from captures alone and ignored the field, so it accepted
+    /// what this engine refused. The case exists to keep this engine from
+    /// drifting the same way.
     @Test("Declaring a subject node requires CAPTURES_AND_CALLS_V1")
     func subjectNodeRequiresItsCapability() throws {
-        // The other half of what the fixture happens to carry: `subject_node`
-        // is frozen content of capability 11, so using it without declaring it
-        // is check 25's business.
         var bundle = try Self.fixture()
-        bundle.programs[1].nodes[6] = {
-            var value = Libbusinessid_Ir_V1_StringOperation()
-            value.kind = .value
-            var node = Libbusinessid_Ir_V1_Node()
-            node.outputType = .string
-            node.stringOperation = value
-            return node
-        }()
 
-        guard case .failure(let error) = try Self.load(bundle) else {
-            Issue.record("a subject node was accepted without its capability")
-            return
-        }
+        // Repair the circularity first, so the capability is the only thing
+        // left to object to.
+        var value = Libbusinessid_Ir_V1_StringOperation()
+        value.kind = .value
+        var node = Libbusinessid_Ir_V1_Node()
+        node.outputType = .string
+        node.stringOperation = value
+        bundle.programs[1].nodes[Int(bundle.programs[1].subjectNode)] = node
+        #expect(try Self.load(bundle) == nil, "the repaired fixture must load")
+
+        // Now take the capability away and nothing else.
+        bundle.requiredFeatureIds.removeAll { $0 == Capability.capturesAndCallsV1 }
+        let error = try #require(try Self.load(bundle))
+        #expect(error.reason.contains("CAPTURES_AND_CALLS_V1"))
+        #expect(error.reason.contains("subject_node"))
+    }
+
+    @Test("A capture also requires the capability, and neither implies the other")
+    func capturesAndSubjectAreIndependent() throws {
+        // Deriving the capability from captures alone is what let a subject
+        // node through. Deriving it from the subject node alone would let a
+        // capture through, so both are asserted.
+        var bundle = try Self.fixture()
+        bundle.programs[1].clearSubjectNode()
+        bundle.programs[1].nodes.removeLast()
+        bundle.requiredFeatureIds.removeAll { $0 == Capability.capturesAndCallsV1 }
+        #expect(try Self.load(bundle) == nil, "without either construct the capability is not used")
+
+        var capture = Libbusinessid_Ir_V1_Capture()
+        capture.name = "whole"
+        capture.node = 0
+        bundle.programs[1].captures = [capture]
+        let error = try #require(try Self.load(bundle))
         #expect(error.reason.contains("CAPTURES_AND_CALLS_V1"))
     }
 }

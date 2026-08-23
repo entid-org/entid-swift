@@ -28,8 +28,15 @@ enum CapabilityUsage {
                     record(Capability.checksumCustomAlphabetV1, "CHAR_MAPPING_CUSTOM_ALPHABET")
                 }
             }
-            if !program.captures.isEmpty || program.subject != nil {
-                record(Capability.capturesAndCallsV1, "Program.captures or Program.subject_node")
+            // Both constructs are frozen content of the capability, and
+            // neither implies the other. Deriving it from captures alone lets
+            // a subject node through, which is how a bundle declaring one
+            // without declaring the capability gets accepted.
+            if !program.captures.isEmpty {
+                record(Capability.capturesAndCallsV1, "Program.captures")
+            }
+            if program.subject != nil {
+                record(Capability.capturesAndCallsV1, "Program.subject_node")
             }
         }
 

@@ -12,42 +12,42 @@ The engine passes 666/666 conformance cases under these readings.
 
 ## Open
 
-### 1. `loader-subject-node-circular-037` carries two independent invalidities
+### 1. `loader-left-pad-length-026` is refused by two checks its name is not about
 
-Rules `2026.08.18` added check 15's clause on "a subject node that does not read
-the subject it defines", and the fixture `bundles/subject_node_circular.binpb`
-to exercise it. No program of the published bundle declares a `subject_node`, so
-that fixture is the only thing in the corpus that can reach the clause.
+The fixture puts a `CANONICALIZATION_OP_KIND_LEFT_PAD` node inside the **format**
+program and makes it the **root** of that program. `ir.md` section 2 gives a
+format program the categories string, predicate, assertion and
+`CALL_OP_KIND_FORMAT`, and `ASSERTION_OP_KIND_SEQUENCE` as its only accepted
+root, so check 16 refuses the fixture twice over — before the `length: 4097` its
+name is about matters at all.
 
-It cannot prove the clause is implemented. The fixture declares
-`subject_node: 6` in program 2 and omits `CAPTURES_AND_CALLS_V1` (11) from
-`required_feature_ids`; `features.md` section 11 lists `Program.subject_node`
-among that capability's frozen content, so **check 25 refuses the fixture on its
-own**. Both checks answer `invalid_ruleset`, so the case is satisfied by an
-engine that never implemented the check 15 clause at all — which is exactly the
-engine the case exists to catch.
+An engine that never implemented the slice bound on `left_pad` therefore passes
+`loader-left-pad-length-026`. It is the same shape as the `subject_node`
+fixture, found by the same property once that property was written down.
 
-Measured here, on the fixture as shipped:
+Measured here:
 
 | Fixture, modified | Outcome |
 |---|---|
-| As shipped | refused, by check 15 (this engine runs 15 before 25) |
-| `required_feature_ids` extended with 11 | still refused, by check 15 |
-| plus `subject_node` cleared | **accepted** — nothing else in it is wrong |
-| `subject_node` well founded, capability 11 still omitted | refused, by check 25 |
+| As shipped | refused — `length 4097 is outside 0...4096`, the named defect |
+| Length repaired to 4096, nothing else | still refused — *a format program roots at an assertion SEQUENCE and nothing else* |
+| The node rehoused into a canonicalization program, length left at 4097 | refused — the named defect, in isolation |
 
-The third row is what makes the second meaningful, and the fourth is the second
-objection in isolation.
+The third row is what a repaired fixture should look like, and it also shows why
+the fixture was built this way: the demo bundle's only canonicalization program
+is *also* the dispatcher's pre-canonicalization program, which `ir.md` section 5
+restricts to five steps that do not include `LEFT_PAD`. The step has no legal
+home in the bundle as it stands.
 
-**Suggested fix:** declare capability 11 in the fixture. One line, and the case
-then tests what its description says it tests.
+**Suggested fix:** give the demo bundle a second canonicalization program, used
+by the definition and not by the dispatcher, and put the `left_pad` there. The
+case then isolates its defect.
 
-**Followed here:** the fixture is refused by check 15 for the stated reason, and
-`Tests/BusinessIDGeneratorTests/SubjectNodeTests.swift` isolates the clause from
-the capability so that this engine's compliance does not rest on the ambiguity.
-It also covers an *indirect* circularity — a subject node two levels above the
-`SUBJECT` read — which a check inspecting only the subject node itself would
-miss.
+**Followed here:** the fixture is refused, and
+`Tests/BusinessIDGeneratorTests/FixtureRepairTests.swift` records exactly which
+check answers at each stage, so this engine's compliance does not rest on the
+ambiguity. That test fails the day the fixture is fixed, which is the signal to
+move it into the repair table with the others.
 
 ### 2. `invalid_encoding` is unreachable through a Swift `String` API
 
@@ -80,6 +80,21 @@ as that is published.
 ## Settled upstream
 
 Kept for the record, because each one changed what this engine does.
+
+### The `subject_node` fixture, and check 25 counting it — settled in `2026.08.22`
+
+`loader-subject-node-circular-037` declared `subject_node` while omitting
+`CAPTURES_AND_CALLS_V1`, whose frozen content includes it, so check 25 refused
+the fixture on its own and the case could not tell an engine implementing check
+15's clause from one that never had. The fixture now declares the capability,
+and the reference loader now counts `subject_node` towards it rather than
+deriving the capability from captures alone.
+
+Measured here after the fix: repairing the circularity — pointing the subject
+node at `value()`, not deleting it — makes the fixture load, and removing the
+capability again refuses it naming `Program.subject_node`. Both directions are
+asserted, because deriving the capability from either construct alone lets the
+other through.
 
 ### Runtime bundle factories, resources and registry deliverables — settled in `2026.08.18`
 
