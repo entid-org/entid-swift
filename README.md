@@ -6,6 +6,9 @@ numbers, LEI, EUID and thirty four other kinds — for Swift.
 ```swift
 import BusinessID
 
+// `vat-be-normalization-004`. Synthetic, produced by the generator of
+// DATA_POLICY.md section 4 — it designates no company, and none is needed
+// here: a README example demonstrates an API, not what a register issues.
 let report = BusinessIDEngine.default.validate(
     IdentifierInput(kind: "vat", value: "BE 0123.456.749")
 )
@@ -16,7 +19,7 @@ report.format.status     // .valid
 report.checksum.status   // .valid
 ```
 
-Rules version `2026.08.25`: **94 definitions across 37 countries**, 37 identifier
+Rules version `2026.08.26`: **94 definitions across 37 countries**, 37 identifier
 kinds, and the full shared conformance corpus of **666 cases** passing.
 
 ## What this answers, and what it does not
@@ -33,6 +36,7 @@ checksum its authority has never published is neither fully validated nor
 invalid, and a single boolean would have to lie about one of the two:
 
 ```swift
+// `cegjegyzekszam-hu-valid-001`, synthetic like the one above.
 let report = engine.validate(IdentifierInput(kind: "cegjegyzekszam", value: "0123456789"))
 
 report.isFormatValid      // true
@@ -49,6 +53,13 @@ Refusing a valid identifier is the most serious defect this project recognises,
 and turning an absence of knowledge into a rejection is how it happens. An
 unknown kind, a country with no rule, an unpublished checksum algorithm — each
 is reported as what it is.
+
+Every identifier printed in this README is **synthetic** and names the
+conformance case it is quoted from. `engine.md` section 12.2.1 and
+`DATA_POLICY.md` section 3 separate the two demonstrations: a synthetic value
+proves an algorithm, a real one proves that a rule describes what a register
+issues. This file demonstrates an API, so synthetic is the correct choice — and
+a value written from memory is neither, and is forbidden everywhere.
 
 ## Installation
 
@@ -196,7 +207,7 @@ to the commit `rules.lock` records under `source_commit` — the same commit as
 the corpus, so a corpus can never be judged by another release's comparator:
 
 ```sh
-make conformance   # rules 2026.08.25: 666 cases, 666 matched, 0 differed
+make conformance   # rules 2026.08.26: 666 cases, 666 matched, 0 differed
 ```
 
 which is
