@@ -103,6 +103,75 @@ struct LoadCheckTests {
         }
     }
 
+    // MARK: The order of section 10
+
+    /// `ir.md` section 10 numbers its checks and says "in this order". Two
+    /// engines answered differently on the same bytes because one ran the
+    /// operation categories in the per-node pass, ahead of the arithmetic
+    /// bounds at check 13, while the rule belongs to check 16. Since
+    /// `2026.08.26` check 16 names the categories explicitly, so which check
+    /// answers is now a stated property rather than an accident of structure.
+    ///
+    /// The node below carries both faults at once, exactly as the old
+    /// `loader-left-pad-length-026` fixture did: a `LEFT_PAD` — a
+    /// canonicalization operation with no place in a format program, check 16 —
+    /// whose `length` is one past the slice bound, check 13. Thirteen comes
+    /// first, so the length is what a conformant loader reports.
+    @Test("A node breaking both check 13 and check 16 is refused by thirteen")
+    func arithmeticBoundsPrecedeTheShape() throws {
+        let outcome = try load {
+            $0.programs[2].nodes.insert(
+                BundleBuilder.canonical(.leftPad) { operation in
+                    operation.text = "0"
+                    operation.length = 4097
+                },
+                at: 0
+            )
+            // Every operand index above the insertion shifts by one.
+            for index in $0.programs[2].nodes.indices where index > 0 {
+                $0.programs[2].nodes[index].inputNodes = $0.programs[2].nodes[index].inputNodes.map { $0 + 1 }
+            }
+            $0.programs[2].rootNode += 1
+        }
+
+        guard case .failure(let error) = outcome else {
+            Issue.record("a bundle carrying both faults was accepted")
+            return
+        }
+        #expect(error.engineErrorName == "invalid_ruleset")
+        #expect(
+            error.reason.contains("length 4097 is outside"),
+            Comment(rawValue: "check 13 must answer before check 16, got: \(error.reason)")
+        )
+        #expect(!error.reason.contains("has no place in a format program"))
+    }
+
+    /// The same node with a legal bound, so the category is what is left to
+    /// object to. Without this, the test above would pass against a loader that
+    /// had no category rule at all.
+    @Test("With the bound repaired, check 16 refuses the same node for its category")
+    func theShapeStillRefusesTheCategory() throws {
+        let outcome = try load {
+            $0.programs[2].nodes.insert(
+                BundleBuilder.canonical(.leftPad) { operation in
+                    operation.text = "0"
+                    operation.length = 4096
+                },
+                at: 0
+            )
+            for index in $0.programs[2].nodes.indices where index > 0 {
+                $0.programs[2].nodes[index].inputNodes = $0.programs[2].nodes[index].inputNodes.map { $0 + 1 }
+            }
+            $0.programs[2].rootNode += 1
+        }
+
+        guard case .failure(let error) = outcome else {
+            Issue.record("a canonicalization step in a format program was accepted")
+            return
+        }
+        #expect(error.reason.contains("has no place in a format program"))
+    }
+
     // MARK: Programs
 
     @Test("Programs out of ascending id order are refused")
