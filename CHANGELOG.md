@@ -154,7 +154,10 @@ rules update that changes no API is a patch release here.
   runner left `-only-testing:BusinessIDConformanceTests` naming a target that no
   longer exists, and left `BusinessIDTesteeTests` — which drives a subprocess —
   compiled for a simulator that has no `Process`. The target is now compiled out
-  anywhere but macOS, and the job runs the library suite: 111 tests in 11 suites.
+  anywhere but macOS, and the job runs the library suite, measured green on a
+  simulator. The count is left to the run rather than written here: a number
+  in prose goes stale on the next test added, which is how a job name came to
+  claim 665 cases against a corpus of 666.
 
 ## [0.1.0]
 
