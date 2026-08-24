@@ -16,10 +16,19 @@ import Testing
 /// lengths writes one `prefix_in` per length under an `any`. So the mixed table
 /// these tests exercise is a shape this engine can no longer be handed.
 ///
-/// They stay anyway. A search that would answer wrongly on a table it can no
-/// longer receive is still worth knowing about: the load check and the search
-/// are two pieces of code that can drift apart, and this suite is what notices
-/// if the first is ever relaxed while the second still assumes it.
+/// They stay, and since `2026.08.32` that is not this engine's judgement but a
+/// requirement. `ir.md` says the refusal takes its own evidence with it: no
+/// conformance case can distinguish a search run per length from one run over
+/// the whole table, because the shape that separates them is the shape the
+/// loader refuses. An engine MUST therefore pin the semantics below its loader,
+/// by a native test comparing its search against the definition transcribed
+/// literally — some element is a prefix of the subject — over tables of mixed
+/// lengths. That is `agreesWithAScan`, and it is the second rule the corpus
+/// cannot carry, alongside `invalid_encoding`.
+///
+/// The independent reason still holds: the load check and the search are two
+/// pieces of code that can drift apart, and this suite is what notices if the
+/// first is relaxed while the second still assumes it.
 @Suite("Prefix membership")
 struct PrefixMembershipTests {
     /// The order the generator emits: length first, code points second.
@@ -62,6 +71,25 @@ struct PrefixMembershipTests {
             #expect(Predicates.prefixIn(Self.view(hit), values), Comment(rawValue: hit))
         }
         for miss in ["B1001", "9A0001", "ZY", "K1101S", "0102", "", "Z"] {
+            #expect(!Predicates.prefixIn(Self.view(miss), values), Comment(rawValue: miss))
+        }
+    }
+
+    /// A table the loader accepts and whose blocks are not all one size.
+    ///
+    /// `ir.md` states the element length in UTF-8 bytes, and allows an engine
+    /// working in another unit to group more finely. This engine groups by code
+    /// point count, so `["PZ", "é"]` — two bytes each, two code points and one —
+    /// reaches the search as two blocks. It is the one shape a bundle may still
+    /// carry that exercises the block walk.
+    @Test("A byte-equal table with two code point lengths is searched correctly")
+    func equalBytesUnequalCodePoints() {
+        let values = Self.table(["PZ", "\u{00E9}"])
+        #expect(values.map(\.count) == [1, 2], "one block of one code point, one of two")
+        for hit in ["PZ", "PZX", "\u{00E9}", "\u{00E9}X"] {
+            #expect(Predicates.prefixIn(Self.view(hit), values), Comment(rawValue: hit))
+        }
+        for miss in ["P", "QQ", "\u{00E8}", ""] {
             #expect(!Predicates.prefixIn(Self.view(miss), values), Comment(rawValue: miss))
         }
     }

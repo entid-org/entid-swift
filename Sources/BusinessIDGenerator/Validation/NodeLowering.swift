@@ -384,10 +384,21 @@ struct NodeLowering {
             // `"ABCD"` finds `ABA`, which is not a prefix, while `AB` is. At a
             // single length, starting with an element is equalling its opening
             // of that length, so the search is exact.
-            let lengths = Set(values.map { $0.unicodeScalars.count })
+            // In UTF-8 bytes, which is the unit `ir.md` states, not the unit
+            // that would suit this engine. Its own search groups by code point
+            // count, which is finer: `PZ` and `é` are both two bytes and are
+            // not both two code points, so a byte-equal table can still hold
+            // two code point lengths. A finer grouping refuses nothing the byte
+            // reading accepts, so the loader checks bytes and the search blocks
+            // more narrowly.
+            //
+            // Check 13 runs the order of section 9 first and this second, in
+            // that order, so a list that is both mis-ordered and mixed reports
+            // the order.
+            let lengths = Set(values.map { $0.utf8.count })
             guard lengths.count <= 1 else {
                 throw reject(
-                    "values mixes element lengths \(lengths.sorted()); "
+                    "values mixes element lengths \(lengths.sorted()) in UTF-8 bytes; "
                         + "write one prefix_in per length under an any"
                 )
             }

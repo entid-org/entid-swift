@@ -12,8 +12,23 @@ The engine passes 676/676 conformance cases under these readings.
 
 ## Open
 
-Nothing open. Every defect reported from this engine has been settled upstream;
-the record is below.
+### `engine.md` numbers two different sections 12.5
+
+`### 12.5 Mutation testing` at line 845 and `## 12.5 Une seule commande,
+silencieuse quand tout passe` at line 851. A reference to "section 12.5" is
+ambiguous between the two, and this engine now has documentation, a `CLAUDE.md`
+and a script citing the second by that number.
+
+The second is also written at `##`, one level above the first, which makes it a
+sibling of `## 12. Exigences qualité` rather than one of its subsections — so
+structurally it sits outside the section whose number it carries.
+
+**Suggested fix:** renumber the single-command section to `### 12.6`, at the
+heading level of its siblings.
+
+**Followed here:** the citations say "section 12.5" and mean the single command,
+because that is what the surrounding text is about. Nothing in this engine turns
+on the number.
 
 ---
 

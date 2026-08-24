@@ -19,8 +19,18 @@ rules update that changes no API is a patch release here.
 
 ### Changed
 
+- **The rules version moves backwards, from `2026.09.2` to `2026.08.32`.**
+  `PATCH` in `YYYY.MM.PATCH` is a counter within a month with no upper bound,
+  and four versions had announced September while still in August. Measured
+  here before accepting it: nothing in this repository compares versions for
+  order. All five comparisons are equality — the generator against the lock, the
+  corpus against the lock, the engine against the lock, and two in tests — and
+  the only code that looks at the version's structure asserts it has three
+  dot-separated components, which `2026.08.32` satisfies.
+
+
 - Conformance is now the upstream runner's verdict:
-  `rules 2026.09.2: 676 cases, 676 matched, 0 differed`. `make conformance`
+  `rules 2026.08.32: 676 cases, 676 matched, 0 differed`. `make conformance`
   runs it. A Go toolchain in CI is the only new prerequisite, and it is a build
   tool: nothing about it enters the published package or its dependencies.
 - The tests that proved the deleted comparator was not vacuous are kept and
@@ -29,10 +39,26 @@ rules update that changes no API is a patch release here.
   differently depending on which case it was handed.
 
 - Rules `2026.08.17` → `2026.08.18` → `2026.08.22` → `2026.08.23` → `2026.08.25`
-  → `2026.08.26` → `2026.08.31` → `2026.09.0` → `2026.09.1` → `2026.09.2`.
-  Every bundle but
+  → `2026.08.26` → `2026.08.31` → `2026.09.0` → `2026.09.1` → `2026.09.2`
+  → `2026.08.32`. Every bundle but
   `2026.08.31` changed in its business version alone; no rule moved in those,
   and the regenerated code differs by the one line that carries the version.
+- **The `prefix_in` element length is measured in UTF-8 bytes**, which is the
+  unit `ir.md` states — not the unit that would suit this engine's search. `PZ`
+  and `é` are both two bytes and are not both two code points, so a table this
+  loader must accept can still reach the search as two blocks. Reading the rule
+  in code points would have refused that table and accepted `["PZ", "éé"]`,
+  which is two code points each and two bytes against four; both directions are
+  pinned, and both fail under the code point reading.
+
+  No conformance case separates the two readings — every element of the
+  published bundle is ASCII, where they agree — so this is pinned natively, as
+  is the per-length search semantics itself: since `2026.08.32` `ir.md` states
+  that the mixed-length refusal takes its own evidence with it and that an
+  engine MUST pin the semantics below its loader. The four hundred random tables
+  of `PrefixMembershipTests` were already doing that by this engine's own
+  judgement; they now satisfy a stated requirement.
+
 - **A `prefix_in` may not mix element lengths**, refused since `2026.09.2` and
   now refused here. This engine reported the gap that led to the rule: the
   published bundle cannot prove the mixed-length reasoning, because all four of
@@ -145,6 +171,29 @@ rules update that changes no API is a patch release here.
   carried.
 
 ### Added
+
+- **`make verify`, the single entry point `engine.md` section 12.5 requires.**
+  It runs the lock digests, the regenerated code, both build configurations, the
+  tests, the conformance corpus judged by the runner from `spec`, lint, format,
+  coverage against its thresholds, the dependency audit, the fuzz smoke run, the
+  example consumer and the iOS simulator. It prints **one line** when everything
+  passes, the failing step's name and that step's output and nothing else when
+  one does not, and exits non-zero the moment a step fails.
+
+  CI calls the same script, so "green" never has two definitions: eleven jobs
+  became one `verify` job, plus two that are not subsets of it — the minimum
+  toolchain, which is a different Swift rather than a different set of steps,
+  and the Protobuf round trip, which needs tools the engine's verification has
+  no reason to require. The release workflow calls it too.
+
+  The rule lives in `CLAUDE.md`, which section 12.5 asks for: it addresses
+  whoever runs, not whoever reads.
+
+  Its failure path was written wrong first and caught before it was trusted:
+  `if ! "$@"` makes `$?` the status of the negation, which is always zero, so a
+  failing step would have exited **zero**. The status is now taken from the
+  command itself, and the comment says why.
+
 
 - `PrefixMembershipTests`: a differential test comparing the search against the
   loop it must be equivalent to over four hundred random tables, a probe budget
