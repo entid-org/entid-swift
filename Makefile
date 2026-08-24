@@ -3,10 +3,17 @@ SWIFT ?= swift
 SPEC ?= spec
 GENERATED := Sources/BusinessID/Generated
 
-.DEFAULT_GOAL := check
+.DEFAULT_GOAL := verify
+
+# The single entry point of `engine.md` section 12.5: silent when everything
+# passes, the failing step's output and only that when one does not. CI calls it
+# too, so "green" never has two definitions.
+.PHONY: verify
+verify: ## Everything, in one command, quiet unless something fails
+	@./Tools/verify.sh
 
 .PHONY: check
-check: verify-lock format-check lint build test conformance generated-check ## Everything a pull request must pass
+check: verify ## Alias kept for muscle memory
 
 .PHONY: build
 build: ## Build debug and release with warnings as errors

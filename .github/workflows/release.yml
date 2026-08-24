@@ -18,49 +18,27 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - name: The artefacts match rules.lock
-        run: ./Tools/verify-lock.sh
-
-      # Regenerating from the attested bundle must reproduce the committed code
-      # exactly. If it does not, the tag would ship rules nobody reviewed.
-      - name: Generated code is reproducible from the attested bundle
-        run: |
-          swift run businessid-gen
-          git diff --exit-code -- Sources/BusinessID/Generated
-
-      - name: Format, lint, build, test
-        run: |
-          swift format lint --recursive --strict --parallel Sources Tests Package.swift
-          brew install swiftlint
-          swiftlint lint --strict --quiet
-          swift build
-          swift build -c release
-          swift test
-
-      # `go-version: stable`, and `GOTOOLCHAIN: auto` on the runner step below.
-      # `engine.md` section 11.1: `actions/setup-go` sets `GOTOOLCHAIN: local`,
-      # which forbids fetching a toolchain, and the binding condition is the
-      # `go` line of the spec module — not its `toolchain` line. Measured here:
-      # stable resolves to go1.27.0 and the module asks for `go 1.25.0`, so this
-      # job never meets the case. The override is set anyway, as the section
-      # advises: it costs nothing, and spec's `go` line will rise one day.
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: stable
           cache: false
-      - name: The whole conformance corpus, judged by the spec runner
+      - name: SwiftLint
+        run: brew install swiftlint
+
+      # The same entry point CI and a developer call. A tag means nothing if
+      # "green" here could differ from "green" there.
+      - name: make verify
         env:
           GOTOOLCHAIN: auto
-        run: make conformance
+        run: make verify
 
-      - name: Coverage gates
-        run: ./Tools/coverage.sh
-
-      - name: A consumer can resolve and use the package
+      # Regenerating from the attested bundle must reproduce the committed code
+      # exactly. `verify` checks the committed output matches; this checks that
+      # writing it again produces the same bytes, which is what a tag ships.
+      - name: Generated code is reproducible from the attested bundle
         run: |
-          cd Examples/BusinessIDConsumer
-          swift build
-          swift run BusinessIDConsumer
+          swift run businessid-gen
+          git diff --exit-code -- Sources/BusinessID/Generated
 
       # The tag is the version. A mismatch means the changelog and the package
       # disagree about what is being published.

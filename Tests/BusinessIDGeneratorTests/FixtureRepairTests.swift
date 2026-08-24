@@ -337,7 +337,7 @@ struct FixtureRepairTests {
     func mixedLengthPrefixInIsRefusedForItsLengths() throws {
         let error = try #require(try Self.outcome(try Self.payload("loader-prefix-in-mixed-lengths-040")))
         #expect(error.engineErrorName == "invalid_ruleset")
-        #expect(error.reason.contains("values mixes element lengths [2, 3]"))
+        #expect(error.reason.contains("values mixes element lengths [2, 3] in UTF-8 bytes"))
         #expect(error.reason.contains("one prefix_in per length under an any"))
         // Not the order rule: the fixture's values are correctly ordered.
         #expect(!error.reason.contains("ascending and deduplicated"))
