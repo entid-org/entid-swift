@@ -22,6 +22,19 @@ import Testing
 /// exists only to reach this branch. `engine-swift.md` says not to, and it is
 /// right: a public type is a commitment SemVer freezes, and this one would
 /// exist to serve a reason code rather than a caller.
+///
+/// Since `2026.08.31` `ir.md` section 6 step 1 states the consequence for the
+/// input bound as well, and it is what this suite already relied on. The bound
+/// counts UTF-8 bytes and runs *before* the step that refuses ill formed text,
+/// so an engine whose string type admits such text has to choose what to count
+/// and MUST say which — a lone surrogate encodes to one replacement byte
+/// through a platform encoder and to three through the encoding it would have
+/// had. Swift's `String` admits none, so there is no choice to state and no
+/// answer to defend: every value that reaches this API already has exactly one
+/// UTF-8 encoding.
+///
+/// What was reasoning here is now normative text, and nothing in this engine
+/// changed to meet it.
 @Suite("Encoding")
 struct EncodingTests {
     // UTF-8 decoding that repairs rather than refuses.
@@ -98,6 +111,32 @@ struct EncodingTests {
                 #expect(engine.canonicalize(input).reasonCode != .invalidEncoding)
             }
         }
+    }
+
+    /// The bound is UTF-8 bytes, on the one input where the two readings of
+    /// `ir.md` section 6 step 1 would separate elsewhere.
+    ///
+    /// U+FFFD is what a repairing decoder substitutes for an ill formed byte,
+    /// and it occupies three UTF-8 bytes and one code point. An engine counting
+    /// code points would accept 1024 of them — 3072 bytes — and one counting
+    /// what its encoder produced for a surrogate would land somewhere else
+    /// again. This asserts the byte count, at the boundary, from both sides.
+    @Test("The input bound counts UTF-8 bytes, not code points")
+    func theBoundCountsBytes() {
+        let engine = BusinessIDEngine.default
+        // 341 x 3 = 1023 bytes, one below the bound; 342 x 3 = 1026, past it.
+        let under = String(repeating: "\u{FFFD}", count: 341)
+        let over = String(repeating: "\u{FFFD}", count: 342)
+        #expect(under.utf8.count == 1023 && under.unicodeScalars.count == 341)
+        #expect(over.utf8.count == 1026 && over.unicodeScalars.count == 342)
+
+        let accepted = engine.validate(IdentifierInput(kind: "siren", value: under))
+        #expect(accepted.format.reasonCode != .inputTooLong)
+        let refused = engine.validate(IdentifierInput(kind: "siren", value: over))
+        #expect(refused.format.status == .unsupported)
+        #expect(refused.format.reasonCode == .inputTooLong)
+        // A safety bound is never a business verdict.
+        #expect(refused.checksum.status == .notRun)
     }
 
     @Test("The reason code stays in the public registry, reachable or not")
