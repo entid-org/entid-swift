@@ -6,7 +6,7 @@ reading this engine follows. None of them is worked around silently: where a
 choice had to be made, it is the one the more recent and argued text states, and
 it is marked here so that `spec` can settle it.
 
-The engine passes 673/673 conformance cases under these readings.
+The engine passes 675/675 conformance cases under these readings.
 
 ---
 

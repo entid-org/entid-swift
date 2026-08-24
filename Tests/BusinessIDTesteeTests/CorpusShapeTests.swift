@@ -23,7 +23,7 @@ struct CorpusShapeTests {
     func corpusShape() throws {
         let corpus = try TesteeHarness.corpus()
         #expect(corpus.rulesVersion == BusinessIDRulesVersion.locked)
-        #expect(corpus.cases.count == 673)
+        #expect(corpus.cases.count == 675)
 
         var counts: [Libbusinessid_Conformance_V1_Operation: Int] = [:]
         for testCase in corpus.cases { counts[testCase.operation, default: 0] += 1 }
@@ -31,7 +31,7 @@ struct CorpusShapeTests {
         #expect(counts[.validate] == 621)
         #expect(counts[.validateFormat] == 3)
         #expect(counts[.validateChecksum] == 1)
-        #expect(counts[.loadRuleset] == 35)
+        #expect(counts[.loadRuleset] == 37)
     }
 
     /// `ir.md` section 5 step 1: no conformance case can carry

@@ -26,13 +26,16 @@ struct BundleLoaderTests {
         #expect(countries.count == 37)
     }
 
-    /// The thirty four `load_ruleset` cases of the corpus, each addressed to
-    /// the generator. The expectation compared is the typed error alone: the
-    /// runner reads it, the generator never does.
+    /// Every `load_ruleset` case of the corpus, each addressed to the generator.
+    /// The expectation compared is the typed error alone: the runner reads it,
+    /// the generator never does.
+    ///
+    /// The count is asserted rather than written into this sentence, which said
+    /// "thirty four" while the assertion below said thirty five.
     @Test("Every hostile bundle of the corpus is refused with the stated error")
     func hostileBundlesAreRefused() throws {
         let cases = try SpecCorpus.loaderCases()
-        #expect(cases.count == 35)
+        #expect(cases.count == 37)
 
         for testCase in cases {
             let observed: String
