@@ -146,12 +146,20 @@ a workflow to request, so a human clicks them once:
   `gh pr merge --auto` is refused and the synchronization run goes red with the
   pull request already open.
 - **A branch protection on `main` requiring exactly one status check, `Verify`** —
-  the job that runs the section 12.5 entry point. Auto-merge merges as soon as
-  nothing *blocks*, which is not the same as merging on green: with no required
-  check it would merge a red synchronization immediately. And `Verify` has to be
-  the only required check, or "green" has two definitions and auto-merge follows
-  the weaker one. The script reads the required checks and refuses to enable
-  auto-merge when they are not exactly that.
+  the name under which the section 12.5 entry point reports. Auto-merge merges as
+  soon as nothing *blocks*, which is not the same as merging on green: with no
+  required check it would merge a red synchronization immediately. And `Verify`
+  has to be the only required check, or "green" has two definitions and
+  auto-merge follows the weaker one. The script reads the required checks and
+  refuses to enable auto-merge when they are not exactly that.
+
+  On a synchronization pull request that verdict does not come from `ci.yml`. A
+  pull request opened with a repository's own `GITHUB_TOKEN` starts no
+  `pull_request` workflow — GitHub cuts there so an action cannot call itself in
+  a loop — so the required check would never start and auto-merge would wait
+  forever. The synchronization workflow has already run `make verify`; it
+  publishes that result as a commit status named `Verify`. Same definition of
+  green, same name, no second workflow and no wider token.
 - **Allow GitHub Actions to create and approve pull requests**, without which
   the token cannot open the pull request at all. This one is two settings, not
   one: the repository checkbox (Settings → Actions → General → Workflow
