@@ -30,7 +30,7 @@ rules update that changes no API is a patch release here.
 
 
 - Conformance is now the upstream runner's verdict:
-  `rules 2026.08.32: 676 cases, 676 matched, 0 differed`. `make conformance`
+  `rules 2026.08.33: 676 cases, 676 matched, 0 differed`. `make conformance`
   runs it. A Go toolchain in CI is the only new prerequisite, and it is a build
   tool: nothing about it enters the published package or its dependencies.
 - The tests that proved the deleted comparator was not vacuous are kept and
@@ -40,7 +40,7 @@ rules update that changes no API is a patch release here.
 
 - Rules `2026.08.17` → `2026.08.18` → `2026.08.22` → `2026.08.23` → `2026.08.25`
   → `2026.08.26` → `2026.08.31` → `2026.09.0` → `2026.09.1` → `2026.09.2`
-  → `2026.08.32`. Every bundle but
+  → `2026.08.32` → `2026.08.33`. Every bundle but
   `2026.08.31` changed in its business version alone; no rule moved in those,
   and the regenerated code differs by the one line that carries the version.
 - **The `prefix_in` element length is measured in UTF-8 bytes**, which is the
