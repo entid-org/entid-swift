@@ -35,7 +35,7 @@ struct BundleLoaderTests {
     @Test("Every hostile bundle of the corpus is refused with the stated error")
     func hostileBundlesAreRefused() throws {
         let cases = try SpecCorpus.loaderCases()
-        #expect(cases.count == 37)
+        #expect(cases.count == 38)
 
         for testCase in cases {
             let observed: String

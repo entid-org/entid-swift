@@ -20,7 +20,7 @@ rules update that changes no API is a patch release here.
 ### Changed
 
 - Conformance is now the upstream runner's verdict:
-  `rules 2026.09.1: 675 cases, 675 matched, 0 differed`. `make conformance`
+  `rules 2026.09.2: 676 cases, 676 matched, 0 differed`. `make conformance`
   runs it. A Go toolchain in CI is the only new prerequisite, and it is a build
   tool: nothing about it enters the published package or its dependencies.
 - The tests that proved the deleted comparator was not vacuous are kept and
@@ -29,9 +29,35 @@ rules update that changes no API is a patch release here.
   differently depending on which case it was handed.
 
 - Rules `2026.08.17` → `2026.08.18` → `2026.08.22` → `2026.08.23` → `2026.08.25`
-  → `2026.08.26` → `2026.08.31` → `2026.09.0` → `2026.09.1`. Every bundle but
+  → `2026.08.26` → `2026.08.31` → `2026.09.0` → `2026.09.1` → `2026.09.2`.
+  Every bundle but
   `2026.08.31` changed in its business version alone; no rule moved in those,
   and the regenerated code differs by the one line that carries the version.
+- **A `prefix_in` may not mix element lengths**, refused since `2026.09.2` and
+  now refused here. This engine reported the gap that led to the rule: the
+  published bundle cannot prove the mixed-length reasoning, because all four of
+  its `prefix_in` nodes hold one element length — 1748 of five, 818 of six, 148
+  of four, 41 of two — so blocking by length is a no-op on them and every
+  conformance case passes against a search that mishandles a mixed table.
+
+  The reason is correctness, not speed: over one sorted list of mixed lengths a
+  search for the greatest element not after the value answers wrongly, since
+  `["AB", "ABA"]` against `"ABCD"` finds `ABA`, which is not a prefix, while
+  `AB` is. At one length, starting with an element is equalling its opening of
+  that length. A rule needing two lengths writes one `prefix_in` per length
+  under an `any`, and the refusal message says so.
+
+  `loader-prefix-in-mixed-lengths-040` was accepted here before the check
+  existed, which is what made it the failing test. It joins the fixtures with no
+  definable repair for the same reason as the alphabet family: bringing two
+  values of different lengths to one length invents a value, and dropping one
+  erases half the construct.
+
+  `PrefixMembershipTests` keeps its four hundred random mixed tables even though
+  the loader now refuses the shape they exercise. The load check and the search
+  are two pieces of code that can drift apart, and the suite is what notices if
+  the first is relaxed while the second still assumes it.
+
 - **The declared order of `prefix_in` values was already enforced here**, which
   `ir.md` section 9 has always stated and check 13 has named since `2026.09.1`.
   The reference loader was not enforcing it, and the omission is invisible while
@@ -134,7 +160,7 @@ rules update that changes no API is a patch release here.
   rather than to `invalid_ruleset` alone.
 - `FixtureRepairTests` also pins `loader-prefix-in-unsorted-039` and repairs it:
   sorting the values makes the bundle load, which is what proves the fixture
-  carries one defect and not two. The corpus reaches 675 cases, 37 of them
+  carries one defect and not two. The corpus reaches 676 cases, 38 of them
   addressed to the generator.
 
 

@@ -378,6 +378,19 @@ struct NodeLowering {
             guard zip(values, values.dropFirst()).allSatisfy({ precedesByUTF8($0, $1) }) else {
                 throw reject("values is not ascending and deduplicated")
             }
+            // One `prefix_in` holds one element length. Over a sorted list of
+            // mixed lengths, a search for the greatest element not after the
+            // value answers wrongly rather than slowly: `["AB", "ABA"]` against
+            // `"ABCD"` finds `ABA`, which is not a prefix, while `AB` is. At a
+            // single length, starting with an element is equalling its opening
+            // of that length, so the search is exact.
+            let lengths = Set(values.map { $0.unicodeScalars.count })
+            guard lengths.count <= 1 else {
+                throw reject(
+                    "values mixes element lengths \(lengths.sorted()); "
+                        + "write one prefix_in per length under an any"
+                )
+            }
             return .prefixIn(values)
         case .charAtIn:
             try requireParameters(.predicateCharAtIn, present: present, required: ["index", "text"])
