@@ -23,12 +23,12 @@ struct CorpusShapeTests {
     func corpusShape() throws {
         let corpus = try TesteeHarness.corpus()
         #expect(corpus.rulesVersion == BusinessIDRulesVersion.locked)
-        #expect(corpus.cases.count == 666)
+        #expect(corpus.cases.count == 673)
 
         var counts: [Libbusinessid_Conformance_V1_Operation: Int] = [:]
         for testCase in corpus.cases { counts[testCase.operation, default: 0] += 1 }
         #expect(counts[.canonicalize] == 13)
-        #expect(counts[.validate] == 614)
+        #expect(counts[.validate] == 621)
         #expect(counts[.validateFormat] == 3)
         #expect(counts[.validateChecksum] == 1)
         #expect(counts[.loadRuleset] == 35)

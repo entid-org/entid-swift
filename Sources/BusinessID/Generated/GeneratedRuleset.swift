@@ -12,14 +12,14 @@
 // compiler on `Int` and are unreachable.
 
 enum GeneratedRuleset {
-    static let rulesVersion = "2026.08.26"
+    static let rulesVersion = "2026.08.31"
     static let formatVersion = 1
     static let capabilities: [Int] = [1, 2, 3, 4, 5, 10, 11, 20, 21, 30, 31, 32, 33, 34, 35, 40, 41, 42]
     static let identifierCount = 94
     static let countryCount = 37
     static let canonicalKinds: [IdentifierKind] = ["cegjegyzekszam", "cnpj", "codice_fiscale_impresa", "company_number", "corporate_number", "cro_number", "cui", "cvr", "duns", "eik", "ein", "enterprise_number", "eori", "euid", "firmenbuchnummer", "gemi", "handelsregisternummer", "he_number", "ico", "juridinio_asmens_kodas", "krs", "kvk", "lei", "maticna_stevilka", "mbr_number", "mbs", "nif", "nipc", "organisationsnummer", "rcs_number", "registracijas_numurs", "registrikood", "siren", "siret", "uscc", "vat", "y_tunnus"]
 
-    static let expansionProfile = "250 programs, 3069 instances, worst program 152 at 118"
+    static let expansionProfile = "250 programs, 3094 instances, worst program 152 at 118"
 
     /// Step 2 and 3 of dispatch: the canonical kind and its aliases share one
     /// space, which the load checks proved holds no duplicate.
@@ -492,14 +492,14 @@ enum GeneratedRuleset {
             if PrefixMatch.hasPrefix(v, GeneratedLiterals.t27) { return 70 }
             if PrefixMatch.hasPrefix(v, GeneratedLiterals.t28) { return 71 }
             if PrefixMatch.hasPrefix(v, GeneratedLiterals.t29) { return 72 }
-            if PrefixMatch.hasPrefix(v, GeneratedLiterals.t52) { return 73 }
+            if PrefixMatch.hasPrefix(v, GeneratedLiterals.t51) { return 73 }
             if PrefixMatch.hasPrefix(v, GeneratedLiterals.t8) { return 74 }
             if PrefixMatch.hasPrefix(v, GeneratedLiterals.t30) { return 75 }
             if PrefixMatch.hasPrefix(v, GeneratedLiterals.t31) { return 76 }
             if PrefixMatch.hasPrefix(v, GeneratedLiterals.t32) { return 77 }
-            if PrefixMatch.hasPrefix(v, GeneratedLiterals.t53) { return 78 }
+            if PrefixMatch.hasPrefix(v, GeneratedLiterals.t52) { return 78 }
             if PrefixMatch.hasPrefix(v, GeneratedLiterals.t33) { return 79 }
-            if PrefixMatch.hasPrefix(v, GeneratedLiterals.t54) { return 80 }
+            if PrefixMatch.hasPrefix(v, GeneratedLiterals.t53) { return 80 }
             if PrefixMatch.hasPrefix(v, GeneratedLiterals.t35) { return 81 }
             if PrefixMatch.hasPrefix(v, GeneratedLiterals.t36) { return 82 }
             if PrefixMatch.hasPrefix(v, GeneratedLiterals.t37) { return 83 }
@@ -873,658 +873,658 @@ enum GeneratedRuleset {
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t31))
         case 1:
             GeneratedPrograms.canon4(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t57))
         case 2:
             GeneratedPrograms.canon51(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t33))
         case 3:
             GeneratedPrograms.canon45(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
-                    canonicalPrefix: GeneratedLiterals.t52))
+                    acceptedPrefixes: GeneratedLiterals.p4,
+                    canonicalPrefix: GeneratedLiterals.t51))
         case 4:
             GeneratedPrograms.canon52(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t58))
         case 5:
             GeneratedPrograms.canon50(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t32))
         case 6:
             GeneratedPrograms.canon61(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t41))
         case 7:
             GeneratedPrograms.canon11(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t25))
         case 8:
             GeneratedPrograms.canon46(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t59))
         case 9:
             GeneratedPrograms.canon3(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t21))
         case 10:
             GeneratedPrograms.canon65(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t60))
         case 11:
             GeneratedPrograms.canon2(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t20))
         case 12:
             GeneratedPrograms.canon47(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t59))
         case 13:
             GeneratedPrograms.canon15(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p2,
+                    acceptedPrefixes: GeneratedLiterals.p5,
                     canonicalPrefix: GeneratedLiterals.t19))
         case 14:
             GeneratedPrograms.canon16(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p3,
+                    acceptedPrefixes: GeneratedLiterals.p6,
                     canonicalPrefix: GeneratedLiterals.t20))
         case 15:
             GeneratedPrograms.canon17(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p4,
+                    acceptedPrefixes: GeneratedLiterals.p7,
                     canonicalPrefix: GeneratedLiterals.t21))
         case 16:
             GeneratedPrograms.canon18(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p5,
+                    acceptedPrefixes: GeneratedLiterals.p8,
                     canonicalPrefix: GeneratedLiterals.t22))
         case 17:
             GeneratedPrograms.canon19(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p6,
+                    acceptedPrefixes: GeneratedLiterals.p9,
                     canonicalPrefix: GeneratedLiterals.t23))
         case 18:
             GeneratedPrograms.canon20(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p7,
+                    acceptedPrefixes: GeneratedLiterals.p10,
                     canonicalPrefix: GeneratedLiterals.t24))
         case 19:
             GeneratedPrograms.canon21(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p8,
+                    acceptedPrefixes: GeneratedLiterals.p11,
                     canonicalPrefix: GeneratedLiterals.t25))
         case 20:
             GeneratedPrograms.canon22(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p9,
+                    acceptedPrefixes: GeneratedLiterals.p12,
                     canonicalPrefix: GeneratedLiterals.t26))
         case 21:
             GeneratedPrograms.canon23(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p10,
+                    acceptedPrefixes: GeneratedLiterals.p13,
                     canonicalPrefix: GeneratedLiterals.t9))
         case 22:
             GeneratedPrograms.canon24(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p11,
+                    acceptedPrefixes: GeneratedLiterals.p14,
                     canonicalPrefix: GeneratedLiterals.t27))
         case 23:
             GeneratedPrograms.canon25(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p12,
+                    acceptedPrefixes: GeneratedLiterals.p15,
                     canonicalPrefix: GeneratedLiterals.t28))
         case 24:
             GeneratedPrograms.canon26(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p13,
+                    acceptedPrefixes: GeneratedLiterals.p16,
                     canonicalPrefix: GeneratedLiterals.t29))
         case 25:
             GeneratedPrograms.canon27(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p14,
+                    acceptedPrefixes: GeneratedLiterals.p17,
                     canonicalPrefix: GeneratedLiterals.t30))
         case 26:
             GeneratedPrograms.canon28(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p15,
+                    acceptedPrefixes: GeneratedLiterals.p18,
                     canonicalPrefix: GeneratedLiterals.t31))
         case 27:
             GeneratedPrograms.canon29(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p16,
+                    acceptedPrefixes: GeneratedLiterals.p19,
                     canonicalPrefix: GeneratedLiterals.t32))
         case 28:
             GeneratedPrograms.canon30(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p17,
+                    acceptedPrefixes: GeneratedLiterals.p20,
                     canonicalPrefix: GeneratedLiterals.t33))
         case 29:
             GeneratedPrograms.canon31(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p18,
+                    acceptedPrefixes: GeneratedLiterals.p21,
                     canonicalPrefix: GeneratedLiterals.t34))
         case 30:
             GeneratedPrograms.canon32(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p19,
+                    acceptedPrefixes: GeneratedLiterals.p22,
                     canonicalPrefix: GeneratedLiterals.t35))
         case 31:
             GeneratedPrograms.canon33(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p20,
+                    acceptedPrefixes: GeneratedLiterals.p23,
                     canonicalPrefix: GeneratedLiterals.t36))
         case 32:
             GeneratedPrograms.canon34(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p21,
+                    acceptedPrefixes: GeneratedLiterals.p24,
                     canonicalPrefix: GeneratedLiterals.t37))
         case 33:
             GeneratedPrograms.canon35(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p22,
+                    acceptedPrefixes: GeneratedLiterals.p25,
                     canonicalPrefix: GeneratedLiterals.t38))
         case 34:
             GeneratedPrograms.canon36(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p23,
+                    acceptedPrefixes: GeneratedLiterals.p26,
                     canonicalPrefix: GeneratedLiterals.t39))
         case 35:
             GeneratedPrograms.canon37(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p24,
+                    acceptedPrefixes: GeneratedLiterals.p27,
                     canonicalPrefix: GeneratedLiterals.t40))
         case 36:
             GeneratedPrograms.canon38(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p25,
+                    acceptedPrefixes: GeneratedLiterals.p28,
                     canonicalPrefix: GeneratedLiterals.t41))
         case 37:
             GeneratedPrograms.canon39(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p26,
+                    acceptedPrefixes: GeneratedLiterals.p29,
                     canonicalPrefix: GeneratedLiterals.t42))
         case 38:
             GeneratedPrograms.canon40(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p27,
+                    acceptedPrefixes: GeneratedLiterals.p30,
                     canonicalPrefix: GeneratedLiterals.t43))
         case 39:
             GeneratedPrograms.canon41(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p28,
+                    acceptedPrefixes: GeneratedLiterals.p31,
                     canonicalPrefix: GeneratedLiterals.t44))
         case 40:
             GeneratedPrograms.canon1(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t19))
         case 41:
             GeneratedPrograms.canon13(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t9))
         case 42:
             GeneratedPrograms.canon8(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t24))
         case 43:
             GeneratedPrograms.canon6(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t22))
         case 44:
             GeneratedPrograms.canon7(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t23))
         case 45:
             GeneratedPrograms.canon64(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t44))
         case 46:
             GeneratedPrograms.canon54(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t34))
         case 47:
             GeneratedPrograms.canon59(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t39))
         case 48:
             GeneratedPrograms.canon58(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t38))
         case 49:
             GeneratedPrograms.canon53(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t59))
         case 50:
             GeneratedPrograms.canon63(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t43))
         case 51:
             GeneratedPrograms.canon57(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t37))
         case 52:
             GeneratedPrograms.canon48(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t30))
         case 53:
             GeneratedPrograms.canon14(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t27))
         case 54:
             GeneratedPrograms.canon60(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t40))
         case 55:
             GeneratedPrograms.canon62(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t42))
         case 56:
             GeneratedPrograms.canon55(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t35))
         case 57:
             GeneratedPrograms.canon56(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t36))
         case 58:
             GeneratedPrograms.canon12(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t26))
         case 59:
             GeneratedPrograms.canon43(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t29))
         case 60:
             GeneratedPrograms.canon44(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t29))
         case 61:
             GeneratedPrograms.canon5(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t61))
         case 62:
             GeneratedPrograms.canon66(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p2,
+                    acceptedPrefixes: GeneratedLiterals.p5,
                     canonicalPrefix: GeneratedLiterals.t19))
         case 63:
             GeneratedPrograms.canon67(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p3,
+                    acceptedPrefixes: GeneratedLiterals.p6,
                     canonicalPrefix: GeneratedLiterals.t20))
         case 64:
             GeneratedPrograms.canon68(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p4,
+                    acceptedPrefixes: GeneratedLiterals.p7,
                     canonicalPrefix: GeneratedLiterals.t21))
         case 65:
             GeneratedPrograms.canon69(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p5,
+                    acceptedPrefixes: GeneratedLiterals.p8,
                     canonicalPrefix: GeneratedLiterals.t22))
         case 66:
             GeneratedPrograms.canon70(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p6,
+                    acceptedPrefixes: GeneratedLiterals.p9,
                     canonicalPrefix: GeneratedLiterals.t23))
         case 67:
             GeneratedPrograms.canon71(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p7,
+                    acceptedPrefixes: GeneratedLiterals.p10,
                     canonicalPrefix: GeneratedLiterals.t24))
         case 68:
             GeneratedPrograms.canon72(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p8,
+                    acceptedPrefixes: GeneratedLiterals.p11,
                     canonicalPrefix: GeneratedLiterals.t25))
         case 69:
             GeneratedPrograms.canon73(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p9,
+                    acceptedPrefixes: GeneratedLiterals.p12,
                     canonicalPrefix: GeneratedLiterals.t26))
         case 70:
             GeneratedPrograms.canon74(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p11,
+                    acceptedPrefixes: GeneratedLiterals.p14,
                     canonicalPrefix: GeneratedLiterals.t27))
         case 71:
             GeneratedPrograms.canon75(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p12,
+                    acceptedPrefixes: GeneratedLiterals.p15,
                     canonicalPrefix: GeneratedLiterals.t28))
         case 72:
             GeneratedPrograms.canon76(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p13,
+                    acceptedPrefixes: GeneratedLiterals.p16,
                     canonicalPrefix: GeneratedLiterals.t29))
         case 73:
             GeneratedPrograms.canon77(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p29,
-                    canonicalPrefix: GeneratedLiterals.t52))
+                    acceptedPrefixes: GeneratedLiterals.p32,
+                    canonicalPrefix: GeneratedLiterals.t51))
         case 74:
             GeneratedPrograms.canon78(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p30,
+                    acceptedPrefixes: GeneratedLiterals.p33,
                     canonicalPrefix: GeneratedLiterals.t9))
         case 75:
             GeneratedPrograms.canon79(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p14,
+                    acceptedPrefixes: GeneratedLiterals.p17,
                     canonicalPrefix: GeneratedLiterals.t30))
         case 76:
             GeneratedPrograms.canon80(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p15,
+                    acceptedPrefixes: GeneratedLiterals.p18,
                     canonicalPrefix: GeneratedLiterals.t31))
         case 77:
             GeneratedPrograms.canon81(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p16,
+                    acceptedPrefixes: GeneratedLiterals.p19,
                     canonicalPrefix: GeneratedLiterals.t32))
         case 78:
             GeneratedPrograms.canon82(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p31,
-                    canonicalPrefix: GeneratedLiterals.t53))
+                    acceptedPrefixes: GeneratedLiterals.p34,
+                    canonicalPrefix: GeneratedLiterals.t52))
         case 79:
             GeneratedPrograms.canon83(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p17,
+                    acceptedPrefixes: GeneratedLiterals.p20,
                     canonicalPrefix: GeneratedLiterals.t33))
         case 80:
             GeneratedPrograms.canon84(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p32,
-                    canonicalPrefix: GeneratedLiterals.t54))
+                    acceptedPrefixes: GeneratedLiterals.p35,
+                    canonicalPrefix: GeneratedLiterals.t53))
         case 81:
             GeneratedPrograms.canon85(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p19,
+                    acceptedPrefixes: GeneratedLiterals.p22,
                     canonicalPrefix: GeneratedLiterals.t35))
         case 82:
             GeneratedPrograms.canon86(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p20,
+                    acceptedPrefixes: GeneratedLiterals.p23,
                     canonicalPrefix: GeneratedLiterals.t36))
         case 83:
             GeneratedPrograms.canon87(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p21,
+                    acceptedPrefixes: GeneratedLiterals.p24,
                     canonicalPrefix: GeneratedLiterals.t37))
         case 84:
             GeneratedPrograms.canon88(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p22,
+                    acceptedPrefixes: GeneratedLiterals.p25,
                     canonicalPrefix: GeneratedLiterals.t38))
         case 85:
             GeneratedPrograms.canon89(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p33,
+                    acceptedPrefixes: GeneratedLiterals.p36,
                     canonicalPrefix: GeneratedLiterals.t55))
         case 86:
             GeneratedPrograms.canon90(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p23,
+                    acceptedPrefixes: GeneratedLiterals.p26,
                     canonicalPrefix: GeneratedLiterals.t39))
         case 87:
             GeneratedPrograms.canon91(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p24,
+                    acceptedPrefixes: GeneratedLiterals.p27,
                     canonicalPrefix: GeneratedLiterals.t40))
         case 88:
             GeneratedPrograms.canon92(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p25,
+                    acceptedPrefixes: GeneratedLiterals.p28,
                     canonicalPrefix: GeneratedLiterals.t41))
         case 89:
             GeneratedPrograms.canon93(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p26,
+                    acceptedPrefixes: GeneratedLiterals.p29,
                     canonicalPrefix: GeneratedLiterals.t42))
         case 90:
             GeneratedPrograms.canon94(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p27,
+                    acceptedPrefixes: GeneratedLiterals.p30,
                     canonicalPrefix: GeneratedLiterals.t43))
         case 91:
             GeneratedPrograms.canon95(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p28,
+                    acceptedPrefixes: GeneratedLiterals.p31,
                     canonicalPrefix: GeneratedLiterals.t44))
         case 92:
             GeneratedPrograms.canon96(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p34,
+                    acceptedPrefixes: GeneratedLiterals.p37,
                     canonicalPrefix: GeneratedLiterals.t56))
         case 93:
             GeneratedPrograms.canon42(
                 &v,
                 CanonicalizationContext(
                     profile: profile,
-                    acceptedPrefixes: GeneratedLiterals.p1,
+                    acceptedPrefixes: GeneratedLiterals.p4,
                     canonicalPrefix: GeneratedLiterals.t28))
         default: break
         }

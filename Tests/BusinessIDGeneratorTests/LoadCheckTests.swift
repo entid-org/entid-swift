@@ -103,6 +103,98 @@ struct LoadCheckTests {
         }
     }
 
+    // MARK: A WHEN branch nothing references
+
+    /// `ir.md` section 3.6 on `CHECKSUM_OP_KIND_WHEN`: "It is accepted only as a
+    /// direct operand of `CHOOSE`; its non applicable state is never observable
+    /// elsewhere." Check 16 carries it.
+    ///
+    /// A `WHEN` no node reads is not a direct operand of anything, so it is
+    /// refused. The reference loader enforced the rule by looking at each node's
+    /// *parents*, and a node with no parent has none to look at — section 2
+    /// permits an unreachable node, so a dead `WHEN` passed there. The Kotlin
+    /// engine read the rule as written and refused it.
+    ///
+    /// Three shapes, because one of them alone proves nothing: the dead branch
+    /// must be refused, the legitimate one must still be accepted, and a program
+    /// rooted at a `WHEN` keeps its own rule and its own message — `root_node`
+    /// is a reference, so that program has a parent of a kind.
+    static func withChecksumProgram(
+        _ bundle: inout BundleBuilder.Bundle,
+        nodes: [Libbusinessid_Ir_V1_Node],
+        root: UInt32
+    ) {
+        bundle.programs.append(BundleBuilder.program(id: 4, kind: .checksum, nodes: nodes, root: root))
+        bundle.identifiers[0].checksumProgram = 4
+        bundle.identifiers[0].clearAbsentChecksumReason()
+        bundle.requiredFeatureIds = [1, 2, 3, 5, 20, 21, 30, 31, 40]
+    }
+
+    /// The control: the same bundle with the `WHEN` where it belongs.
+    @Test("A WHEN read by a CHOOSE is accepted")
+    func whenInsideChooseIsAccepted() throws {
+        let outcome = try load {
+            Self.withChecksumProgram(
+                &$0,
+                nodes: [
+                    BundleBuilder.string(.subject),
+                    BundleBuilder.checksum(.luhn, inputs: [0]),
+                    BundleBuilder.predicate(.isEmpty, inputs: [0]),
+                    BundleBuilder.checksum(.when, inputs: [2, 1]),
+                    BundleBuilder.checksum(.choose, inputs: [3, 1]),
+                ],
+                root: 4
+            )
+        }
+        if case .failure(let error) = outcome { Issue.record("\(error)") }
+    }
+
+    @Test("A WHEN branch nothing references is refused")
+    func deadWhenIsRefused() throws {
+        let outcome = try load {
+            Self.withChecksumProgram(
+                &$0,
+                nodes: [
+                    BundleBuilder.string(.subject),
+                    BundleBuilder.checksum(.luhn, inputs: [0]),
+                    BundleBuilder.predicate(.isEmpty, inputs: [0]),
+                    // Read by nothing: not the root, not an operand.
+                    BundleBuilder.checksum(.when, inputs: [2, 1]),
+                ],
+                root: 1
+            )
+        }
+        guard case .failure(let error) = outcome else {
+            Issue.record("a WHEN branch no node reads was accepted")
+            return
+        }
+        #expect(error.engineErrorName == "invalid_ruleset")
+        #expect(error.reason.contains("WHEN branch outside a CHOOSE"))
+    }
+
+    @Test("A checksum program rooted at a WHEN keeps its own message")
+    func whenAtTheRootIsRefusedByTheRootRule() throws {
+        let outcome = try load {
+            Self.withChecksumProgram(
+                &$0,
+                nodes: [
+                    BundleBuilder.string(.subject),
+                    BundleBuilder.checksum(.luhn, inputs: [0]),
+                    BundleBuilder.predicate(.isEmpty, inputs: [0]),
+                    BundleBuilder.checksum(.when, inputs: [2, 1]),
+                ],
+                root: 3
+            )
+        }
+        guard case .failure(let error) = outcome else {
+            Issue.record("a checksum program rooted at a WHEN was accepted")
+            return
+        }
+        // The root rule, not the operand rule: a reader has to be able to tell
+        // which of the two was broken.
+        #expect(error.reason.contains("never roots at a WHEN branch"))
+    }
+
     // MARK: The order of section 10
 
     /// `ir.md` section 10 numbers its checks and says "in this order". Two

@@ -13,11 +13,11 @@ struct ExpansionTests {
     func publishedProfile() throws {
         let bundle = try RuleBundleLoader.load(try SpecCorpus.rulesBundle())
         #expect(bundle.expansion.programCount == 250)
-        #expect(bundle.expansion.totalInstances == 3069)
+        #expect(bundle.expansion.totalInstances == 3094)
         #expect(bundle.expansion.worstProgramID == 152)
         #expect(bundle.expansion.worstInstances == 118)
         #expect(bundle.expansion.worstNodeCount == 66)
-        #expect(bundle.expansion.summary == "250 programs, 3069 instances, worst program 152 at 118")
+        #expect(bundle.expansion.summary == "250 programs, 3094 instances, worst program 152 at 118")
     }
 
     /// The bundle carries fifty four captures and every one of them is reached

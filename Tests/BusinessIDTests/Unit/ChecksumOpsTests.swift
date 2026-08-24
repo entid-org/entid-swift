@@ -141,6 +141,37 @@ struct ChecksumOpsTests {
     /// The most serious defect this project recognises is refusing a valid
     /// identifier, and every path that cannot conclude has to land on
     /// `unsupported`.
+    /// The clause `engine.md` section 9.1 carried until `2026.08.31`, and the
+    /// behaviour this engine had regardless.
+    ///
+    /// That paragraph said an out-of-bounds view is an absent value and never an
+    /// exception, then said that an out-of-bounds access in a checksum after a
+    /// valid format must produce an engine error. It contradicted itself in two
+    /// sentences, and the gap was observable on a real input: one engine
+    /// answering an absence, another an error. `ir.md` section 1.1 is
+    /// unreserved — "Absence is never an error and never an exception" — and the
+    /// clause is gone.
+    ///
+    /// The intuition behind it stays true: a format rule is supposed to
+    /// establish the bounds before the checksum runs. That is a property of a
+    /// ruleset, not a runtime behaviour, and nothing proves it at load time.
+    @Test("An out-of-bounds slice in a checksum is unsupported, never an error")
+    func outOfBoundsInAChecksumIsAbsence() {
+        // "1234" has four code points; every access below reaches past them,
+        // which is exactly the situation the deleted clause described.
+        let subject = view("1234")
+        let past: [ChecksumOutcome] = [
+            ChecksumOps.compareSlice(7, subject, start: 8, end: 12, messageKey: "k"),
+            ChecksumOps.compareSlice(7, subject, start: 2, end: 99, messageKey: "k"),
+            ChecksumOps.compareDigit(7, subject, index: 40, messageKey: "k"),
+            ChecksumOps.luhn(subject.slice(start: 10, end: 20), messageKey: "k"),
+            ChecksumOps.iso7064Mod97Dash10(subject.slice(from: 9), messageKey: "k"),
+        ]
+        for outcome in past {
+            #expect(outcome == .unsupported(.unsupportedChecksum, nil), Comment(rawValue: "\(outcome)"))
+        }
+    }
+
     @Test("No operation turns an inability to conclude into invalid")
     func inabilityIsNeverInvalid() {
         let cannotConclude: [ChecksumOutcome] = [

@@ -93,6 +93,16 @@ enum BundleBuilder {
         return node
     }
 
+    static func checksum(_ kind: Libbusinessid_Ir_V1_ChecksumOpKind, inputs: [UInt32] = []) -> Node {
+        var operation = Libbusinessid_Ir_V1_ChecksumOperation()
+        operation.kind = kind
+        var node = Node()
+        node.outputType = .checksumOutcome
+        node.inputNodes = inputs
+        node.checksumOperation = operation
+        return node
+    }
+
     static func call(
         _ kind: Libbusinessid_Ir_V1_CallOpKind,
         program: UInt32,
