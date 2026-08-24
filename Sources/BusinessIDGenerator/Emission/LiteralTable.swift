@@ -81,7 +81,22 @@ struct LiteralTable {
                 out.line("static let \(literal.name): [[Unicode.Scalar]] = []")
                 continue
             }
-            let items = literal.texts.map(SwiftSource.quote).joined(separator: ", ")
+            // Sorted by length first, code points second. The bundle presents
+            // these ascending by UTF-8 bytes, which the loader checks; this is
+            // the same order re-blocked so that every prefix of one length is
+            // contiguous. `Predicates.prefixIn` binary searches each block, and
+            // `engine.md` section 14 asks for a membership test that is not
+            // linear in the size of the list.
+            let ordered = literal.texts.sorted { left, right in
+                let leftScalars = Array(left.unicodeScalars)
+                let rightScalars = Array(right.unicodeScalars)
+                if leftScalars.count != rightScalars.count { return leftScalars.count < rightScalars.count }
+                for (one, other) in zip(leftScalars, rightScalars) where one.value != other.value {
+                    return one.value < other.value
+                }
+                return false
+            }
+            let items = ordered.map(SwiftSource.quote).joined(separator: ", ")
             out.line(
                 "static let \(literal.name): [[Unicode.Scalar]] = "
                     + "[\(items)].map { Array($0.unicodeScalars) }"
