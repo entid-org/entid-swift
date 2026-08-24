@@ -44,6 +44,11 @@ rules update that changes no API is a patch release here.
   answered slowly but wrongly, and `Predicates.prefixIn` now records that its
   correctness rests on a precondition the loader checks.
 
+  All three shapes the reference loader let through — descending, duplicated,
+  and equal keys out of order — are now asserted on both parameter lists, with
+  a control that the same lists in order are accepted. The corpus fixture
+  carries the first only, and this suite covered descending lengths alone.
+
 - **A membership test is no longer linear in the size of the list**, which
   `engine.md` section 14 asks for as of `2026.09.0`. `Predicates.prefixIn` was
   `prefixes.contains { view.hasPrefix($0) }`; the register memberships made that
