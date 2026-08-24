@@ -1,3 +1,9 @@
+// The testee is driven as a subprocess, which no simulator can do, so this
+// whole target is compiled out anywhere but macOS rather than skipped at run
+// time. A skipped test reads as a passing one in a summary; an absent one does
+// not.
+#if os(macOS)
+
 package import BusinessIDWire
 import Testing
 
@@ -122,3 +128,4 @@ struct TesteeTests {
     }
 
 }
+#endif

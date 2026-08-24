@@ -1,3 +1,4 @@
+package import BusinessIDWire
 import Testing
 
 @testable import BusinessIDGenerator
@@ -60,6 +61,37 @@ struct ExpansionTests {
         )
         // 1, 3, 7, 15 ... 2^(n+1) - 1
         #expect(Expansion.instances(of: program) == (1 << 11) - 1)
+    }
+
+    /// The corpus fixture for check 14, refused for the count and for nothing
+    /// else.
+    ///
+    /// It has been wrong twice: it first rooted the doubling chain in the
+    /// *format* program, then rooted a *checksum* program in a string. Both
+    /// times an engine that never counted an instance refused it on the shape
+    /// alone and passed the case for the wrong reason. Since `2026.08.25` the
+    /// chain feeds a checksum node appended after it, so the shape is accepted
+    /// and the count is what is left to object to.
+    @Test("The expansion fixture is refused by the count, not by the program shape")
+    func expansionFixtureIsRefusedForItsCount() throws {
+        let payload = try SpecCorpus.loaderCases().first { $0.id == "loader-program-expansion-036" }
+        let bundle = try Libbusinessid_Ir_V1_RuleBundle(
+            serializedBytes: [UInt8](try #require(payload).rulesPayload)
+        )
+        let bytes: [UInt8] = try bundle.serializedBytes()
+
+        var refusal: LoadError?
+        do {
+            _ = try RuleBundleLoader.load(bytes)
+        } catch {
+            refusal = error
+        }
+        let error = try #require(refusal)
+        #expect(error.engineErrorName == "invalid_ruleset")
+        // Forty doublings above a subject, then the checksum node the chain
+        // feeds: 2^41 instances against a budget of 100000.
+        #expect(error.reason.contains("expands to 2199023255552 operation instances"))
+        #expect(error.reason.contains("beyond the budget of 100000"))
     }
 
     @Test("The arithmetic saturates rather than wrapping")

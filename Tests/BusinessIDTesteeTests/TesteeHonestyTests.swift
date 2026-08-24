@@ -1,3 +1,9 @@
+// The testee is driven as a subprocess, which no simulator can do, so this
+// whole target is compiled out anywhere but macOS rather than skipped at run
+// time. A skipped test reads as a passing one in a summary; an absent one does
+// not.
+#if os(macOS)
+
 package import BusinessIDWire
 import Foundation
 import Testing
@@ -6,15 +12,84 @@ import Testing
 ///
 /// The runner is the only program that reads an expected result, and it comes
 /// from the specification repository pinned to the commit `rules.lock` records.
-/// This package writes the testee, and these cases are what make the absence of
-/// cheating something a reader can check rather than something a README claims:
-/// the testee does not read the corpus, does not interpret an expectation, and
-/// does not behave differently depending on which case it was handed.
+/// This package writes the testee, and `engine.md` section 11.3 states the form
+/// the proof has to take: five observable properties, because an intention
+/// cannot be tested.
 ///
-/// This suite reads the corpus, on purpose. The point is that the code under
-/// test cannot.
+/// | What is asserted | What it excludes |
+/// | --- | --- |
+/// | the testee names neither the corpus nor anything that reads one | reading the expectations directly |
+/// | it reaches no file system | the corpus is a file; whoever opens nothing reads none |
+/// | it answers identically whatever the case identifier — plausible, absurd, empty | recognising a case |
+/// | it answers identically whatever the order of the requests | behaviour that depends on history |
+/// | it answers identically to a repeated request | non determinism |
+///
+/// **This suite opens no corpus.** Section 11.3 requires the requests to be
+/// invented on the spot: a proof that the testee never reads the corpus, built
+/// out of the corpus, demonstrates the opposite of what it asserts. Every
+/// request below is written here; the values are quoted from a conformance case
+/// named in the comment above them, which is how this package sources an
+/// identifier without opening anything at run time.
+///
+/// What the corpus itself carries is asserted in `CorpusShapeTests`, which is
+/// not a proof about the testee and says so by living elsewhere.
 @Suite("The testee does not cheat")
 struct TesteeHonestyTests {
+    // MARK: - Requests invented here
+
+    /// `siren-validate-format-050`.
+    static let validSIREN = "012345674"
+    /// `siren-validate-format-invalid-051`.
+    static let shortSIREN = "01234567"
+    /// `siren-validate-checksum-052`.
+    static let badChecksumSIREN = "012345675"
+    /// `dispatch-country-mismatch-004`.
+    static let belgianVAT = "BE0123456749"
+
+    static func request(
+        _ caseID: String,
+        _ operation: Libbusinessid_Conformance_V1_Operation,
+        kind: String,
+        input: String,
+        countryCode: String? = nil
+    ) -> Libbusinessid_Testee_V1_TesteeRequest {
+        var request = Libbusinessid_Testee_V1_TesteeRequest()
+        request.caseID = caseID
+        request.operation = operation
+        request.kind = kind
+        request.input = input
+        if let countryCode { request.countryCode = countryCode }
+        return request
+    }
+
+    /// A set covering every operation of the protocol, including the two that
+    /// answer with a failure rather than an observation.
+    ///
+    /// It is deliberately varied — valid, invalid, unknown kind, explicit
+    /// country, a bundle that cannot load — because a testee that adapted to
+    /// the case would have more room to do so here than on one shape repeated.
+    static var invented: [Libbusinessid_Testee_V1_TesteeRequest] {
+        var requests: [Libbusinessid_Testee_V1_TesteeRequest] = [
+            request("invented-1", .validate, kind: "siren", input: validSIREN),
+            request("invented-2", .validate, kind: "siren", input: shortSIREN),
+            request("invented-3", .validate, kind: "siren", input: badChecksumSIREN),
+            request("invented-4", .validateFormat, kind: "siren", input: validSIREN),
+            request("invented-5", .validateChecksum, kind: "siren", input: badChecksumSIREN),
+            request("invented-6", .canonicalize, kind: "siren", input: "  012 345-674  "),
+            request("invented-7", .validate, kind: "vat", input: belgianVAT, countryCode: "FR"),
+            request("invented-8", .validate, kind: "no_such_kind", input: "whatever"),
+            request("invented-9", .validate, kind: "siren", input: ""),
+            request("invented-10", .canonicalize, kind: "", input: ""),
+            request("invented-11", .unspecified, kind: "siren", input: validSIREN),
+        ]
+        // Bytes that are not a rule bundle, so the answer is a refusal rather
+        // than an acceptance, and it needs no bundle to be carried here.
+        var load = request("invented-12", .loadRuleset, kind: "siren", input: "")
+        load.rulesPayload = Data([0xFF, 0xFF, 0xFF, 0xFF])
+        requests.append(load)
+        return requests
+    }
+
     // MARK: - It cannot read the corpus
 
     /// The testee's own code, with comments removed.
@@ -103,15 +178,27 @@ struct TesteeHonestyTests {
         }
     }
 
+    /// The same clause, said to a reader who does not trust source inspection:
+    /// the corpus sits under the repository root, so a testee run from a
+    /// directory that holds none has nothing to open.
     @Test("The testee answers the same from a directory holding no corpus")
     func answersTheSameAnywhere() throws {
-        // Source inspection says it does not read the corpus; this says the
-        // same thing to a reader who does not trust source inspection.
-        let cases = try TesteeHarness.corpus().cases
-        let sample = Array(cases.prefix(60)) + Array(cases.suffix(40))
-        let requests = sample.map(TesteeHarness.request(for:))
-
+        let requests = Self.invented
         let fromRepository = try TesteeHarness.exchange(requests)
+
+        // The set has to exercise something. Comparing twelve failures would
+        // compare nothing, and would keep passing if the requests degenerated.
+        var shapes: Set<String> = []
+        for response in fromRepository {
+            switch response.result {
+            case .validationReport: shapes.insert("report")
+            case .canonicalization: shapes.insert("canonicalization")
+            case .load: shapes.insert("load")
+            case .failure: shapes.insert("failure")
+            case .none: shapes.insert("none")
+            }
+        }
+        #expect(shapes == ["report", "canonicalization", "load", "failure"])
 
         let empty = URL(fileURLWithPath: NSTemporaryDirectory())
             .appending(path: "businessid-empty-\(UUID().uuidString)")
@@ -131,15 +218,25 @@ struct TesteeHonestyTests {
         // than silently scoring the wrong case. A testee that consulted it
         // could answer one way for a case it recognises and another for the
         // rest.
-        let cases = try TesteeHarness.corpus().cases
-        let subject = try #require(cases.first { $0.operation == .validate })
-        let base = TesteeHarness.request(for: subject)
+        let base = Self.request("invented-1", .validate, kind: "siren", input: Self.validSIREN)
+
+        // Plausible identifiers, shaped exactly like the corpus writes them;
+        // absurd ones; and the empty one.
+        let borrowed = [
+            "siren-validate-format-050",
+            "siren-validate-format-invalid-051",
+            "loader-truncated-001",
+            "dispatch-country-mismatch-004",
+            "vat-be-validate-001",
+            "unknown",
+            "invented-1-x",
+            "../../nowhere/at/all",
+            "🙂",
+            String(repeating: "z", count: 4096),
+            "",
+        ]
 
         var disguises: [Libbusinessid_Testee_V1_TesteeRequest] = []
-        // Identifiers of other cases, of cases expecting the opposite verdict,
-        // and identifiers that name nothing at all.
-        let borrowed =
-            cases.prefix(40).map(\.id) + ["", "unknown", subject.id + "-x", "loader-truncated-001"]
         for identifier in borrowed {
             var disguised = base
             disguised.caseID = identifier
@@ -161,12 +258,12 @@ struct TesteeHonestyTests {
     @Test("The order requests arrive in changes nothing")
     func orderChangesNothing() throws {
         // A testee that kept state between requests could answer correctly only
-        // in the order the corpus happens to be written.
-        let cases = Array(try TesteeHarness.corpus().cases.prefix(120))
-        let requests = cases.map(TesteeHarness.request(for:))
+        // in the order it happened to be given.
+        let requests = Self.invented
 
         var inOrder: [String: Libbusinessid_Testee_V1_TesteeResponse] = [:]
         for response in try TesteeHarness.exchange(requests) { inOrder[response.caseID] = response }
+        #expect(inOrder.count == requests.count, "the case identifiers are distinct")
 
         var seeded = SplitMix(seed: 0x5EED_1234)
         var shuffled = requests
@@ -181,47 +278,38 @@ struct TesteeHonestyTests {
 
     @Test("Repeating one request produces one identical answer each time")
     func repetitionIsStable() throws {
-        let subject = try #require(try TesteeHarness.corpus().cases.first { $0.operation == .validate })
-        let request = TesteeHarness.request(for: subject)
+        let request = Self.request("invented-1", .validate, kind: "siren", input: Self.validSIREN)
         let responses = try TesteeHarness.exchange(Array(repeating: request, count: 25))
         #expect(responses.count == 25)
         for response in responses { #expect(response == responses[0]) }
     }
 
-    // MARK: - The corpus itself
+    // MARK: - And neither does this suite
 
-    @Test("The corpus carries what this release says it carries")
-    func corpusShape() throws {
-        // The runner runs whatever the corpus holds, so a case disappearing
-        // would pass silently. This is the tripwire for that.
-        let corpus = try TesteeHarness.corpus()
-        #expect(corpus.rulesVersion == BusinessIDRulesVersion.locked)
-        #expect(corpus.cases.count == 666)
-
-        var counts: [Libbusinessid_Conformance_V1_Operation: Int] = [:]
-        for testCase in corpus.cases { counts[testCase.operation, default: 0] += 1 }
-        #expect(counts[.canonicalize] == 13)
-        #expect(counts[.validate] == 614)
-        #expect(counts[.validateFormat] == 3)
-        #expect(counts[.validateChecksum] == 1)
-        #expect(counts[.loadRuleset] == 35)
-    }
-
-    /// `ir.md` section 5 step 1: no conformance case can carry
-    /// `invalid_encoding`, because a proto3 `string` is valid UTF-8 by
-    /// definition, on the wire and in the corpus.
-    @Test("No conformance case asks for invalid_encoding")
-    func noCaseCarriesInvalidEncoding() throws {
-        for testCase in try TesteeHarness.corpus().cases {
-            switch testCase.expected.value {
-            case .canonicalization(let expected):
-                #expect(expected.reasonCode != .invalidEncoding, Comment(rawValue: testCase.id))
-            case .validationReport(let expected):
-                #expect(expected.format.reasonCode != .invalidEncoding, Comment(rawValue: testCase.id))
-                #expect(expected.checksum.reasonCode != .invalidEncoding, Comment(rawValue: testCase.id))
-            case .none:
-                continue
-            }
+    /// The clause that closes section 11.3, kept true by measurement rather
+    /// than by the paragraph above claiming it.
+    ///
+    /// This suite used to build its requests out of the corpus, which is the
+    /// drift the clause names. Reading its own text is the cheapest thing that
+    /// notices the drift coming back.
+    @Test("The honesty suite opens no corpus either")
+    func thisSuiteOpensNoCorpus() throws {
+        // Two routes, and nothing else can reach the file: the harness reader,
+        // or a path this suite builds itself.
+        //
+        // Each token is assembled from two pieces, because a scanner that
+        // spelled them out would find itself and fail against a suite that is
+        // clean — and neither token may appear as data elsewhere in the file,
+        // which is why `businessid-conformance` alone is not one of them: it is
+        // in the list `noExpectationInTheSource` scans the testee for.
+        let forbidden = [
+            "TesteeHarness." + "corpus",
+            "spec/businessid-" + "conformance",
+        ]
+        let text = try String(contentsOf: URL(fileURLWithPath: #filePath), encoding: .utf8)
+        let code = Self.strippingComments(text)
+        for token in forbidden {
+            #expect(!code.contains(token), Comment(rawValue: "the honesty suite reaches \(token)"))
         }
     }
 }
@@ -238,19 +326,4 @@ struct SplitMix {
         return mixed ^ (mixed >> 31)
     }
 }
-
-/// The business version `rules.lock` names, read rather than repeated.
-enum BusinessIDRulesVersion {
-    static let locked: String = {
-        guard
-            let text = try? String(
-                contentsOf: TesteeHarness.root.appending(path: "rules.lock"), encoding: .utf8
-            )
-        else { return "" }
-        return
-            text
-            .split(separator: "\n")
-            .first { $0.hasPrefix("rules_version = ") }
-            .map { String($0.split(separator: "\"")[1]) } ?? ""
-    }()
-}
+#endif

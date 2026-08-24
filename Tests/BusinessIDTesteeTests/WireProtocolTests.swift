@@ -1,6 +1,7 @@
-// The testee is driven as a subprocess, which only the host platform can do.
-// A simulator still exercises the engine through the in-process cases; what is
-// skipped here is the framing, not a rule.
+// The testee is driven as a subprocess, which no simulator can do, so this
+// whole target is compiled out anywhere but macOS rather than skipped at run
+// time. A skipped test reads as a passing one in a summary; an absent one does
+// not.
 #if os(macOS)
 
 import Foundation

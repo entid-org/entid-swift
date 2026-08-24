@@ -12,48 +12,124 @@ The engine passes 666/666 conformance cases under these readings.
 
 ## Open
 
-### 1. `loader-left-pad-length-026` is refused by two checks its name is not about
-
-The fixture puts a `CANONICALIZATION_OP_KIND_LEFT_PAD` node inside the **format**
-program and makes it the **root** of that program. `ir.md` section 2 gives a
-format program the categories string, predicate, assertion and
-`CALL_OP_KIND_FORMAT`, and `ASSERTION_OP_KIND_SEQUENCE` as its only accepted
-root, so check 16 refuses the fixture twice over — before the `length: 4097` its
-name is about matters at all.
-
-An engine that never implemented the slice bound on `left_pad` therefore passes
-`loader-left-pad-length-026`. It is the same shape as the `subject_node`
-fixture, found by the same property once that property was written down.
-
-Measured here:
-
-| Fixture, modified | Outcome |
-|---|---|
-| As shipped | refused — `length 4097 is outside 0...4096`, the named defect |
-| Length repaired to 4096, nothing else | still refused — *a format program roots at an assertion SEQUENCE and nothing else* |
-| The node rehoused into a canonicalization program, length left at 4097 | refused — the named defect, in isolation |
-
-The third row is what a repaired fixture should look like, and it also shows why
-the fixture was built this way: the demo bundle's only canonicalization program
-is *also* the dispatcher's pre-canonicalization program, which `ir.md` section 5
-restricts to five steps that do not include `LEFT_PAD`. The step has no legal
-home in the bundle as it stands.
-
-**Suggested fix:** give the demo bundle a second canonicalization program, used
-by the definition and not by the dispatcher, and put the `left_pad` there. The
-case then isolates its defect.
-
-**Followed here:** the fixture is refused, and
-`Tests/BusinessIDGeneratorTests/FixtureRepairTests.swift` records exactly which
-check answers at each stage, so this engine's compliance does not rest on the
-ambiguity. That test fails the day the fixture is fixed, which is the signal to
-move it into the repair table with the others.
+Nothing open. Every defect reported from this engine has been settled upstream;
+the record is below.
 
 ---
 
 ## Settled upstream
 
 Kept for the record, because each one changed what this engine does.
+
+### The JSONL shipped with no digest — settled in `2026.08.26`
+
+`rules.lock` attested seven artefacts. `spec/businessid-conformance.jsonl` was
+not one of them, and it is the file this engine's tests cite case ids from when
+they quote a value: `EngineTests` names the case above every literal, and the
+rule in `CONTRIBUTING.md` is that a real value comes from the corpus or from an
+issuer, never from memory. A drift between the JSONL and the attested `.binpb`
+would have left those citations pointing at the wrong case with nothing
+noticing — `verify-lock.sh` had nothing to compare.
+
+Measured before reporting: the vendored JSONL was, and is, byte identical to the
+release. The defect was the absence of a check, not a drift.
+
+`rules.lock` now carries `conformance_jsonl_sha256`, taken on the decompressed
+bytes that land in `spec/` rather than on the published archive, and `spec.md`
+documents the field.
+
+Measured here after the fix: appending one byte to the JSONL makes
+`verify-lock.sh` fail and exit 1. `SHA256Tests` derives its list from the lock
+rather than repeating it, so a ninth digest fails the suite until it is mapped —
+the same defect one level up. And `DocumentedValuesTests` now rests on the
+JSONL, which is only defensible because the digest exists.
+
+A note on reading the new field: `conformance_jsonl_sha256` is unchanged between
+`2026.08.25` and `2026.08.26` while `conformance_sha256` moved. That is not a
+stale file. The JSONL is the reviewed source and carries no rules version — the
+generated `.binpb` injects one into every expected report — so a version only
+bump changes the binary and not the source. Verified against the `2026.08.26`
+release archive, byte for byte.
+
+### `spec.md` permitted embedding the bundle — settled in `2026.08.26`
+
+Found while the digest above was being documented, not by this engine, and
+recorded here because it is the more serious of the two. `spec.md` said, in the
+section describing `rules.lock`, that an engine MAY embed the bundle if it
+chooses to interpret it — which `engine.md` section 1.2 forbids outright and
+which this package's `PackagingTests` has always asserted against. It survived
+four audits because every mechanical guard read `engine.md` and the per language
+contracts and stopped there.
+
+Nothing changed here: this engine never embedded the bundle, and the packaging
+suite already refused a `.binpb` under `Sources/`, a `resources:` clause and any
+mention of `SwiftProtobuf` in the shipped library.
+
+### Check 16 names the operation categories — settled in `2026.08.26`
+
+`ir.md` section 10 listed check 16 as "accepted root per kind", while section 2
+also gives each kind its accepted operation categories, and said nothing about
+where that clause runs. Two engines answered differently on the same bytes: one
+ran the categories in its per-node pass, ahead of the arithmetic bounds at check
+13. Check 16 now names them, "both as section 2 states them".
+
+Measured here: this loader already enforced the categories exhaustively, inside
+`ProgramShape`, which runs after the per-program pass — so it answered check 13
+first, as section 10 orders. `LoadCheckTests` now pins it on a node that breaks
+both at once, and the assertion was watched failing against a loader with the
+bound removed, which reports the category instead.
+
+### `loader-left-pad-length-026` refused by two checks its name is not about — settled in `2026.08.25`
+
+The fixture put a `CANONICALIZATION_OP_KIND_LEFT_PAD` node inside the **format**
+program and made it the **root** of that program. `ir.md` section 2 gives a
+format program the categories string, predicate, assertion and
+`CALL_OP_KIND_FORMAT`, and `ASSERTION_OP_KIND_SEQUENCE` as its only accepted
+root, so check 16 refused the fixture twice over — before the `length: 4097` its
+name is about mattered at all. An engine that never implemented the slice bound
+on `left_pad` passed the case.
+
+It could not be repaired in place either: the demo bundle's only
+canonicalization program was *also* the dispatcher's pre-canonicalization
+program, which `ir.md` section 5 restricts to five steps that do not include
+`LEFT_PAD`, so the step had no legal home in the bundle as it stood. The fix had
+to add a program, and the first attempt at it traded one refusal for another.
+
+The bundle now carries a second canonicalization program, id 4, referenced by
+the definition and not by the dispatcher, rooted in a `SEQUENCE`, holding the
+`LEFT_PAD` step alone.
+
+Measured here after the fix, by decoding the payload rather than reading the
+description:
+
+| Fixture, modified | Outcome |
+|---|---|
+| As shipped | refused — `program 4 node 0: length 4097 is outside 0...4096`, the named defect |
+| Length repaired to 4096, nothing else | accepted |
+
+So the case now isolates exactly one check, and the fixture moved from the list
+of defects with no definable repair into the repair table of
+`Tests/BusinessIDGeneratorTests/FixtureRepairTests.swift`, where the second row
+above is the assertion.
+
+### The expansion fixture rooted a checksum program in a string — settled in `2026.08.25`
+
+`loader-program-expansion-036` was wrong twice. It first rooted the doubling
+chain in the *format* program; the correction moved the chain into the checksum
+program but left `root_node` pointing at the last `CONCAT`, which roots a
+checksum program in a `VALUE_TYPE_STRING` and is a check 16 violation. Both
+times an engine that counted no instance at all refused the fixture on its shape
+and passed the case for the wrong reason.
+
+The chain now feeds a `CHECKSUM_OP_KIND_LUHN` node appended after it, and that
+node is the root.
+
+Measured here after the fix: refused with `program 3 expands to 2199023255552
+operation instances, beyond the budget of 100000` — forty doublings above a
+subject, then the checksum node, so 2^41 against a budget of 100000. The
+unreferenced `LUHN` node the fixture still carries at index 1 costs nothing,
+which is `ir.md` section 2: a node no root reaches is not emitted.
+`Tests/BusinessIDGeneratorTests/ExpansionTests.swift` pins the reason.
 
 ### Where the conformance runner comes from — settled in `2026.08.23`
 

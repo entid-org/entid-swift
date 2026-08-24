@@ -681,6 +681,13 @@ Aucune release n'est nécessaire, rien n'est à télécharger à la main, et le 
 prérequis est une toolchain Go dans la CI : c'est un outil de construction, il
 n'entre ni dans le paquet publié ni dans ses dépendances.
 
+Le module `spec` demande une version de Go plus récente que celle qu'un moteur
+épingle probablement pour lui-même, et `actions/setup-go` pose `GOTOOLCHAIN: local`,
+ce qui interdit d'en récupérer une. L'étape du runner doit donc poser
+`GOTOOLCHAIN: auto` — le testee, lui, reste construit avec la toolchain épinglée du
+moteur. Mesuré : sans cela, la première exécution échoue sur la résolution de la
+toolchain, pas sur un écart de conformité.
+
 Un moteur NE DOIT PAS écrire son propre runner. C'est la seule chose qui fasse que
 « conforme » veuille dire quelque chose : un comparateur écrit par le moteur qu'il
 juge peut comparer trop faiblement — oublier un champ, traiter un champ absent
@@ -722,8 +729,22 @@ La conformité partagée ne remplace pas :
 - property tests et fuzzing ;
 - benchmarks ;
 - tests de régression propres au runtime ;
-- tests prouvant que le testee ne triche pas : qu'il ne lit pas le corpus,
-  n'interprète aucun attendu et ne se comporte pas différemment selon le cas.
+- tests prouvant que le testee ne triche pas.
+
+Ce dernier point mérite d'être précisé, parce qu'une intention ne se teste pas.
+Le moteur TypeScript l'a formulé en propriétés observables, et c'est la forme
+exigée :
+
+| Ce qu'on affirme | Ce que ça exclut |
+| --- | --- |
+| le testee ne nomme ni le corpus ni rien qui en lise un | la lecture directe des attendus |
+| il n'atteint aucun système de fichiers | le corpus est un fichier ; qui n'ouvre rien ne le lit pas |
+| il répond identiquement quel que soit l'identifiant de cas — plausible, absurde, vide | la reconnaissance d'un cas |
+| il répond identiquement quel que soit l'ordre des requêtes | un comportement dépendant de l'historique |
+| il répond identiquement à une requête répétée | le non-déterminisme |
+
+Les requêtes de ces tests sont inventées sur place : le test d'honnêteté n'ouvre
+pas le corpus non plus, sinon il démontrerait le contraire de ce qu'il affirme.
 
 ## 12. Exigences qualité
 
@@ -751,6 +772,37 @@ Quality gates minimum :
 
 Le code Protobuf généré et les simples façades mécaniques peuvent être exclus du
 calcul, avec exclusion documentée.
+
+**Le code émis depuis le bundle l'est aussi, et pour une raison différente.** Ces
+seuils portent sur le code écrit à la main : le moteur, ses primitives, son API,
+son générateur. Le code émis, lui, est couvert par la conformité, et sa couverture
+ne mesure pas la qualité du moteur mais celle du corpus — une branche de règle
+jamais exécutée dit qu'aucun cas ne l'atteint, ce que le rapport des opérations
+inutilisées dit déjà mieux. **Mesurez-la et publiez-la, ne l'érigez pas en seuil** :
+un moteur irréprochable échouerait sur une lacune du corpus, et la seule façon de
+repasser au vert serait d'abaisser le seuil.
+
+Deux moteurs ont mesuré la même chose : retirer six cent soixante-huit cas de
+conformité d'une suite unitaire n'a pas bougé la couverture du code écrit à la main.
+La conformité est un accord entre implémentations, pas un parcours de code ; ce sont
+deux outils, et confondre leurs chiffres fait prendre une bonne nouvelle pour une
+mauvaise.
+
+### 12.2.1 Les identifiants d'un README
+
+Deux moteurs se sont arrêtés sur la même question, ce qui veut dire que le document
+ne répondait pas. `DATA_POLICY.md` section 3 la tranche déjà, et sa raison mérite
+d'être répétée ici : une valeur synthétique prouve un **algorithme**, une valeur
+réelle prouve que la **règle décrit ce qu'un registre émet**. Ce sont deux
+démonstrations différentes.
+
+Un exemple de README démontre une API, pas le format d'un registre. Une valeur
+synthétique y est donc correcte — et une valeur réelle y serait un choix discutable,
+puisqu'elle désigne une entreprise sans que personne ait besoin qu'elle en désigne
+une. La seule exigence est que l'exemple **dise ce qu'il est** : synthétique, produit
+par le générateur documenté, et de préférence le cas de conformité dont il est tiré.
+
+Une valeur inventée de mémoire n'est aucune des deux, et reste interdite partout.
 
 ### 12.3 Property tests
 

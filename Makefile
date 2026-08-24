@@ -66,7 +66,7 @@ ios: ## Run the suite on an iOS simulator, as CI does
 		| python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; \
 			print(next(x['udid'] for k,v in d.items() if 'iOS' in k for x in v))"); \
 	xcodebuild test -scheme BusinessID-Package -destination "id=$$DESTINATION" \
-		-only-testing:BusinessIDTests -only-testing:BusinessIDConformanceTests -quiet
+		-only-testing:BusinessIDTests -quiet
 
 .PHONY: mutation
 mutation: ## Apply each targeted mutant and require a test to fail
