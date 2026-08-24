@@ -120,6 +120,17 @@ struct FixtureRepairTests {
                 operation.length = 4096
             }
         },
+        Repair(caseID: "loader-prefix-in-unsorted-039", what: "put the values in ascending order") {
+            mutatePredicates(&$0) { operation in
+                guard operation.kind == .prefixIn else { return }
+                // UTF-8 byte order, which is what section 9 declares and what
+                // the loader checks. Swift's `<` on String is Unicode ordering
+                // and only coincides with it on ASCII.
+                operation.values.sort {
+                    Array($0.utf8).lexicographicallyPrecedes(Array($1.utf8))
+                }
+            }
+        },
         Repair(caseID: "loader-modulus-out-of-range-021", what: "use a modulus in range") {
             mutateIntegers(&$0) { operation in
                 guard operation.kind == .modDigits else { return }
@@ -273,6 +284,43 @@ struct FixtureRepairTests {
         #expect(error.reason.contains("length 4097 is outside"))
     }
 
+    /// The corpus caught up with a rule this engine had already pinned.
+    ///
+    /// `CHECKSUM_OP_KIND_WHEN` is accepted only as a direct operand of `CHOOSE`,
+    /// and until `2026.09.0` the clause had no case at all: the only `WHEN`
+    /// fixture used one as a program root, which is refused for its own reason,
+    /// so the thirty five `load_ruleset` answers were identical between two
+    /// releases whatever an engine did with a dead branch.
+    ///
+    /// This asserts which rule answers, not merely that something did — the
+    /// fixture declares `CHECKSUM_TRISTATE_V1`, so it cannot be stopped at check
+    /// 25 by accident, and its root is the `LUHN`, so it cannot be stopped by
+    /// the root rule either.
+    @Test("The unreferenced WHEN fixture is refused by the CHOOSE operand rule")
+    func unreferencedWhenIsRefusedForItsRule() throws {
+        let error = try #require(try Self.outcome(try Self.payload("loader-when-unreferenced-038")))
+        #expect(error.engineErrorName == "invalid_ruleset")
+        #expect(error.reason.contains("WHEN branch outside a CHOOSE"))
+        #expect(!error.reason.contains("never roots at a WHEN branch"))
+    }
+
+    /// The order `ir.md` section 9 declares for `PredicateOperation.values`,
+    /// which check 13 has named since `2026.09.1`.
+    ///
+    /// The reference loader was not enforcing it, and the omission is invisible
+    /// while a lookup is a scan: a scan of an unsorted list is merely slow. It
+    /// becomes load bearing the moment the lookup is a binary search, because
+    /// then an unsorted list is not answered slowly but wrongly. This engine
+    /// checked the order before it had a reason to, so making the lookup
+    /// logarithmic could not silently break it — but nothing said which check
+    /// answered, and this does.
+    @Test("The unsorted prefix_in fixture is refused by the declared order")
+    func unsortedPrefixInIsRefusedForItsOrder() throws {
+        let error = try #require(try Self.outcome(try Self.payload("loader-prefix-in-unsorted-039")))
+        #expect(error.engineErrorName == "invalid_ruleset")
+        #expect(error.reason.contains("values is not ascending and deduplicated"))
+    }
+
     @Test("Every fixture that admits a repair is covered, and the rest are named")
     func coverage() throws {
         let repaired = Set(Self.repairs.map(\.caseID))
@@ -291,6 +339,10 @@ struct FixtureRepairTests {
             "loader-call-cycle-014",
             "loader-unknown-call-target-015",
             "loader-stray-when-branch-022",
+            // A WHEN nothing references cannot be made referenced by changing a
+            // field: it needs a CHOOSE to be an operand of, and adding one is
+            // adding a construct. Its reason is pinned below instead.
+            "loader-when-unreferenced-038",
             "loader-unbounded-digits-to-integer-020",
             "loader-type-mismatch-012",
             // The defect is a relationship between two declarations.
