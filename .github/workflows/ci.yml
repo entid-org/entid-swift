@@ -90,18 +90,20 @@ jobs:
       # build tool: nothing about it enters the published package or its
       # dependencies. An engine that judged its own results could declare
       # itself conformant by comparing too weakly.
-      # `go-version: stable` and not a pinned older Go, deliberately.
-      # `engine.md` section 11.1: the spec module asks for a newer toolchain
-      # than an engine typically pins for itself, and `actions/setup-go` sets
-      # `GOTOOLCHAIN: local`, which forbids fetching one. Measured here: stable
-      # resolves to go1.27.0, above the module's `toolchain go1.26.5`, so the
-      # step needs no `GOTOOLCHAIN: auto`. Pin an older Go and it will, and the
-      # first run fails on toolchain resolution rather than on conformance.
+      # `go-version: stable`, and `GOTOOLCHAIN: auto` on the runner step below.
+      # `engine.md` section 11.1: `actions/setup-go` sets `GOTOOLCHAIN: local`,
+      # which forbids fetching a toolchain, and the binding condition is the
+      # `go` line of the spec module — not its `toolchain` line. Measured here:
+      # stable resolves to go1.27.0 and the module asks for `go 1.25.0`, so this
+      # job never meets the case. The override is set anyway, as the section
+      # advises: it costs nothing, and spec's `go` line will rise one day.
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: stable
           cache: false
       - name: Run the shared corpus through the testee
+        env:
+          GOTOOLCHAIN: auto
         run: make conformance
 
   generated:
