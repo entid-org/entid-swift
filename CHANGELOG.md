@@ -9,6 +9,27 @@ rules update that changes no API is a patch release here.
 
 ## [Unreleased]
 
+### Added
+
+- **The engine fetches the release; the release no longer pushes into the
+  engine** (`engine.md` section 11.4). `.github/workflows/spec-sync.yml` runs on
+  a daily clock and on demand, compares the newest `libbusinessid/spec` release
+  to `rules.lock`, and stops there when they concord. When they do not it
+  downloads the artefacts, checks `SHA256SUMS`, verifies the provenance
+  attestation of the sums file, the manifest, the bundle and the corpus, and
+  only then writes `spec/`, `rules.lock` and `spec/PROVENANCE.md` — everything
+  is staged in a temporary directory, so a release whose attestation does not
+  verify never touches the working tree. It then regenerates the emitted code,
+  runs `make verify`, opens a pull request green or red, and enables auto-merge.
+
+  Two things this buys that the push direction could not. Regeneration needs
+  SwiftPM, which `spec` does not have, so a release that pushed shipped a new
+  bundle beside the old emitted code — four red engines at the first release.
+  And `spec` no longer needs a write token on this repository: the engine writes
+  with the `GITHUB_TOKEN` it already gets, so a compromise of `spec` stops at
+  `spec`. The trigger is a clock and not a `repository_dispatch` for the same
+  reason — a pushed event would hand the token back.
+
 ### Removed
 
 - **The conformance runner written in this repository.** The real one comes
