@@ -157,10 +157,13 @@ synchronized by this workflow."
   # that lands here and not on the archive.
   gzip -dc "${art}/businessid-conformance-${version}.jsonl.gz" \
     > "${staged}/spec/businessid-conformance.jsonl"
-  # engine.md, engine-swift.md and spec.md are deliberately not in this list:
-  # the release does not publish them, so nothing attests them and nothing in
-  # rules.lock could name their digest. They stay a developer sync.
-  for schema in rules.proto conformance.proto testee.proto ir.md features.md; do
+  # The prose contracts travel with the release since spec#87, and section 11.4
+  # step 3 names them: an engine that fetched only the data would keep a stale
+  # contract and not notice, because nothing digests them. Nothing in rules.lock
+  # names their digest either -- what attests them is SHA256SUMS, whose own
+  # attestation was verified above.
+  for schema in rules.proto conformance.proto testee.proto ir.md features.md \
+                spec.md engine.md engine-swift.md; do
     cp "${art}/${schema}" "${staged}/spec/${schema}"
   done
 
@@ -202,7 +205,7 @@ synchronized by this workflow."
 
 cmd_pull_request() {
   local tag="$1" version="$2" outcome="$3"
-  local branch="rules/${version}" url state body contexts repo failure
+  local branch="rules/${version}" url state body contexts repo failure verdict
   # Exactly what a synchronization is allowed to change: the release under
   # spec/, the lock that attests it, and the code emitted from it. Not `add -A`,
   # which would sweep in whatever `swift package resolve` touched on the way
@@ -233,8 +236,30 @@ cmd_pull_request() {
     git push --set-upstream origin "${branch}"
   fi
 
+  repo="${GITHUB_REPOSITORY:-$(gh repo view --json nameWithOwner -q .nameWithOwner)}"
+
+  # The verdict of the section 12.5 entry point, published as a commit status
+  # under the name the branch protection requires.
+  #
+  # A pull request opened with a repository's own GITHUB_TOKEN starts no
+  # `pull_request` workflow -- GitHub cuts there so an action cannot call itself
+  # in a loop -- so the check the protection waits for would never start, and
+  # auto-merge would wait forever. This workflow has already run the entry point;
+  # publishing its result is not a second definition of green, it is the same one
+  # under the expected name. A repository writes its own statuses, so this needs
+  # no wider token than the one already in hand.
+  if [ "${outcome}" = "success" ]; then verdict="success"; else verdict="failure"; fi
+  gh api -X POST "repos/${repo}/statuses/$(git rev-parse HEAD)" \
+    -f "state=${verdict}" \
+    -f "context=${REQUIRED_CHECK}" \
+    -f "description=make verify on the synchronization runner" \
+    -f "target_url=${GITHUB_SERVER_URL:-https://github.com}/${repo}/actions/runs/${GITHUB_RUN_ID:-0}" \
+    --silent
+  echo "spec-sync: published ${REQUIRED_CHECK} = ${verdict} on $(git rev-parse --short HEAD)"
+
   if [ "${outcome}" = "success" ]; then
-    state="\`make verify\` passed on the runner that wrote this."
+    state="\`make verify\` passed on the runner that wrote this, and is published on the
+head commit as the \`${REQUIRED_CHECK}\` status."
   else
     state="\`make verify\` **failed** on the runner that wrote this. Section 11.4: a red
 pull request is not merged to unblock the chain. It is fixed, or the release is
@@ -254,7 +279,8 @@ Automated synchronization of the LibBusinessID rules, \`engine.md\` section 11.4
 ${state}
 
 This automation opens the pull request and enables auto-merge. It cannot approve
-it, and auto-merge only merges once the required check on \`main\` is green.
+it, and auto-merge only merges once the \`${REQUIRED_CHECK}\` status on the head
+commit is green.
 BODY
 )"
 
@@ -285,7 +311,15 @@ pushed, so a re-run picks it up."
   # merge this one immediately, red or not. That check must also be the only
   # required one, or "green" has two definitions and auto-merge follows the
   # weaker.
-  repo="${GITHUB_REPOSITORY:-$(gh repo view --json nameWithOwner -q .nameWithOwner)}"
+  # Whether main is protected at all is readable with the token in hand -- it is
+  # a field of the branch object. Which checks it requires is not: there is no
+  # `administration` permission for a workflow to request, so that read is
+  # attempted and its refusal reported rather than treated as an answer.
+  [ "$(gh api "repos/${repo}/branches/main" --jq .protected)" = "true" ] || die \
+"main is not protected, so auto-merge would merge this pull request at once, green
+or red. Require exactly [${REQUIRED_CHECK}] on main first. The pull request is open
+at ${url}."
+
   failure="$(mktemp)"
   if contexts="$(gh api "repos/${repo}/branches/main/protection/required_status_checks" \
        --jq '[.checks[].context] | sort | join(",")' 2>"${failure}")"; then
@@ -295,9 +329,8 @@ entry point is the one required check. Set the required status checks of main to
 exactly [${REQUIRED_CHECK}]. The pull request is open at ${url}."
     echo "spec-sync: main requires ${contexts}, and nothing else"
   elif grep -qiE 'not protected|not enabled' "${failure}"; then
-    # Read, not assumed: the endpoint answers this only when there is nothing to
-    # wait for. Enabling auto-merge here would merge the moment the pull request
-    # is mergeable, which is at once.
+    # Protected, but requiring nothing to pass. Auto-merge would merge the moment
+    # the pull request is mergeable, which is at once.
     die \
 "main requires no status check, so auto-merge would merge this pull request at once,
 green or red. Require exactly [${REQUIRED_CHECK}] on main first. The pull request is

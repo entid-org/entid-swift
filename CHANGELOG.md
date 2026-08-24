@@ -17,10 +17,17 @@ rules update that changes no API is a patch release here.
   to `rules.lock`, and stops there when they concord. When they do not it
   downloads the artefacts, checks `SHA256SUMS`, verifies the provenance
   attestation of the sums file, the manifest, the bundle and the corpus, and
-  only then writes `spec/`, `rules.lock` and `spec/PROVENANCE.md` — everything
-  is staged in a temporary directory, so a release whose attestation does not
-  verify never touches the working tree. It then regenerates the emitted code,
-  runs `make verify`, opens a pull request green or red, and enables auto-merge.
+  only then writes `spec/`, `rules.lock` and `spec/PROVENANCE.md`, the prose
+  contracts included — everything is staged in a temporary directory, so a
+  release whose attestation does not verify never touches the working tree. It
+  then regenerates the emitted code, runs `make verify`, publishes that verdict
+  as the `Verify` commit status, opens a pull request green or red, and enables
+  auto-merge.
+
+  The verdict has to be published rather than awaited: a pull request opened with
+  a repository's own `GITHUB_TOKEN` starts no `pull_request` workflow, so a
+  branch protection requiring a check that never starts would hold every
+  synchronization forever.
 
   Two things this buys that the push direction could not. Regeneration needs
   SwiftPM, which `spec` does not have, so a release that pushed shipped a new

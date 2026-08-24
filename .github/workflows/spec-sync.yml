@@ -64,6 +64,10 @@ jobs:
       # compromise of `spec` stops at `spec`.
       contents: write
       pull-requests: write
+      # The verdict of the section 12.5 entry point is published as a commit
+      # status: a pull request opened with this token starts no `pull_request`
+      # workflow, so the check the branch protection waits for would never start.
+      statuses: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # Go twice over: the figures `write_provenance.sh` reads out of the
@@ -118,10 +122,10 @@ jobs:
           GOTOOLCHAIN: auto
         run: make verify
 
-      # Step 6, and the auto-merge that makes a green synchronization need
-      # nobody. The script refuses to enable it unless the section 12.5 entry
-      # point is the one required check on main.
-      - name: Open the pull request and enable auto-merge
+      # Step 6: the pull request, the verdict of step 5 published under the name
+      # the branch protection requires, and the auto-merge that makes a green
+      # synchronization need nobody.
+      - name: Open the pull request, publish the verdict, enable auto-merge
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ needs.compare.outputs.tag }}
