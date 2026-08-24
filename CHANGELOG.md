@@ -20,7 +20,7 @@ rules update that changes no API is a patch release here.
 ### Changed
 
 - Conformance is now the upstream runner's verdict:
-  `rules 2026.08.31: 673 cases, 673 matched, 0 differed`. `make conformance`
+  `rules 2026.09.1: 675 cases, 675 matched, 0 differed`. `make conformance`
   runs it. A Go toolchain in CI is the only new prerequisite, and it is a build
   tool: nothing about it enters the published package or its dependencies.
 - The tests that proved the deleted comparator was not vacuous are kept and
@@ -29,9 +29,45 @@ rules update that changes no API is a patch release here.
   differently depending on which case it was handed.
 
 - Rules `2026.08.17` → `2026.08.18` → `2026.08.22` → `2026.08.23` → `2026.08.25`
-  → `2026.08.26`. Each bundle changed in its business version alone; no rule
-  moved, and the regenerated code differs by the one line that carries the
-  version.
+  → `2026.08.26` → `2026.08.31` → `2026.09.0` → `2026.09.1`. Every bundle but
+  `2026.08.31` changed in its business version alone; no rule moved in those,
+  and the regenerated code differs by the one line that carries the version.
+- **The declared order of `prefix_in` values was already enforced here**, which
+  `ir.md` section 9 has always stated and check 13 has named since `2026.09.1`.
+  The reference loader was not enforcing it, and the omission is invisible while
+  a lookup is a scan — a scan of an unsorted list is merely slow. It becomes
+  load bearing the moment the lookup is a binary search.
+
+  Measured rather than asserted, by enumerating permutations of
+  `["AA", "BB", "CC", "DD"]`: `["AA", "BB", "DD", "CC"]` against `"CCX"` makes
+  the search answer false where a scan answers true. So an unsorted list is not
+  answered slowly but wrongly, and `Predicates.prefixIn` now records that its
+  correctness rests on a precondition the loader checks.
+
+- **A membership test is no longer linear in the size of the list**, which
+  `engine.md` section 14 asks for as of `2026.09.0`. `Predicates.prefixIn` was
+  `prefixes.contains { view.hasPrefix($0) }`; the register memberships made that
+  visible, because the cost falls on the refused input, which has to rule out
+  every entry before answering.
+
+  The generator now emits a membership table sorted by length first and code
+  points second, so every prefix of one length is a contiguous ordered block,
+  and the predicate binary searches each block for the view's own prefix of that
+  length. Measured end to end, on the German court table of 1748 + 818 codes:
+
+  | | scan | blocked search |
+  | --- | --- | --- |
+  | absent court | 7083 ns | 3411 ns |
+  | present court | 4148 ns | 3755 ns |
+  | probes, absent, 1748 entries | 1748 | 20 |
+  | probes, absent, 818 entries | 818 | 18 |
+
+  A single binary search over the whole table would have been wrong, not merely
+  slow: with `["A", "AA"]` and the value `"ABC"` the greatest entry not
+  exceeding the value is `"AA"`, which is not a prefix, while `"A"` is. The
+  differential test caught exactly that on `"1BBA"` against a table holding
+  `"1"`.
+
 - **`2026.08.31` is the first release to move a rule.** Three memberships were
   added — 148 French greffe codes, 2566 German XJustiz court codes split by
   length, and a Luxembourg section letter constrained to being a letter rather
@@ -78,6 +114,24 @@ rules update that changes no API is a patch release here.
   carried.
 
 ### Added
+
+- `PrefixMembershipTests`: a differential test comparing the search against the
+  loop it must be equivalent to over four hundred random tables, a probe budget
+  standing in for a timing, and the same budget on the tables actually shipped.
+  The published bundle cannot prove any of it — its three membership tables hold
+  one length each, so the blocking is a no-op on them and every conformance case
+  passes against a search that mishandles a mixed table.
+- Two benchmarks aimed at a membership miss, which `engine.md` section 14 asks
+  for and this set did not have: both existing early-rejection benchmarks stop
+  at dispatch and never reach a list.
+- `FixtureRepairTests` pins `loader-when-unreferenced-038`, the corpus case the
+  `WHEN`-outside-`CHOOSE` clause had lacked entirely, to the rule it names
+  rather than to `invalid_ruleset` alone.
+- `FixtureRepairTests` also pins `loader-prefix-in-unsorted-039` and repairs it:
+  sorting the values makes the bundle load, which is what proves the fixture
+  carries one defect and not two. The corpus reaches 675 cases, 37 of them
+  addressed to the generator.
+
 
 - `LoadCheckTests` pins `CHECKSUM_OP_KIND_WHEN` as accepted **only** as a direct
   operand of `CHOOSE`, including the branch nothing references at all. The
