@@ -124,6 +124,47 @@ a specification update into a commit whose message described a loader, and the
 change to the normative documents became invisible to anyone reading the log.
 Check `git status` before staging when `spec/` is in the tree.
 
+## A rules update arrives on its own
+
+`.github/workflows/spec-sync.yml` implements `engine.md` section 11.4. Every
+morning, and on demand, it compares the newest `libbusinessid/spec` release to
+`rules.lock` and stops there when they concord. Otherwise it downloads the
+artefacts, checks `SHA256SUMS`, verifies the provenance attestation — repository,
+signing workflow, tag — and only then writes `spec/`, `rules.lock` and
+`spec/PROVENANCE.md`, regenerates the emitted code, runs `make verify` and opens
+a pull request. Nothing reaches the working tree before the attestation passes.
+
+So a rules update is not something anyone does by hand. `Tools/spec-sync.sh
+compare` answers what the workflow would decide today.
+
+The pull request is opened green or red, and auto-merge is enabled on it. That
+is only meaningful under three conditions, and the first two are repository
+settings no `GITHUB_TOKEN` can grant — there is no administration permission for
+a workflow to request, so a human clicks them once:
+
+- **Settings → General → Pull Requests → Allow auto-merge.** Without it
+  `gh pr merge --auto` is refused and the synchronization run goes red with the
+  pull request already open.
+- **A branch protection on `main` requiring exactly one status check, `Verify`** —
+  the job that runs the section 12.5 entry point. Auto-merge merges as soon as
+  nothing *blocks*, which is not the same as merging on green: with no required
+  check it would merge a red synchronization immediately. And `Verify` has to be
+  the only required check, or "green" has two definitions and auto-merge follows
+  the weaker one. The script reads the required checks and refuses to enable
+  auto-merge when they are not exactly that.
+- **Allow GitHub Actions to create and approve pull requests**, without which
+  the token cannot open the pull request at all. This one is two settings, not
+  one: the repository checkbox (Settings → Actions → General → Workflow
+  permissions) is refused with *"The organization does not allow GitHub Actions
+  to create or approve pull requests"* until the same box is checked for the
+  `libbusinessid` organization (Organization settings → Actions → General →
+  Workflow permissions). The box also permits approving; this automation never
+  approves and never merges its own pull request, it only asks for auto-merge.
+
+Tagging and publishing this package stay manual, and a red pull request is never
+merged to unblock the chain: it is fixed, or the release is refused with the
+reason written down.
+
 ## Releasing
 
 A release is a SemVer tag. `rulesVersion` is independent: a rules update that

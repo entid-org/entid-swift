@@ -53,6 +53,10 @@ line counts — and the durations belong in a report as context.
   specification repository at the commit `rules.lock` records under
   `source_commit`, and every artefact is attested by a digest. A problem in it
   is reported upstream, not patched locally.
+- **A rules update is not done by hand.** `.github/workflows/spec-sync.yml`
+  fetches the release, verifies it, regenerates and opens the pull request
+  (`engine.md` section 11.4). `Tools/spec-sync.sh compare` says what it would
+  decide today.
 - **Nothing is read from `spec/` before `verify-lock` passes.**
 - **Never write an identifier from memory.** Every real value in a test, a
   fixture or a document comes from the shared corpus, from an issuer's published
