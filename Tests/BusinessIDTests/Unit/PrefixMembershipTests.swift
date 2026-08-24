@@ -6,12 +6,20 @@ import Testing
 /// `Predicates.prefixIn`, which `engine.md` section 14 requires to be sublinear
 /// in the size of the list.
 ///
-/// The published bundle cannot prove this suite right. Its three membership
-/// tables hold one length each — 1748 five-character German court codes, 818
-/// six-character ones, 148 four-character French greffe codes — so the blocking
-/// by length is a no-op on them and every conformance case would pass against a
-/// search that mishandles a mixed table. A later bundle may carry one, and the
-/// differential test below is what stands in for the cases that do not exist.
+/// The published bundle cannot prove this suite right. Its `prefix_in` nodes
+/// hold one element length each — 1748 of five, 818 of six, 148 of four, 41 of
+/// two — so the blocking by length is a no-op on them and every conformance
+/// case would pass against a search that mishandles a mixed table.
+///
+/// Reporting that is what closed the hole: since `2026.09.2` a bundle mixing
+/// element lengths in one `prefix_in` is refused at load, and a rule needing two
+/// lengths writes one `prefix_in` per length under an `any`. So the mixed table
+/// these tests exercise is a shape this engine can no longer be handed.
+///
+/// They stay anyway. A search that would answer wrongly on a table it can no
+/// longer receive is still worth knowing about: the load check and the search
+/// are two pieces of code that can drift apart, and this suite is what notices
+/// if the first is ever relaxed while the second still assumes it.
 @Suite("Prefix membership")
 struct PrefixMembershipTests {
     /// The order the generator emits: length first, code points second.

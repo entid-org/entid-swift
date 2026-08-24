@@ -6,7 +6,7 @@ reading this engine follows. None of them is worked around silently: where a
 choice had to be made, it is the one the more recent and argued text states, and
 it is marked here so that `spec` can settle it.
 
-The engine passes 675/675 conformance cases under these readings.
+The engine passes 676/676 conformance cases under these readings.
 
 ---
 
@@ -20,6 +20,28 @@ the record is below.
 ## Settled upstream
 
 Kept for the record, because each one changed what this engine does.
+
+### A `prefix_in` may not mix element lengths — settled in `2026.09.2`
+
+Reported from here while making the membership lookup logarithmic. The mixed
+length case is the one a per-length search exists for, and the published bundle
+cannot exercise it: all four `prefix_in` nodes hold one element length — 1748 of
+five, 818 of six, 148 of four, 41 of two — so blocking by length is a no-op on
+them and every conformance case passes against a search that mishandles a mixed
+table. Four hundred random tables in `PrefixMembershipTests` stood in for the
+cases that did not exist.
+
+Rather than leave every engine to re-derive the per-length rule, the bundle may
+not carry the shape at all. `PREDICATE_OP_KIND_PREFIX_IN` now states that every
+element has the same length, gives the counterexample, and names the spelling a
+rule needing two lengths uses: one `prefix_in` per length under an `any`, which
+the German court rule already does.
+
+Measured here: `loader-prefix-in-mixed-lengths-040` was **accepted** by this
+loader before the check existed, which is what made it the failing test. It is
+now refused naming both lengths and the replacement spelling, and four built
+shapes are refused alongside it, with a control proving the `any` form is
+accepted — so the rule forbids a spelling, not a capability.
 
 ### A `WHEN` branch nothing references — settled in `2026.08.31`
 

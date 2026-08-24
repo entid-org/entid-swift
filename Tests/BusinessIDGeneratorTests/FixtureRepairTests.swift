@@ -321,6 +321,28 @@ struct FixtureRepairTests {
         #expect(error.reason.contains("values is not ascending and deduplicated"))
     }
 
+    /// A `prefix_in` may not mix element lengths, as of `2026.09.2`.
+    ///
+    /// This engine reported that the published bundle cannot prove the
+    /// mixed-length reasoning: all four `prefix_in` nodes hold one element
+    /// length — 1748 of five, 818 of six, 148 of four, 41 of two — so blocking
+    /// by length is a no-op on them and every conformance case passes against a
+    /// search that mishandles a mixed table. Rather than leave each engine to
+    /// re-derive the per-length rule, the bundle may not carry the shape.
+    ///
+    /// The fixture is the counterexample itself, `["AB", "ABA"]`, and it is
+    /// sorted and deduplicated — so the order check accepts it and only the
+    /// length rule can answer.
+    @Test("The mixed-length prefix_in fixture is refused for its lengths")
+    func mixedLengthPrefixInIsRefusedForItsLengths() throws {
+        let error = try #require(try Self.outcome(try Self.payload("loader-prefix-in-mixed-lengths-040")))
+        #expect(error.engineErrorName == "invalid_ruleset")
+        #expect(error.reason.contains("values mixes element lengths [2, 3]"))
+        #expect(error.reason.contains("one prefix_in per length under an any"))
+        // Not the order rule: the fixture's values are correctly ordered.
+        #expect(!error.reason.contains("ascending and deduplicated"))
+    }
+
     @Test("Every fixture that admits a repair is covered, and the rest are named")
     func coverage() throws {
         let repaired = Set(Self.repairs.map(\.caseID))
@@ -350,6 +372,11 @@ struct FixtureRepairTests {
             "loader-duplicate-prefix-017",
             "loader-undeclared-feature-006",
             "loader-predicate-constant-028",
+            // Same reason as the alphabet family below: bringing two values of
+            // different lengths to one length means inventing a value of the
+            // right length, and dropping one erases half the construct. Its
+            // reason is pinned below instead.
+            "loader-prefix-in-mixed-lengths-040",
             // The alphabet family: repairing means choosing an alphabet, which
             // is inventing a rule rather than undoing a mutation.
             "loader-alphabet-empty-031",

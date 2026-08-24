@@ -403,6 +403,49 @@ struct LoadCheckTests {
         }
     }
 
+    /// `ir.md` on `PREDICATE_OP_KIND_PREFIX_IN`, since `2026.09.2`: every element
+    /// has the same length, and a bundle mixing lengths is refused.
+    ///
+    /// The reason is correctness, not speed. Over one sorted list of mixed
+    /// lengths a search for the greatest element not after the value answers
+    /// wrongly: `["AB", "ABA"]` against `"ABCD"` finds `ABA`, which is not a
+    /// prefix, while `AB` is. At one length, starting with an element is
+    /// equalling its opening of that length.
+    ///
+    /// Each list below is correctly ordered and deduplicated, so only the length
+    /// rule can refuse it.
+    @Test(
+        "A prefix list mixing element lengths is refused",
+        arguments: [["AB", "ABA"], ["A", "AB"], ["AB", "CD", "EFG"], ["ABC", "AB"].sorted()]
+    )
+    func mixedLengthPrefixValues(_ values: [String]) throws {
+        try expectRefused(.invalidRuleset(""), "one prefix_in holds one element length") {
+            $0.programs[2].nodes[1] = BundleBuilder.predicate(.prefixIn, inputs: [0]) {
+                $0.values = values
+            }
+        }
+    }
+
+    /// The shape a rule needing two lengths is written in, so the refusal above
+    /// forbids a spelling and not a capability.
+    @Test("Two prefix lists of one length each, under an ANY, are accepted")
+    func onePrefixListPerLengthIsAccepted() throws {
+        switch try load({
+            $0.programs[2].nodes = [
+                BundleBuilder.string(.subject),
+                BundleBuilder.predicate(.prefixIn, inputs: [0]) { $0.values = ["AB", "CD"] },
+                BundleBuilder.predicate(.prefixIn, inputs: [0]) { $0.values = ["ABA", "EFG"] },
+                BundleBuilder.predicate(.any, inputs: [1, 2]),
+                BundleBuilder.require(3, reason: .empty, messageKey: "test.empty"),
+                BundleBuilder.assertionSequence([4]),
+            ]
+            $0.programs[2].rootNode = 5
+        }) {
+        case .failure(let error): Issue.record("\(error)")
+        case .success: break
+        }
+    }
+
     /// The control: the same lists in the declared order are accepted, so the
     /// two above cannot be passing because the builder itself was refused.
     @Test("The same lists in ascending order are accepted")
