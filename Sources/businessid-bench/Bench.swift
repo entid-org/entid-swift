@@ -42,6 +42,18 @@ struct Bench {
         // Rejected before any rule runs.
         let unknownKind = IdentifierInput(kind: "no_such_kind", value: "X")
         let tooLong = IdentifierInput(kind: "siren", value: String(repeating: "1", count: 2000))
+        // The membership benchmarks `engine.md` section 14 asks for. The cost of
+        // a register membership falls on the refused input, not the valid one,
+        // so a bench measuring only correct identifiers cannot see it. The
+        // German table is the largest in the bundle: 1748 five-character codes
+        // and 818 six-character ones.
+        // `euid-de-real-003`.
+        let germanValid = IdentifierInput(kind: "euid", value: "DEK1101R.HRB116737")
+        // `euid-de-register-unknown-004`: a court that is in neither table, so
+        // every entry has to be ruled out.
+        let germanUnknown = IdentifierInput(kind: "euid", value: "DEZZZZZ.HRB12345")
+        // `euid-fr-register-unknown-040`: the same against the 148 greffe codes.
+        let frenchUnknown = IdentifierInput(kind: "euid", value: "FR9999.012345674")
 
         measure("validate: simple format and checksum", iterations: iterations) {
             blackHole(engine.validate(simple))
@@ -60,6 +72,15 @@ struct Bench {
         }
         measure("reject early: input above the byte bound", iterations: iterations) {
             blackHole(engine.validate(tooLong))
+        }
+        measure("membership: German court, present", iterations: iterations) {
+            blackHole(engine.validate(germanValid))
+        }
+        measure("membership: German court, absent", iterations: iterations) {
+            blackHole(engine.validate(germanUnknown))
+        }
+        measure("membership: French greffe, absent", iterations: iterations) {
+            blackHole(engine.validate(frenchUnknown))
         }
 
         await measureParallel("parallel validation across tasks", iterations: iterations)
