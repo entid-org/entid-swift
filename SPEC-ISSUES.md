@@ -12,6 +12,36 @@ The engine passes 676/676 conformance cases under these readings.
 
 ## Open
 
+### `spec/PROVENANCE.md` is the one file of step 3 the release does not carry
+
+Step 3 makes the engine write `spec/PROVENANCE.md`. Since spec#87 every other
+file it names is a release artefact — the bundle, the corpus, the schemas, and
+the prose contracts. That one is not, and neither is anything needed to build it.
+It has exactly one writer, `tools/write_provenance.sh`, and every input that
+writer reads lives in the `spec` checkout: `docs/spec/provenance/body.md`,
+`docs/spec/provenance/<lang>.md`, `docs/generated/coverage.md`, and
+`go run ./cmd/businessidc inspect`. So a workflow that has verified the release
+still cannot assemble the file from it, and has to clone `spec` as well — a
+second fetch beside the attested one, pinned only by the `sourceCommit` the
+attested manifest names.
+
+Which also means no release published so far can be synchronized:
+`write_provenance.sh` was added after `v0.1.1` was tagged. Measured on a runner —
+[run 32779621303](https://github.com/libbusinessid/businessid-swift/actions/runs/32779621303) — `v0.1.1` passes its sums and all four attestation identities,
+and the synchronization then stops because the release it has just verified was
+built from a commit with no provenance writer.
+
+**Suggested fix:** publish the assembled per-engine `PROVENANCE.md` as a release
+asset, listed in `SHA256SUMS` and covered by the attestation, exactly as the
+prose contracts now are. Step 3 would then read only attested bytes, no engine
+would need a clone of `spec`, and the file would still have one writer.
+
+**Followed here:** the writer is pinned to the commit the attested manifest
+names, exactly as the `Makefile` pins the conformance runner. A release built
+before that script existed is refused with the reason printed, rather than given
+a second writer — two writers are what made a released engine name `4bf7699` in
+its provenance header and `b264614` in its lock.
+
 ### `engine.md` numbers two different sections 12.5
 
 `### 12.5 Mutation testing` at line 845 and `## 12.5 Une seule commande,
@@ -35,6 +65,19 @@ on the number.
 ## Settled upstream
 
 Kept for the record, because each one changed what this engine does.
+
+### "The newest release" is not `releases/latest` — settled in `engine.md` 11.4
+
+`release.yml` marks every non-stable bundle `--prerelease`, so it stays out of
+`releases/latest`, and every release published so far is `alpha`:
+`GET /repos/libbusinessid/spec/releases/latest` answers **404** and
+`gh release view` answers "release not found" while `v0.1.1` exists. An engine
+that asked the obvious endpoint would have reported nothing to synchronize every
+morning until the first stable bundle.
+
+Section 11.4 now says it in as many words: list the releases and take the most
+recent that is not a draft. This engine does that, sorted by publication date, so
+the 404 is never reached.
 
 ### A `prefix_in` may not mix element lengths — settled in `2026.09.2`
 
