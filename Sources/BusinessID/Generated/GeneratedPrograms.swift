@@ -5147,7 +5147,7 @@ enum GeneratedPrograms {
             n12() ? .pass : .fail(.invalidFormat, "euid.de.register")
         }
         func n14() -> Bool {
-            Predicates.lengthBetween(n2(), 1, 8)
+            Predicates.lengthBetween(n2(), 5, 6)
         }
         func n15() -> AssertionOutcome {
             n14() ? .pass : .fail(.invalidLength, "euid.de.register_length")
@@ -5158,10 +5158,34 @@ enum GeneratedPrograms {
         func n17() -> AssertionOutcome {
             n16() ? .pass : .fail(.invalidCharacters, "euid.de.register_characters")
         }
-        func n18() -> AssertionOutcome {
+        func n18() -> Bool {
+            Predicates.lengthEq(n2(), 5)
+        }
+        func n19() -> Bool {
+            Predicates.prefixIn(n2(), GeneratedLiterals.p0)
+        }
+        func n20() -> Bool {
+            n18() && n19()
+        }
+        func n21() -> Bool {
+            Predicates.lengthEq(n2(), 6)
+        }
+        func n22() -> Bool {
+            Predicates.prefixIn(n2(), GeneratedLiterals.p1)
+        }
+        func n23() -> Bool {
+            n21() && n22()
+        }
+        func n24() -> Bool {
+            n20() || n23()
+        }
+        func n25() -> AssertionOutcome {
+            n24() ? .pass : .fail(.invalidFormat, "euid.de.register_unknown")
+        }
+        func n26() -> AssertionOutcome {
             GeneratedPrograms.format164(c, n3())
         }
-        func n19() -> AssertionOutcome {
+        func n27() -> AssertionOutcome {
             let a0 = n6()
             if case .fail = a0 { return a0 }
             let a1 = n8()
@@ -5174,11 +5198,13 @@ enum GeneratedPrograms {
             if case .fail = a4 { return a4 }
             let a5 = n17()
             if case .fail = a5 { return a5 }
-            let a6 = n18()
+            let a6 = n25()
             if case .fail = a6 { return a6 }
+            let a7 = n26()
+            if case .fail = a7 { return a7 }
             return .pass
         }
-        return n19()
+        return n27()
     }
 
     static func format175(_ c: RuleContext, _ suppliedSubject: ScalarView?) -> AssertionOutcome {
@@ -5621,21 +5647,27 @@ enum GeneratedPrograms {
             n12() ? .pass : .fail(.invalidFormat, "euid.fr.register")
         }
         func n14() -> Bool {
-            Predicates.lengthBetween(n2(), 1, 8)
+            Predicates.lengthEq(n2(), 4)
         }
         func n15() -> AssertionOutcome {
             n14() ? .pass : .fail(.invalidLength, "euid.fr.register_length")
         }
         func n16() -> Bool {
-            n2().allSatisfyNonEmpty(ASCIIClass.isAlphanumeric)
+            n2().allSatisfyNonEmpty(ASCIIClass.isDigit)
         }
         func n17() -> AssertionOutcome {
             n16() ? .pass : .fail(.invalidCharacters, "euid.fr.register_characters")
         }
-        func n18() -> AssertionOutcome {
-            GeneratedPrograms.format197(c, n3())
+        func n18() -> Bool {
+            Predicates.prefixIn(n2(), GeneratedLiterals.p2)
         }
         func n19() -> AssertionOutcome {
+            n18() ? .pass : .fail(.invalidFormat, "euid.fr.register_unknown")
+        }
+        func n20() -> AssertionOutcome {
+            GeneratedPrograms.format197(c, n3())
+        }
+        func n21() -> AssertionOutcome {
             let a0 = n6()
             if case .fail = a0 { return a0 }
             let a1 = n8()
@@ -5648,11 +5680,13 @@ enum GeneratedPrograms {
             if case .fail = a4 { return a4 }
             let a5 = n17()
             if case .fail = a5 { return a5 }
-            let a6 = n18()
+            let a6 = n19()
             if case .fail = a6 { return a6 }
+            let a7 = n20()
+            if case .fail = a7 { return a7 }
             return .pass
         }
-        return n19()
+        return n21()
     }
 
     static func format181(_ c: RuleContext, _ suppliedSubject: ScalarView?) -> AssertionOutcome {
@@ -6984,7 +7018,7 @@ enum GeneratedPrograms {
             n0().allSatisfyNonEmpty(ASCIIClass.isDigit)
         }
         func n9() -> Bool {
-            Predicates.prefixIn(n0(), GeneratedLiterals.p0)
+            Predicates.prefixIn(n0(), GeneratedLiterals.p3)
         }
         func n10() -> Bool {
             n8() || n9()
@@ -7391,7 +7425,7 @@ enum GeneratedPrograms {
             n4() ? .pass : .fail(.invalidLength, "lu.rcs_number.length")
         }
         func n6() -> Bool {
-            n0().hasPrefix(GeneratedLiterals.t45)
+            Predicates.charAtIn(n0(), 0, GeneratedLiterals.t17)
         }
         func n7() -> AssertionOutcome {
             n6() ? .pass : .fail(.invalidFormat, "lu.rcs_number.prefix")
@@ -7486,7 +7520,7 @@ enum GeneratedPrograms {
             n4() ? .pass : .fail(.invalidLength, "mt.mbr_number.length")
         }
         func n6() -> Bool {
-            n0().hasPrefix(GeneratedLiterals.t46)
+            n0().hasPrefix(GeneratedLiterals.t45)
         }
         func n7() -> AssertionOutcome {
             n6() ? .pass : .fail(.invalidFormat, "mt.mbr_number.prefix")
@@ -7693,7 +7727,7 @@ enum GeneratedPrograms {
             n6() ? .pass : .fail(.invalidCharacters, "se.organisationsnummer.characters")
         }
         func n8() -> Bool {
-            Predicates.charAtIn(n0(), 2, GeneratedLiterals.t47)
+            Predicates.charAtIn(n0(), 2, GeneratedLiterals.t46)
         }
         func n9() -> AssertionOutcome {
             n8() ? .pass : .fail(.invalidFormat, "se.organisationsnummer.group")
@@ -7862,7 +7896,7 @@ enum GeneratedPrograms {
             n9() ? .pass : .fail(.invalidCharacters, "vat.at.characters")
         }
         func n11() -> Bool {
-            Predicates.charAtIn(n0(), 2, GeneratedLiterals.t48)
+            Predicates.charAtIn(n0(), 2, GeneratedLiterals.t47)
         }
         func n12() -> AssertionOutcome {
             n11() ? .pass : .fail(.invalidFormat, "vat.at.u_marker")
@@ -7919,7 +7953,7 @@ enum GeneratedPrograms {
             n9() ? .pass : .fail(.invalidCharacters, "vat.be.characters")
         }
         func n11() -> Bool {
-            Predicates.charAtIn(n0(), 2, GeneratedLiterals.t49)
+            Predicates.charAtIn(n0(), 2, GeneratedLiterals.t48)
         }
         func n12() -> AssertionOutcome {
             n11() ? .pass : .fail(.invalidFormat, "vat.be.enterprise_prefix")
@@ -8302,13 +8336,13 @@ enum GeneratedPrograms {
             n15().allSatisfyNonEmpty(ASCIIClass.isDigit)
         }
         func n17() -> Bool {
-            Predicates.charAtIn(n0(), 10, GeneratedLiterals.t50)
+            Predicates.charAtIn(n0(), 10, GeneratedLiterals.t49)
         }
         func n18() -> Bool {
             n16() && n17()
         }
         func n19() -> Bool {
-            Predicates.charAtIn(n0(), 2, GeneratedLiterals.t51)
+            Predicates.charAtIn(n0(), 2, GeneratedLiterals.t50)
         }
         func n20() -> Bool {
             n19() && n13() && n17()
@@ -8488,7 +8522,7 @@ enum GeneratedPrograms {
             n6() ? .pass : .fail(.invalidLength, "vat.gb.length")
         }
         func n8() -> Bool {
-            n0().hasPrefix(GeneratedLiterals.t52)
+            n0().hasPrefix(GeneratedLiterals.t51)
         }
         func n9() -> AssertionOutcome {
             n8() ? .pass : .fail(.invalidFormat, "vat.gb.prefix")
@@ -8792,7 +8826,7 @@ enum GeneratedPrograms {
             n7() ? .pass : .fail(.invalidLength, "vat.is.length")
         }
         func n9() -> Bool {
-            n0().hasPrefix(GeneratedLiterals.t53)
+            n0().hasPrefix(GeneratedLiterals.t52)
         }
         func n10() -> AssertionOutcome {
             n9() ? .pass : .fail(.invalidFormat, "vat.is.prefix")
@@ -8890,7 +8924,7 @@ enum GeneratedPrograms {
             n4() ? .pass : .fail(.invalidLength, "vat.li.length")
         }
         func n6() -> Bool {
-            n0().hasPrefix(GeneratedLiterals.t54)
+            n0().hasPrefix(GeneratedLiterals.t53)
         }
         func n7() -> AssertionOutcome {
             n6() ? .pass : .fail(.invalidFormat, "vat.li.prefix")
@@ -9101,7 +9135,7 @@ enum GeneratedPrograms {
             n9() ? .pass : .fail(.invalidCharacters, "vat.nl.characters")
         }
         func n11() -> Bool {
-            Predicates.charAtIn(n0(), 11, GeneratedLiterals.t45)
+            Predicates.charAtIn(n0(), 11, GeneratedLiterals.t54)
         }
         func n12() -> AssertionOutcome {
             n11() ? .pass : .fail(.invalidFormat, "vat.nl.b_marker")

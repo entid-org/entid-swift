@@ -16,7 +16,7 @@ struct BundleLoaderTests {
         #expect(bundle.programs.count == 250)
         #expect(bundle.definitions.count == 94)
         #expect(bundle.dispatchers.count == 37)
-        #expect(bundle.programs.reduce(0) { $0 + $1.nodes.count } == 2376)
+        #expect(bundle.programs.reduce(0) { $0 + $1.nodes.count } == 2386)
     }
 
     @Test("The published bundle covers thirty seven countries")
