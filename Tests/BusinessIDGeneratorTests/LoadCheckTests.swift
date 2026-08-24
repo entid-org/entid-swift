@@ -371,12 +371,57 @@ struct LoadCheckTests {
 
     // MARK: Arithmetic
 
-    @Test("An accepted length list out of order is refused")
-    func unsortedLengths() throws {
+    /// `ir.md` section 9 puts `PredicateOperation.lengths` and `values` under the
+    /// declared order — ascending, deduplicated — and check 13 has named it
+    /// since `2026.09.1`. The reference loader was not enforcing it, and three
+    /// shapes passed there: descending, duplicated, and equal keys out of order.
+    ///
+    /// The corpus fixture carries the first shape only. All three are asserted
+    /// here, on both parameter lists, because the omission is invisible while a
+    /// lookup is a scan and load bearing the moment it is a binary search.
+    @Test(
+        "Every shape of a mis-ordered length list is refused",
+        arguments: [[9, 3], [3, 3], [3, 9, 9], [9, 9, 3]]
+    )
+    func unsortedLengths(_ lengths: [UInt32]) throws {
         try expectRefused(.invalidRuleset(""), "lengths are ascending and deduplicated") {
             $0.programs[2].nodes[1] = BundleBuilder.predicate(.lengthIn, inputs: [0]) {
-                $0.lengths = [9, 3]
+                $0.lengths = lengths
             }
+        }
+    }
+
+    @Test(
+        "Every shape of a mis-ordered prefix list is refused",
+        arguments: [["CD", "AB"], ["AB", "AB"], ["AB", "CD", "CD"], ["CD", "CD", "AB"]]
+    )
+    func unsortedPrefixValues(_ values: [String]) throws {
+        try expectRefused(.invalidRuleset(""), "values are ascending and deduplicated") {
+            $0.programs[2].nodes[1] = BundleBuilder.predicate(.prefixIn, inputs: [0]) {
+                $0.values = values
+            }
+        }
+    }
+
+    /// The control: the same lists in the declared order are accepted, so the
+    /// two above cannot be passing because the builder itself was refused.
+    @Test("The same lists in ascending order are accepted")
+    func sortedListsAreAccepted() throws {
+        switch try load({
+            $0.programs[2].nodes[1] = BundleBuilder.predicate(.lengthIn, inputs: [0]) {
+                $0.lengths = [3, 9]
+            }
+        }) {
+        case .failure(let error): Issue.record("\(error)")
+        case .success: break
+        }
+        switch try load({
+            $0.programs[2].nodes[1] = BundleBuilder.predicate(.prefixIn, inputs: [0]) {
+                $0.values = ["AB", "CD"]
+            }
+        }) {
+        case .failure(let error): Issue.record("\(error)")
+        case .success: break
         }
     }
 
