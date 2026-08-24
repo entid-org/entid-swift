@@ -20,7 +20,7 @@ rules update that changes no API is a patch release here.
 ### Changed
 
 - Conformance is now the upstream runner's verdict:
-  `rules 2026.08.26: 666 cases, 666 matched, 0 differed`. `make conformance`
+  `rules 2026.08.31: 673 cases, 673 matched, 0 differed`. `make conformance`
   runs it. A Go toolchain in CI is the only new prerequisite, and it is a build
   tool: nothing about it enters the published package or its dependencies.
 - The tests that proved the deleted comparator was not vacuous are kept and
@@ -32,6 +32,14 @@ rules update that changes no API is a patch release here.
   → `2026.08.26`. Each bundle changed in its business version alone; no rule
   moved, and the regenerated code differs by the one line that carries the
   version.
+- **`2026.08.31` is the first release to move a rule.** Three memberships were
+  added — 148 French greffe codes, 2566 German XJustiz court codes split by
+  length, and a Luxembourg section letter constrained to being a letter rather
+  than to `B` — and the corpus grew from 666 to 673 cases. Conformant with no
+  engine change: the lists are data the bundle carries, and the generator
+  compiles them. Measured here: bundle 99 677 → 120 872 bytes, emitted Swift
+  392 042 → 418 425 bytes, total nodes 2376 → 2386, expansion 3069 → 3094
+  instances across the same 250 programs, worst program unchanged at 152/118.
 - `ir.md` settled two defects this engine reported in `2026.08.18`: check 15
   now carries the clause on a subject node built from the subject it defines,
   worded as this engine already implemented it, and section 2 states that check
@@ -70,6 +78,26 @@ rules update that changes no API is a patch release here.
   carried.
 
 ### Added
+
+- `LoadCheckTests` pins `CHECKSUM_OP_KIND_WHEN` as accepted **only** as a direct
+  operand of `CHOOSE`, including the branch nothing references at all. The
+  reference loader read the rule through each node's parents, and a node with no
+  parent has none — `ir.md` section 2 permits an unreachable node, so a dead
+  `WHEN` passed there. This loader required the `CHOOSE` parent to be present
+  rather than merely required no other parent, so it already refused one; the
+  test now says so, and fails against the parents-only reading.
+- `ChecksumOpsTests` pins an out-of-bounds access inside a checksum as an
+  absence. `engine.md` section 9.1 contradicted itself in two sentences until
+  `2026.08.31` — an absent value and never an exception, then an engine error
+  after a valid format — and the clause is gone. This engine never had it: no
+  `fatalError`, `precondition` or `assert` exists in the shipped library.
+- `EncodingTests` pins the input bound as UTF-8 bytes at the boundary, from both
+  sides, on `U+FFFD` — three bytes and one code point, so the two readings of
+  `ir.md` section 6 step 1 separate on it. That step now states the freedom an
+  engine whose string type admits ill formed text has, and requires it to say
+  which answer it took; Swift's `String` admits none, so there is nothing to
+  choose and the suite says why.
+
 
 - **`rules.lock` carries an eighth digest, `conformance_jsonl_sha256`.** The
   JSONL shipped under `spec/` with nothing attesting it while the engine tests

@@ -6,7 +6,7 @@ reading this engine follows. None of them is worked around silently: where a
 choice had to be made, it is the one the more recent and argued text states, and
 it is marked here so that `spec` can settle it.
 
-The engine passes 666/666 conformance cases under these readings.
+The engine passes 673/673 conformance cases under these readings.
 
 ---
 
@@ -20,6 +20,48 @@ the record is below.
 ## Settled upstream
 
 Kept for the record, because each one changed what this engine does.
+
+### A `WHEN` branch nothing references — settled in `2026.08.31`
+
+`ir.md` section 3.6 has always said `CHECKSUM_OP_KIND_WHEN` "is accepted only as
+a direct operand of `CHOOSE`", and check 16 carries it. The reference loader
+enforced it by looking at each node's parents, and a node with no parent has
+none to look at — section 2 permits an unreachable node — so a `WHEN` nothing
+reads passed there. The Kotlin engine read the rule as written and refused it.
+Check 16 now says so explicitly, and the program root stays excluded because
+`root_node` is a reference: a program rooted in a `WHEN` keeps its own rule and
+its own message.
+
+Measured here: this loader required the `CHOOSE` parent to be *present*, not
+merely required that no other parent exist, so it already refused a dead branch.
+`LoadCheckTests` now pins all three shapes, and the dead-branch case was watched
+failing against the parents-only reading, which accepts it.
+
+### `engine.md` section 9.1 contradicted itself — settled in `2026.08.31`
+
+Two sentences: an out-of-bounds view produces an absent value and never an
+exception, then an out-of-bounds access in a checksum after a valid format must
+produce an engine error. `ir.md` section 1.1 is unreserved — "Absence is never
+an error and never an exception" — and the second sentence is gone.
+
+Nothing changed here: the shipped library contains no `fatalError`, no
+`precondition` and no `assert`, and every out-of-bounds view yields `.absent`.
+`ChecksumOpsTests` now pins the case the deleted clause described, and it was
+watched failing against a `ScalarView` that clamps instead of vanishing — which
+answers `invalid` where this engine answers `unsupported`.
+
+### The input bound and ill formed text — settled in `2026.08.31`
+
+`ir.md` section 6 step 1 counts UTF-8 bytes and runs before the step that
+refuses ill formed input, so an engine whose string type admits such text has to
+invent a count. The freedom is now stated, with the obligation to say which
+answer was taken.
+
+Swift's `String` admits none, so this engine has no choice to state.
+`EncodingTests` already documented that; the documentation is now backed by
+normative text rather than by this engine's own reasoning, and a new case pins
+the bound at the boundary on `U+FFFD` — three bytes, one code point — from both
+sides.
 
 ### The JSONL shipped with no digest — settled in `2026.08.26`
 
