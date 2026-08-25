@@ -69,7 +69,15 @@ jobs:
           xcodebuild docbuild -scheme EntID \
             -destination 'generic/platform=macOS' \
             -derivedDataPath .build/docc -quiet
+      # A .doccarchive is uploaded as a tarball, not as a directory. DocC names
+      # its files after the symbols they document, so `validate(_:)` becomes a
+      # path containing a colon -- and upload-artifact refuses a colon, because
+      # the artifact has to unpack on Windows too. The whole release went red on
+      # a documentation job for a character in a file name.
+      - name: Pack the archive
+        run: tar -czf EntID.doccarchive.tar.gz -C .build/docc/Build/Products/Debug EntID.doccarchive
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: documentation
-          path: .build/docc/Build/Products/Debug/EntID.doccarchive
+          path: EntID.doccarchive.tar.gz
+          if-no-files-found: error
