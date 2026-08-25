@@ -13,7 +13,7 @@ rules update that changes no API is a patch release here.
 
 - **The engine fetches the release; the release no longer pushes into the
   engine** (`engine.md` section 11.4). `.github/workflows/spec-sync.yml` runs on
-  a daily clock and on demand, compares the newest `libbusinessid/spec` release
+  a daily clock and on demand, compares the newest `entid-org/spec` release
   to `rules.lock`, and stops there when they concord. When they do not it
   downloads the artefacts, checks `SHA256SUMS`, verifies the provenance
   attestation of the sums file, the manifest, the bundle and the corpus, and
@@ -46,6 +46,31 @@ rules update that changes no API is a patch release here.
   get it; that line now exists.
 
 ### Changed
+
+- **Renamed to EntID — a source-breaking change for every consumer.** The
+  project is `entid` and the organisation is `entid-org`; this repository is
+  `entid-org/entid-swift`. The module a consumer imports is renamed with it, so
+  **every `import BusinessID` becomes `import EntID`**, `BusinessIDEngine`
+  becomes `EntIDEngine`, and the product to depend on is
+  `.product(name: "EntID", package: "entid-swift")`. There is no deprecated
+  alias and no compatibility shim: a type alias cannot rename a module, so a
+  half-rename would leave the one thing that actually breaks — the import —
+  broken anyway, with a second name to keep alive forever. Nothing was ever
+  tagged under the old name, so no published version is affected.
+
+  The build-time tools move too: `businessid-gen`, `businessid-testee`,
+  `businessid-fuzz` and `businessid-bench` are now `entid-gen`, `entid-testee`,
+  `entid-fuzz` and `entid-bench`; `BUSINESSID_SPEC_ROOT` and `BUSINESSID_TESTEE`
+  are now `ENTID_SPEC_ROOT` and `ENTID_TESTEE`; the vendored artefacts are
+  `spec/entid-rules.binpb`, `spec/entid-conformance.binpb` and
+  `spec/entid-conformance.jsonl`, which is also what the release publishes.
+
+  What did **not** move in this commit is what the pinned release owns rather
+  than this repository: the Protobuf package `libbusinessid.*` and the
+  `Libbusinessid_` prefix protoc derives from it, the `proto/libbusinessid/`
+  tree its own `import` statements name, and the Go module path of the
+  conformance runner. Those follow `source_commit`, and they move when the
+  synchronization moves it.
 
 - **The rules version moves backwards, from `2026.09.2` to `2026.08.32`.**
   `PATCH` in `YYYY.MM.PATCH` is a counter within a month with no upper bound,
@@ -313,8 +338,8 @@ rules update that changes no API is a patch release here.
   in-repository runner was deleted and the corpus left `swift test`. Mutation
   score back to 14/14.
 - The iOS job could not have passed. Deleting the in-repository conformance
-  runner left `-only-testing:BusinessIDConformanceTests` naming a target that no
-  longer exists, and left `BusinessIDTesteeTests` — which drives a subprocess —
+  runner left `-only-testing:EntIDConformanceTests` naming a target that no
+  longer exists, and left `EntIDTesteeTests` — which drives a subprocess —
   compiled for a simulator that has no `Process`. The target is now compiled out
   anywhere but macOS, and the job runs the library suite, measured green on a
   simulator. The count is left to the run rather than written here: a number
@@ -327,16 +352,16 @@ First engine. Rules `2026.08.17`, IR format version `1`.
 
 ### Added
 
-- `BusinessIDEngine` with `canonicalize`, `validate`, `validateFormat`,
+- `EntIDEngine` with `canonicalize`, `validate`, `validateFormat`,
   `validateChecksum`, `rulesInfo` and `capabilities`. All synchronous, and
   permanently so.
 - Coverage of 94 identifier definitions across 37 countries and 37 kinds: VAT,
   LEI, EUID, SIREN, SIRET, CNPJ, USCC, EIN, DUNS, EORI and twenty seven national
   registration numbers.
-- `businessid-gen`, the build-time generator. It reads the attested rule bundle,
+- `entid-gen`, the build-time generator. It reads the attested rule bundle,
   applies the twenty five load checks of `ir.md` section 10 and emits Swift.
   Nothing it needs at build time ships to a consumer.
-- `businessid-testee`, the conformance testee, speaking the published wire
+- `entid-testee`, the conformance testee, speaking the published wire
   protocol over stdin and stdout.
 - Codable conformance on every public result type, using the field names and the
   lower case enum spellings of the common model.

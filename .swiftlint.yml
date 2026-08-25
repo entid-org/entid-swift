@@ -2,9 +2,9 @@
 # responsibility, so it is linted through the emitter's own tests instead.
 excluded:
   - .build
-  - Examples/BusinessIDConsumer/.build
-  - Sources/BusinessID/Generated
-  - Sources/BusinessIDWire/Generated
+  - Examples/EntIDConsumer/.build
+  - Sources/EntID/Generated
+  - Sources/EntIDWire/Generated
 
 opt_in_rules:
   - array_init

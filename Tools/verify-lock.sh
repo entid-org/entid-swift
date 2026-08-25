@@ -25,13 +25,13 @@ check() {
 }
 
 echo "rules.lock names $(locked rules_version), format version $(grep -E '^format_version' rules.lock | tr -d ' ' | cut -d= -f2)"
-check rules_sha256 spec/businessid-rules.binpb
-check conformance_sha256 spec/businessid-conformance.binpb
+check rules_sha256 spec/entid-rules.binpb
+check conformance_sha256 spec/entid-conformance.binpb
 # The JSONL is shipped decompressed, so the digest is taken on what lands in
 # spec/ rather than on the archive the release publishes. It went unlisted
 # until 2026.08.26: nothing verified the file the engine tests cite case ids
 # from, and a drift would have passed unseen.
-check conformance_jsonl_sha256 spec/businessid-conformance.jsonl
+check conformance_jsonl_sha256 spec/entid-conformance.jsonl
 check rules_proto_sha256 spec/rules.proto
 check conformance_proto_sha256 spec/conformance.proto
 check testee_proto_sha256 spec/testee.proto

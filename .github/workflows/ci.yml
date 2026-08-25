@@ -79,4 +79,4 @@ jobs:
             https://github.com/apple/swift-protobuf.git .swift-protobuf-tool
           swift build --package-path .swift-protobuf-tool -c release --product protoc-gen-swift
           PATH="$PWD/.swift-protobuf-tool/.build/release:$PATH" make proto
-          git diff --exit-code -- Sources/BusinessIDWire/Generated
+          git diff --exit-code -- Sources/EntIDWire/Generated

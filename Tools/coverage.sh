@@ -25,7 +25,7 @@ cd "$(dirname "$0")/.."
 swift test --enable-code-coverage "$@" >/dev/null
 
 PROFDATA=$(find .build -name default.profdata -print -quit)
-BINARY=$(find .build -name 'BusinessIDPackageTests.xctest' -print -quit)/Contents/MacOS/BusinessIDPackageTests
+BINARY=$(find .build -name 'EntIDPackageTests.xctest' -print -quit)/Contents/MacOS/EntIDPackageTests
 if [ ! -f "$BINARY" ]; then
   BINARY=$(find .build -name '*PackageTests.xctest' -print -quit)
 fi
@@ -36,13 +36,13 @@ coverage() {
 }
 
 # Written by nobody here: the Protobuf plumbing, the tests, the build tree, and
-# the code businessid-gen emits from the bundle.
-NOT_OURS='(Tests/|\.build/|BusinessIDWire/Generated|Sources/BusinessID/Generated)'
-LIBRARY=$(coverage "${NOT_OURS}|Sources/BusinessIDGenerator|Sources/BusinessIDConformance|Sources/BusinessIDTestee")
+# the code entid-gen emits from the bundle.
+NOT_OURS='(Tests/|\.build/|EntIDWire/Generated|Sources/EntID/Generated)'
+LIBRARY=$(coverage "${NOT_OURS}|Sources/EntIDGenerator|Sources/EntIDConformance|Sources/EntIDTestee")
 PACKAGE=$(coverage "${NOT_OURS}")
 
 # Measured and published, deliberately not gated.
-EMITTED=$(xcrun llvm-cov report "$BINARY" -instr-profile="$PROFDATA" Sources/BusinessID/Generated \
+EMITTED=$(xcrun llvm-cov report "$BINARY" -instr-profile="$PROFDATA" Sources/EntID/Generated \
   | tail -1 | awk '{ gsub(/%/, "", $10); print $10 }')
 
 printf 'hand written library line coverage: %s%% (minimum %s%%)\n' "$LIBRARY" "$LIBRARY_MINIMUM"

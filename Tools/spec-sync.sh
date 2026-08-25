@@ -14,7 +14,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-SPEC_REPO="libbusinessid/spec"
+SPEC_REPO="entid-org/spec"
 SIGNER_WORKFLOW=".github/workflows/release.yml"
 # The job of `.github/workflows/ci.yml` that runs the section 12.5 entry point.
 # Auto-merge follows the required checks of the branch, so this name is what
@@ -48,8 +48,8 @@ latest_tag() {
 # release title carries it too, in prose; the asset name is the machine's copy.
 release_version() {
   gh api "repos/${SPEC_REPO}/releases/tags/$1" \
-    --jq '.assets[].name | select(startswith("businessid-manifest-") and endswith(".json"))' \
-    | sed -e 's/^businessid-manifest-//' -e 's/\.json$//' | head -1
+    --jq '.assets[].name | select(startswith("entid-manifest-") and endswith(".json"))' \
+    | sed -e 's/^entid-manifest-//' -e 's/\.json$//' | head -1
 }
 
 cmd_compare() {
@@ -66,7 +66,7 @@ cmd_compare() {
   [ -n "${tag}" ] || die "no published release in ${SPEC_REPO}"
 
   version="$(release_version "${tag}")"
-  [ -n "${version}" ] || die "release ${tag} publishes no businessid-manifest-*.json"
+  [ -n "${version}" ] || die "release ${tag} publishes no entid-manifest-*.json"
 
   locked_version="$(lock rules_version)"
   locked_tag="$(lock attestation_identity | sed -n 's|.*@refs/tags/||p')"
@@ -117,9 +117,9 @@ cmd_sync() {
   # gh refuse the arguments before verifying anything.
   for subject in \
     "SHA256SUMS" \
-    "businessid-manifest-${version}.json" \
-    "businessid-rules-${version}.binpb" \
-    "businessid-conformance-${version}.binpb"
+    "entid-manifest-${version}.json" \
+    "entid-rules-${version}.binpb" \
+    "entid-conformance-${version}.binpb"
   do
     gh attestation verify "${art}/${subject}" \
       --repo "${SPEC_REPO}" \
@@ -128,7 +128,7 @@ cmd_sync() {
     echo "spec-sync: attested ${subject}"
   done
 
-  manifest="${art}/businessid-manifest-${version}.json"
+  manifest="${art}/entid-manifest-${version}.json"
   [ "$(jq -r .rulesVersion "${manifest}")" = "${version}" ] \
     || die "the manifest declares $(jq -r .rulesVersion "${manifest}"), not ${version}"
   commit="$(jq -r .sourceCommit "${manifest}")"
@@ -151,12 +151,12 @@ synchronized by this workflow."
 
   # 3. spec/, rules.lock and spec/PROVENANCE.md, staged first.
   mkdir -p "${staged}/spec"
-  cp "${art}/businessid-rules-${version}.binpb"       "${staged}/spec/businessid-rules.binpb"
-  cp "${art}/businessid-conformance-${version}.binpb" "${staged}/spec/businessid-conformance.binpb"
+  cp "${art}/entid-rules-${version}.binpb"       "${staged}/spec/entid-rules.binpb"
+  cp "${art}/entid-conformance-${version}.binpb" "${staged}/spec/entid-conformance.binpb"
   # Shipped decompressed, which is why rules.lock takes that digest on the file
   # that lands here and not on the archive.
-  gzip -dc "${art}/businessid-conformance-${version}.jsonl.gz" \
-    > "${staged}/spec/businessid-conformance.jsonl"
+  gzip -dc "${art}/entid-conformance-${version}.jsonl.gz" \
+    > "${staged}/spec/entid-conformance.jsonl"
   # The prose contracts travel with the release since spec#87, and section 11.4
   # step 3 names them: an engine that fetched only the data would keep a stale
   # contract and not notice, because nothing digests them. Nothing in rules.lock
@@ -191,7 +191,7 @@ synchronized by this workflow."
   # runner's default, and setup-go pins GOTOOLCHAIN to local.
   bash "${work}/spec-source/tools/write_provenance.sh" \
     "${work}/spec-source" "${art}" "${version}" "${commit}" \
-    businessid-swift "${staged}/spec/PROVENANCE.md"
+    entid-swift "${staged}/spec/PROVENANCE.md"
 
   cp "${staged}/rules.lock" rules.lock
   cp -R "${staged}/spec/." spec/
@@ -210,7 +210,7 @@ cmd_pull_request() {
   # spec/, the lock that attests it, and the code emitted from it. Not `add -A`,
   # which would sweep in whatever `swift package resolve` touched on the way
   # through.
-  local -a paths=(spec rules.lock Sources/BusinessID/Generated)
+  local -a paths=(spec rules.lock Sources/EntID/Generated)
 
   if [ -z "$(git status --porcelain -- "${paths[@]}")" ]; then
     echo "spec-sync: ${version} changes nothing here; no pull request to open"
@@ -267,7 +267,7 @@ refused with the reason written down."
   fi
 
 body="$(cat <<BODY
-Automated synchronization of the LibBusinessID rules, \`engine.md\` section 11.4.
+Automated synchronization of the EntID rules, \`engine.md\` section 11.4.
 
 - rules version: \`${version}\`
 - source release: [\`${tag}\`](https://github.com/${SPEC_REPO}/releases/tag/${tag})

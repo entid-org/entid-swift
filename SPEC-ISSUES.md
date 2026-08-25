@@ -20,14 +20,14 @@ the prose contracts. That one is not, and neither is anything needed to build it
 It has exactly one writer, `tools/write_provenance.sh`, and every input that
 writer reads lives in the `spec` checkout: `docs/spec/provenance/body.md`,
 `docs/spec/provenance/<lang>.md`, `docs/generated/coverage.md`, and
-`go run ./cmd/businessidc inspect`. So a workflow that has verified the release
+`go run ./cmd/entidc inspect`. So a workflow that has verified the release
 still cannot assemble the file from it, and has to clone `spec` as well — a
 second fetch beside the attested one, pinned only by the `sourceCommit` the
 attested manifest names.
 
 Which also means no release published so far can be synchronized:
 `write_provenance.sh` was added after `v0.1.1` was tagged. Measured on a runner —
-[run 32779621303](https://github.com/libbusinessid/businessid-swift/actions/runs/32779621303) — `v0.1.1` passes its sums and all four attestation identities,
+[run 32779621303](https://github.com/entid-org/entid-swift/actions/runs/32779621303) — `v0.1.1` passes its sums and all four attestation identities,
 and the synchronization then stops because the release it has just verified was
 built from a commit with no provenance writer.
 
@@ -70,7 +70,7 @@ Kept for the record, because each one changed what this engine does.
 
 `release.yml` marks every non-stable bundle `--prerelease`, so it stays out of
 `releases/latest`, and every release published so far is `alpha`:
-`GET /repos/libbusinessid/spec/releases/latest` answers **404** and
+`GET /repos/entid-org/spec/releases/latest` answers **404** and
 `gh release view` answers "release not found" while `v0.1.1` exists. An engine
 that asked the obvious endpoint would have reported nothing to synchronize every
 morning until the first stable bundle.
@@ -145,7 +145,7 @@ sides.
 
 ### The JSONL shipped with no digest — settled in `2026.08.26`
 
-`rules.lock` attested seven artefacts. `spec/businessid-conformance.jsonl` was
+`rules.lock` attested seven artefacts. `spec/entid-conformance.jsonl` was
 not one of them, and it is the file this engine's tests cite case ids from when
 they quote a value: `EngineTests` names the case above every literal, and the
 rule in `CONTRIBUTING.md` is that a real value comes from the corpus or from an
@@ -231,7 +231,7 @@ description:
 
 So the case now isolates exactly one check, and the fixture moved from the list
 of defects with no definable repair into the repair table of
-`Tests/BusinessIDGeneratorTests/FixtureRepairTests.swift`, where the second row
+`Tests/EntIDGeneratorTests/FixtureRepairTests.swift`, where the second row
 above is the assertion.
 
 ### The expansion fixture rooted a checksum program in a string — settled in `2026.08.25`
@@ -251,7 +251,7 @@ operation instances, beyond the budget of 100000` — forty doublings above a
 subject, then the checksum node, so 2^41 against a budget of 100000. The
 unreferenced `LUHN` node the fixture still carries at index 1 costs nothing,
 which is `ir.md` section 2: a node no root reaches is not emitted.
-`Tests/BusinessIDGeneratorTests/ExpansionTests.swift` pins the reason.
+`Tests/EntIDGeneratorTests/ExpansionTests.swift` pins the reason.
 
 ### Where the conformance runner comes from — settled in `2026.08.23`
 
@@ -279,7 +279,7 @@ the step with a native test naming the malformed form its own string type
 admits, and an engine whose string type admits none documents that instead of
 widening its public API to reach the branch.
 
-Swift is the third case, and `Tests/BusinessIDTests/API/EncodingTests.swift`
+Swift is the third case, and `Tests/EntIDTests/API/EncodingTests.swift`
 pins it: `String(bytes:encoding:)` refuses an invalid byte,
 `String(decoding:as:)` repairs it to U+FFFD, `Unicode.Scalar(0xD800)` is `nil`,
 and the engine reports `invalidEncoding` for none of the awkward inputs that can

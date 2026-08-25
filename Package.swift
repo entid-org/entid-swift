@@ -11,7 +11,7 @@ let strictSwiftSettings: [SwiftSetting] = [
 ]
 
 let package = Package(
-    name: "BusinessID",
+    name: "EntID",
     platforms: [
         .macOS(.v13),
         .iOS(.v16),
@@ -21,12 +21,12 @@ let package = Package(
     products: [
         // The shipped engine: generated code, the primitives it calls, and a
         // hand written API. It has no dependency and never decodes a bundle.
-        .library(name: "BusinessID", targets: ["BusinessID"]),
-        // Build time tool. Reads `businessid-rules.binpb`, applies the twenty
+        .library(name: "EntID", targets: ["EntID"]),
+        // Build time tool. Reads `entid-rules.binpb`, applies the twenty
         // five load checks and emits Swift. Never shipped to a consumer.
-        .executable(name: "businessid-gen", targets: ["businessid-gen"]),
+        .executable(name: "entid-gen", targets: ["entid-gen"]),
         // Conformance testee, driven by the runner over stdin/stdout.
-        .executable(name: "businessid-testee", targets: ["businessid-testee"]),
+        .executable(name: "entid-testee", targets: ["entid-testee"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.38.1")
@@ -35,7 +35,7 @@ let package = Package(
         // MARK: - Shipped engine
 
         .target(
-            name: "BusinessID",
+            name: "EntID",
             swiftSettings: strictSwiftSettings
         ),
 
@@ -45,20 +45,20 @@ let package = Package(
         // edited by hand, never public: `package` visibility keeps it reachable
         // by the generator and the conformance plumbing and by nothing else.
         .target(
-            name: "BusinessIDWire",
+            name: "EntIDWire",
             dependencies: [.product(name: "SwiftProtobuf", package: "swift-protobuf")]
         ),
         .target(
-            name: "BusinessIDGenerator",
+            name: "EntIDGenerator",
             dependencies: [
-                "BusinessIDWire",
+                "EntIDWire",
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
             ],
             swiftSettings: strictSwiftSettings
         ),
         .executableTarget(
-            name: "businessid-gen",
-            dependencies: ["BusinessIDGenerator"],
+            name: "entid-gen",
+            dependencies: ["EntIDGenerator"],
             swiftSettings: strictSwiftSettings
         ),
 
@@ -71,56 +71,56 @@ let package = Package(
         // tests proving it does not cheat.
 
         .target(
-            name: "BusinessIDTestee",
+            name: "EntIDTestee",
             dependencies: [
-                "BusinessID",
-                "BusinessIDGenerator",
-                "BusinessIDWire",
+                "EntID",
+                "EntIDGenerator",
+                "EntIDWire",
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
             ],
             swiftSettings: strictSwiftSettings
         ),
         .executableTarget(
-            name: "businessid-testee",
-            dependencies: ["BusinessIDTestee"],
+            name: "entid-testee",
+            dependencies: ["EntIDTestee"],
             swiftSettings: strictSwiftSettings
         ),
 
         // MARK: - Development tools, never products
 
         .executableTarget(
-            name: "businessid-fuzz",
-            dependencies: ["BusinessID", "BusinessIDGenerator"],
+            name: "entid-fuzz",
+            dependencies: ["EntID", "EntIDGenerator"],
             swiftSettings: strictSwiftSettings
         ),
         .executableTarget(
-            name: "businessid-bench",
-            dependencies: ["BusinessID", "BusinessIDGenerator"],
+            name: "entid-bench",
+            dependencies: ["EntID", "EntIDGenerator"],
             swiftSettings: strictSwiftSettings
         ),
 
         // MARK: - Tests
 
         .testTarget(
-            name: "BusinessIDTests",
-            dependencies: ["BusinessID"],
+            name: "EntIDTests",
+            dependencies: ["EntID"],
             swiftSettings: strictSwiftSettings
         ),
         .testTarget(
-            name: "BusinessIDGeneratorTests",
+            name: "EntIDGeneratorTests",
             dependencies: [
-                "BusinessIDGenerator",
-                "BusinessIDWire",
+                "EntIDGenerator",
+                "EntIDWire",
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
             ],
             swiftSettings: strictSwiftSettings
         ),
         .testTarget(
-            name: "BusinessIDTesteeTests",
+            name: "EntIDTesteeTests",
             dependencies: [
-                "BusinessID",
-                "BusinessIDTestee",
-                "BusinessIDWire",
+                "EntID",
+                "EntIDTestee",
+                "EntIDWire",
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
             ],
             swiftSettings: strictSwiftSettings

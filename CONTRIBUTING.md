@@ -10,8 +10,8 @@ A pull request that changes a rule belongs there, with its source, its
 conformance cases and its false-negative analysis. A pull request here changes
 how the engine executes rules, or how the generator compiles them.
 
-Everything under `Sources/BusinessID/Generated` and
-`Sources/BusinessIDWire/Generated` is emitted. Never edit it by hand; run
+Everything under `Sources/EntID/Generated` and
+`Sources/EntIDWire/Generated` is emitted. Never edit it by hand; run
 `make generate` or `make proto` and commit the result.
 
 ## Before you start
@@ -127,7 +127,7 @@ Check `git status` before staging when `spec/` is in the tree.
 ## A rules update arrives on its own
 
 `.github/workflows/spec-sync.yml` implements `engine.md` section 11.4. Every
-morning, and on demand, it compares the newest `libbusinessid/spec` release to
+morning, and on demand, it compares the newest `entid-org/spec` release to
 `rules.lock` and stops there when they concord. Otherwise it downloads the
 artefacts, checks `SHA256SUMS`, verifies the provenance attestation — repository,
 signing workflow, tag — and only then writes `spec/`, `rules.lock` and
@@ -165,7 +165,7 @@ a workflow to request, so a human clicks them once:
   one: the repository checkbox (Settings → Actions → General → Workflow
   permissions) is refused with *"The organization does not allow GitHub Actions
   to create or approve pull requests"* until the same box is checked for the
-  `libbusinessid` organization (Organization settings → Actions → General →
+  `entid-org` organization (Organization settings → Actions → General →
   Workflow permissions). The box also permits approving; this automation never
   approves and never merges its own pull request, it only asks for auto-merge.
 
