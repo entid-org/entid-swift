@@ -37,8 +37,8 @@ jobs:
       # writing it again produces the same bytes, which is what a tag ships.
       - name: Generated code is reproducible from the attested bundle
         run: |
-          swift run businessid-gen
-          git diff --exit-code -- Sources/BusinessID/Generated
+          swift run entid-gen
+          git diff --exit-code -- Sources/EntID/Generated
 
       # The tag is the version. A mismatch means the changelog and the package
       # disagree about what is being published.
@@ -46,7 +46,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
-          DECLARED=$(grep -oE 'engineVersion = "[^"]+"' Sources/BusinessID/API/RulesInfo.swift \
+          DECLARED=$(grep -oE 'engineVersion = "[^"]+"' Sources/EntID/API/RulesInfo.swift \
             | sed -E 's/.*"(.*)"/\1/')
           echo "tag $TAG, declared $DECLARED"
           [ "$TAG" = "$DECLARED" ]
@@ -66,10 +66,10 @@ jobs:
       # job produces.
       - name: Build
         run: |
-          xcodebuild docbuild -scheme BusinessID \
+          xcodebuild docbuild -scheme EntID \
             -destination 'generic/platform=macOS' \
             -derivedDataPath .build/docc -quiet
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: documentation
-          path: .build/docc/Build/Products/Debug/BusinessID.doccarchive
+          path: .build/docc/Build/Products/Debug/EntID.doccarchive

@@ -66,13 +66,13 @@ regenerates, and publishes a patch; the advisory names the affected digest.
 
 - The library holds no state and opens no file. Sandboxing it needs no
   exemption.
-- `BusinessID` links no dependency. SwiftPM still resolves `swift-protobuf`,
+- `EntID` links no dependency. SwiftPM still resolves `swift-protobuf`,
   which belongs to the generator and the conformance tooling; nothing a
   consumer builds links it, and `Tools/audit-dependencies.py` fails CI if a
   second name appears in the resolved graph.
-- `businessid-gen`, `businessid-testee`, `businessid-fuzz` and
-  `businessid-bench` are development tools. None of them is reachable from the
-  `BusinessID` library product, and a consumer never builds them.
+- `entid-gen`, `entid-testee`, `entid-fuzz` and
+  `entid-bench` are development tools. None of them is reachable from the
+  `EntID` library product, and a consumer never builds them.
 - If you accept identifiers from untrusted sources, note that the 1024-byte
   bound applies to the raw input; bounding your own field before calling costs
   nothing and fails earlier.

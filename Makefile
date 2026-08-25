@@ -1,11 +1,11 @@
 # Everything CI runs, runnable locally with the same commands.
 SWIFT ?= swift
 SPEC ?= spec
-GENERATED := Sources/BusinessID/Generated
+GENERATED := Sources/EntID/Generated
 
 .DEFAULT_GOAL := verify
 
-# The single entry point of `engine.md` section 12.5: silent when everything
+# The single entry point of `engine.md` section 12.6: silent when everything
 # passes, the failing step's output and only that when one does not. CI calls it
 # too, so "green" never has two definitions.
 .PHONY: verify
@@ -29,31 +29,33 @@ test: ## Run every test
 # can never be judged by another release's comparator. An engine that wrote its
 # own comparator could declare itself conformant by comparing too weakly.
 SOURCE_COMMIT := $(shell sed -n 's/^source_commit = "\(.*\)"/\1/p' rules.lock)
-RUNNER := github.com/libbusinessid/spec/cmd/conformance-runner@$(SOURCE_COMMIT)
+# The module path is a property of the pinned commit, not of the organisation
+# today: `go run` refuses a path the fetched `go.mod` does not declare, which is
+# exactly how it refused `entid-org` while the lock still named a commit from
+# before the rename. It follows `source_commit`, and it moved with it here.
+RUNNER := github.com/entid-org/spec/cmd/conformance-runner@$(SOURCE_COMMIT)
 
 .PHONY: conformance
 conformance: ## Run the shared corpus through the testee, judged by the spec runner
-	$(SWIFT) build --product businessid-testee
-	go run $(RUNNER) -corpus $(SPEC)/businessid-conformance.binpb -- \
-		$$($(SWIFT) build --product businessid-testee --show-bin-path)/businessid-testee
+	$(SWIFT) build --product entid-testee
+	go run $(RUNNER) -corpus $(SPEC)/entid-conformance.binpb -- \
+		$$($(SWIFT) build --product entid-testee --show-bin-path)/entid-testee
 
 .PHONY: generate
 generate: ## Compile the rule bundle to Swift
-	$(SWIFT) run businessid-gen --rules $(SPEC)/businessid-rules.binpb --lock rules.lock --out $(GENERATED)
+	$(SWIFT) run entid-gen --rules $(SPEC)/entid-rules.binpb --lock rules.lock --out $(GENERATED)
 
 .PHONY: generated-check
 generated-check: ## Fail when the committed generated code is stale
-	$(SWIFT) run businessid-gen --rules $(SPEC)/businessid-rules.binpb --lock rules.lock --out $(GENERATED) --check
+	$(SWIFT) run entid-gen --rules $(SPEC)/entid-rules.binpb --lock rules.lock --out $(GENERATED) --check
 
 .PHONY: proto
 proto: ## Regenerate the Protobuf code the generator reads (needs protoc and protoc-gen-swift)
 	protoc -I proto \
-		--swift_out=Sources/BusinessIDWire/Generated \
+		--swift_out=Sources/EntIDWire/Generated \
 		--swift_opt=Visibility=Package \
 		--swift_opt=FileNaming=PathToUnderscores \
-		proto/libbusinessid/ir/v1/rules.proto \
-		proto/libbusinessid/conformance/v1/conformance.proto \
-		proto/libbusinessid/testee/v1/testee.proto
+		$(shell find proto -name '*.proto' | sort)
 
 .PHONY: format
 format: ## Apply the formatter
@@ -72,8 +74,8 @@ ios: ## Run the suite on an iOS simulator, as CI does
 	@DESTINATION=$$(xcrun simctl list devices available --json \
 		| python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; \
 			print(next(x['udid'] for k,v in d.items() if 'iOS' in k for x in v))"); \
-	xcodebuild test -scheme BusinessID-Package -destination "id=$$DESTINATION" \
-		-only-testing:BusinessIDTests -quiet
+	xcodebuild test -scheme EntID-Package -destination "id=$$DESTINATION" \
+		-only-testing:EntIDTests -quiet
 
 .PHONY: mutation
 mutation: ## Apply each targeted mutant and require a test to fail
@@ -85,11 +87,11 @@ coverage: ## Measure line coverage against its gates
 
 .PHONY: fuzz
 fuzz: ## A short deterministic fuzz run
-	$(SWIFT) run -c release businessid-fuzz --rounds 20000
+	$(SWIFT) run -c release entid-fuzz --rounds 20000
 
 .PHONY: bench
 bench: ## Regression benchmarks
-	$(SWIFT) run -c release businessid-bench
+	$(SWIFT) run -c release entid-bench
 
 .PHONY: verify-lock
 verify-lock: ## Check every digest rules.lock attests
@@ -97,7 +99,7 @@ verify-lock: ## Check every digest rules.lock attests
 
 .PHONY: docs
 docs: ## Build the DocC archive
-	xcodebuild docbuild -scheme BusinessID -destination 'generic/platform=macOS' \
+	xcodebuild docbuild -scheme EntID -destination 'generic/platform=macOS' \
 		-derivedDataPath .build/docc -quiet
 	@echo "archive: $$(find .build/docc -name '*.doccarchive' | head -1)"
 

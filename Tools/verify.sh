@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# The single entry point `engine.md` section 12.5 requires.
+# The single entry point `engine.md` section 12.6 requires.
 #
 #   success: one line, carrying the numbers that matter and nothing else
 #   failure: the output of the failing step and only that, preceded by its name
@@ -50,14 +50,14 @@ step "format"              swift format lint -r -s -p Sources Tests Package.swif
 step "lint"                swiftlint lint --strict --quiet
 step "build debug"         swift build
 step "build release"       swift build -c release
-step "generated code"      swift run businessid-gen --rules spec/businessid-rules.binpb \
-                             --lock rules.lock --out Sources/BusinessID/Generated --check
+step "generated code"      swift run entid-gen --rules spec/entid-rules.binpb \
+                             --lock rules.lock --out Sources/EntID/Generated --check
 step "tests"               swift test
 step "conformance"         make conformance
 step "coverage"            ./Tools/coverage.sh
-step "fuzz smoke"          swift run -c release businessid-fuzz --rounds 20000
+step "fuzz smoke"          swift run -c release entid-fuzz --rounds 20000
 step "dependency audit"    bash -c 'swift package resolve && swift package show-dependencies --format json | python3 Tools/audit-dependencies.py'
-step "consumer package"    bash -c 'cd Examples/BusinessIDConsumer && swift build && swift run BusinessIDConsumer'
+step "consumer package"    bash -c 'cd Examples/EntIDConsumer && swift build && swift run EntIDConsumer'
 step "ios simulator"       make ios
 
 RULES=$(sed -n 's/^rules_version = "\(.*\)"/\1/p' rules.lock)
@@ -67,7 +67,7 @@ LIBRARY=$(from 's/^hand written library line coverage: \([0-9.]*\)%.*/\1/p' cove
 PACKAGE=$(from 's/^hand written package line coverage: \([0-9.]*\)%.*/\1/p' coverage)
 EMITTED=$(from 's/^emitted rule code line coverage: *\([0-9.]*\)%.*/\1/p' coverage)
 # What a consumer compiles: the shipped library and nothing else.
-SHIPPED=$(find Sources/BusinessID -name '*.swift' -exec cat {} + | wc -c | tr -d ' ')
+SHIPPED=$(find Sources/EntID -name '*.swift' -exec cat {} + | wc -c | tr -d ' ')
 
 printf 'verify: rules %s, %s tests, %s conformance, coverage %s/%s gated %s emitted, shipped %s KiB\n' \
   "$RULES" "$TESTS" "$CASES" "$LIBRARY" "$PACKAGE" "$EMITTED" "$((SHIPPED / 1024))"

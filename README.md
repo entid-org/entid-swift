@@ -1,15 +1,15 @@
-# BusinessID
+# EntID
 
 Offline validation of company identifiers — VAT numbers, national registration
 numbers, LEI, EUID and thirty four other kinds — for Swift.
 
 ```swift
-import BusinessID
+import EntID
 
 // `vat-be-normalization-004`. Synthetic, produced by the generator of
 // DATA_POLICY.md section 4 — it designates no company, and none is needed
 // here: a README example demonstrates an API, not what a register issues.
-let report = BusinessIDEngine.default.validate(
+let report = EntIDEngine.default.validate(
     IdentifierInput(kind: "vat", value: "BE 0123.456.749")
 )
 
@@ -19,7 +19,7 @@ report.format.status     // .valid
 report.checksum.status   // .valid
 ```
 
-Rules version `2026.08.33`: **94 definitions across 37 countries**, 37 identifier
+Rules version `2026.08.38`: **94 definitions across 37 countries**, 37 identifier
 kinds, and the full shared conformance corpus of **676 cases** passing.
 
 ## What this answers, and what it does not
@@ -64,11 +64,11 @@ a value written from memory is neither, and is forbidden everywhere.
 ## Installation
 
 ```swift
-.package(url: "https://github.com/libbusinessid/businessid-swift.git", from: "0.1.0")
+.package(url: "https://github.com/entid-org/entid-swift.git", from: "0.1.0")
 ```
 
 ```swift
-.product(name: "BusinessID", package: "businessid-swift")
+.product(name: "EntID", package: "entid-swift")
 ```
 
 Requires Swift 6.1. Declared for macOS 13+, iOS 16+, tvOS 16+ and watchOS 9+;
@@ -78,10 +78,10 @@ there: the runner drives the testee as a subprocess, which a simulator has no
 `Process` for, so that target is compiled out anywhere but macOS rather than
 skipped at run time.
 
-**The `BusinessID` library links nothing.** No Protobuf, no HTTP, no UIKit, no
+**The `EntID` library links nothing.** No Protobuf, no HTTP, no UIKit, no
 AppKit; the binary of a consumer carries none of them. SwiftPM does still
 *resolve* this package's whole manifest, so `swift-protobuf` is fetched into
-`.build/checkouts` — it belongs to `businessid-gen` and the conformance
+`.build/checkouts` — it belongs to `entid-gen` and the conformance
 tooling, which are separate targets a consumer never builds and never links.
 `Tools/audit-dependencies.py` fails CI if a second name ever appears there.
 
@@ -90,7 +90,7 @@ tooling, which are separate targets a consumer never builds and never links.
 All four are synchronous, and will stay synchronous.
 
 ```swift
-let engine = BusinessIDEngine.default
+let engine = EntIDEngine.default
 
 engine.canonicalize(input)      // normalize only, no rule runs
 engine.validate(input)          // format, then checksum
@@ -126,7 +126,7 @@ this API. There is no Protobuf decoder, no IR interpreter and no `.binpb` in the
 package.
 
 ```
-spec/businessid-rules.binpb ──▶ businessid-gen ──▶ Sources/BusinessID/Generated/*.swift
+spec/entid-rules.binpb ──▶ entid-gen ──▶ Sources/EntID/Generated/*.swift
         (attested input)         (25 checks)              (committed, reviewable)
 ```
 
@@ -145,14 +145,14 @@ ruleset goes through the generator, at build time.
 
 ## Concurrency
 
-`BusinessIDEngine` is a `Sendable` value with no stored property. Sharing it
+`EntIDEngine` is a `Sendable` value with no stored property. Sharing it
 across tasks needs no lock and no `@unchecked` escape hatch, because there is
 nothing to protect. Every public type is `Sendable`; nothing is cached between
 calls; no global is mutable.
 
 ```swift
 await withTaskGroup(of: ValidationReport.self) { group in
-    for input in inputs { group.addTask { BusinessIDEngine.default.validate(input) } }
+    for input in inputs { group.addTask { EntIDEngine.default.validate(input) } }
 }
 ```
 
@@ -190,7 +190,7 @@ separate, server-only module when it is specified.
 ## Documentation
 
 ```sh
-make docs        # DocC archive for the BusinessID target
+make docs        # DocC archive for the EntID target
 make help        # every task CI runs
 ```
 
@@ -207,14 +207,14 @@ to the commit `rules.lock` records under `source_commit` — the same commit as
 the corpus, so a corpus can never be judged by another release's comparator:
 
 ```sh
-make conformance   # rules 2026.08.33: 676 cases, 676 matched, 0 differed
+make conformance   # rules 2026.08.38: 676 cases, 676 matched, 0 differed
 ```
 
 which is
 
 ```sh
-go run github.com/libbusinessid/spec/cmd/conformance-runner@<source_commit> \
-  -corpus spec/businessid-conformance.binpb -- .build/debug/businessid-testee
+go run github.com/entid-org/spec/cmd/conformance-runner@<source_commit> \
+  -corpus spec/entid-conformance.binpb -- .build/debug/entid-testee
 ```
 
 A Go toolchain in CI is the only prerequisite. It is a build tool: nothing about

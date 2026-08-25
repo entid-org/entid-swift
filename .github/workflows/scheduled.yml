@@ -20,7 +20,7 @@ jobs:
       # A different seed each night, printed in the output, so a finding is
       # reproducible from the log alone.
       - name: Fuzz the decoder and the engine
-        run: swift run -c release businessid-fuzz --seed ${{ github.run_id }} --rounds 2000000
+        run: swift run -c release entid-fuzz --seed ${{ github.run_id }} --rounds 2000000
 
   benchmarks:
     name: Benchmarks
@@ -31,7 +31,7 @@ jobs:
         with:
           xcode-version: latest-stable
       - name: Measure
-        run: swift run -c release businessid-bench | tee benchmarks.txt
+        run: swift run -c release entid-bench | tee benchmarks.txt
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: benchmarks

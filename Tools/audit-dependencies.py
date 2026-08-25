@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fails when the dependency graph grows beyond what this package declares.
 
-The `BusinessID` target has no dependency and links nothing. The generator has
+The `EntID` target has no dependency and links nothing. The generator has
 one, `swift-protobuf`, because it is the only target that decodes anything —
 and because SwiftPM resolves a whole manifest, a consumer fetches it even
 though nothing it builds links it. That makes the list below part of what a

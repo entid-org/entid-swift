@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # `engine.md` section 12.5: one entry point, and CI calls the same one a
+  # `engine.md` section 12.6: one entry point, and CI calls the same one a
   # developer does, so "green" never has two definitions. It is silent when
   # everything passes and prints the failing step's output and only that when
   # something does not.
@@ -79,4 +79,4 @@ jobs:
             https://github.com/apple/swift-protobuf.git .swift-protobuf-tool
           swift build --package-path .swift-protobuf-tool -c release --product protoc-gen-swift
           PATH="$PWD/.swift-protobuf-tool/.build/release:$PATH" make proto
-          git diff --exit-code -- Sources/BusinessIDWire/Generated
+          git diff --exit-code -- Sources/EntIDWire/Generated

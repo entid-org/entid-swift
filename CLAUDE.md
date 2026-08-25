@@ -11,7 +11,7 @@ configurations, the tests, the shared conformance corpus judged by the runner
 from `spec`, lint, format, coverage against its thresholds, the dependency
 audit, the fuzz smoke run, the example consumer, and the iOS simulator.
 
-Its contract, from `engine.md` section 12.5:
+Its contract, from `engine.md` section 12.6:
 
 - **it succeeds silently** — one line, carrying the numbers that matter;
 - **it fails loudly and narrowly** — the name of the failing step and that
@@ -53,9 +53,9 @@ line counts — and the durations belong in a report as context.
   specification repository at the commit `rules.lock` records under
   `source_commit`, and every artefact is attested by a digest. A problem in it
   is reported upstream, not patched locally.
-- **A rules update is not done by hand.** `.github/workflows/spec-sync.yml`
+- **A rules update is not done by hand.** `.github/workflows/rules-sync.yml`
   fetches the release, verifies it, regenerates and opens the pull request
-  (`engine.md` section 11.4). `Tools/spec-sync.sh compare` says what it would
+  (`engine.md` section 11.4). `Tools/rules-sync.sh compare` says what it would
   decide today.
 - **Nothing is read from `spec/` before `verify-lock` passes.**
 - **Never write an identifier from memory.** Every real value in a test, a
