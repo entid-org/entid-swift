@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# The single entry point `engine.md` section 12.5 requires.
+# The single entry point `engine.md` section 12.6 requires.
 #
 #   success: one line, carrying the numbers that matter and nothing else
 #   failure: the output of the failing step and only that, preceded by its name

@@ -29,8 +29,8 @@ enum SpecCorpus {
         try specFile("entid-rules.binpb")
     }
 
-    static func conformance() throws -> Libbusinessid_Conformance_V1_ConformanceBundle {
-        try Libbusinessid_Conformance_V1_ConformanceBundle(
+    static func conformance() throws -> Entid_Conformance_V1_ConformanceBundle {
+        try Entid_Conformance_V1_ConformanceBundle(
             serializedBytes: Data(specFile("entid-conformance.binpb"))
         )
     }
@@ -38,7 +38,7 @@ enum SpecCorpus {
     /// The `load_ruleset` cases, which address the generator rather than the
     /// engine: a truncated bundle or one carrying a call cycle must make
     /// generation fail.
-    static func loaderCases() throws -> [Libbusinessid_Conformance_V1_ConformanceCase] {
+    static func loaderCases() throws -> [Entid_Conformance_V1_ConformanceCase] {
         try conformance().cases.filter { $0.operation == .loadRuleset }
     }
 }

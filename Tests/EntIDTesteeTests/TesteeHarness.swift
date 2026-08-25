@@ -23,18 +23,18 @@ enum TesteeHarness {
             .deletingLastPathComponent()
     }()
 
-    static func corpus() throws -> Libbusinessid_Conformance_V1_ConformanceBundle {
+    static func corpus() throws -> Entid_Conformance_V1_ConformanceBundle {
         let path = root.appending(path: "spec/entid-conformance.binpb")
-        return try Libbusinessid_Conformance_V1_ConformanceBundle(
+        return try Entid_Conformance_V1_ConformanceBundle(
             serializedBytes: [UInt8](try Data(contentsOf: path))
         )
     }
 
     /// A request built from a case, exactly as the runner builds one.
     static func request(
-        for testCase: Libbusinessid_Conformance_V1_ConformanceCase
-    ) -> Libbusinessid_Testee_V1_TesteeRequest {
-        var request = Libbusinessid_Testee_V1_TesteeRequest()
+        for testCase: Entid_Conformance_V1_ConformanceCase
+    ) -> Entid_Testee_V1_TesteeRequest {
+        var request = Entid_Testee_V1_TesteeRequest()
         request.caseID = testCase.id
         request.operation = testCase.operation
         request.input = testCase.input
@@ -113,9 +113,9 @@ enum TesteeHarness {
     /// Sends every request through one subprocess, optionally from a working
     /// directory of the caller's choosing.
     static func exchange(
-        _ requests: [Libbusinessid_Testee_V1_TesteeRequest],
+        _ requests: [Entid_Testee_V1_TesteeRequest],
         workingDirectory: URL? = nil
-    ) throws -> [Libbusinessid_Testee_V1_TesteeResponse] {
+    ) throws -> [Entid_Testee_V1_TesteeResponse] {
         let process = Process()
         process.executableURL = try executable()
         if let workingDirectory { process.currentDirectoryURL = workingDirectory }
@@ -134,7 +134,7 @@ enum TesteeHarness {
         process.waitUntilExit()
 
         return try unframe(raw).map {
-            try Libbusinessid_Testee_V1_TesteeResponse(serializedBytes: $0)
+            try Entid_Testee_V1_TesteeResponse(serializedBytes: $0)
         }
     }
 }

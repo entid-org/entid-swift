@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # `engine.md` section 12.5: one entry point, and CI calls the same one a
+  # `engine.md` section 12.6: one entry point, and CI calls the same one a
   # developer does, so "green" never has two definitions. It is silent when
   # everything passes and prints the failing step's output and only that when
   # something does not.

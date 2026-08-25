@@ -9,14 +9,14 @@ import struct Foundation.Data
 /// property a test is about: a builder that starts from the smallest accepted
 /// ruleset makes the one changed line the subject of the test.
 enum BundleBuilder {
-    typealias Bundle = Libbusinessid_Ir_V1_RuleBundle
-    typealias Program = Libbusinessid_Ir_V1_Program
-    typealias Node = Libbusinessid_Ir_V1_Node
+    typealias Bundle = Entid_Ir_V1_RuleBundle
+    typealias Program = Entid_Ir_V1_Program
+    typealias Node = Entid_Ir_V1_Node
 
     // MARK: Nodes
 
-    static func string(_ kind: Libbusinessid_Ir_V1_StringOpKind, inputs: [UInt32] = []) -> Node {
-        var operation = Libbusinessid_Ir_V1_StringOperation()
+    static func string(_ kind: Entid_Ir_V1_StringOpKind, inputs: [UInt32] = []) -> Node {
+        var operation = Entid_Ir_V1_StringOperation()
         operation.kind = kind
         var node = Node()
         node.outputType = .string
@@ -26,7 +26,7 @@ enum BundleBuilder {
     }
 
     static func slice(_ input: UInt32, start: UInt32, end: UInt32) -> Node {
-        var operation = Libbusinessid_Ir_V1_StringOperation()
+        var operation = Entid_Ir_V1_StringOperation()
         operation.kind = .slice
         operation.start = start
         operation.end = end
@@ -38,11 +38,11 @@ enum BundleBuilder {
     }
 
     static func predicate(
-        _ kind: Libbusinessid_Ir_V1_PredicateOpKind,
+        _ kind: Entid_Ir_V1_PredicateOpKind,
         inputs: [UInt32] = [],
-        configure: (inout Libbusinessid_Ir_V1_PredicateOperation) -> Void = { _ in }
+        configure: (inout Entid_Ir_V1_PredicateOperation) -> Void = { _ in }
     ) -> Node {
-        var operation = Libbusinessid_Ir_V1_PredicateOperation()
+        var operation = Entid_Ir_V1_PredicateOperation()
         operation.kind = kind
         configure(&operation)
         var node = Node()
@@ -54,10 +54,10 @@ enum BundleBuilder {
 
     static func require(
         _ input: UInt32,
-        reason: Libbusinessid_Ir_V1_ReasonCode = .empty,
+        reason: Entid_Ir_V1_ReasonCode = .empty,
         messageKey: String? = nil
     ) -> Node {
-        var operation = Libbusinessid_Ir_V1_AssertionOperation()
+        var operation = Entid_Ir_V1_AssertionOperation()
         operation.kind = .require
         operation.reasonCode = reason
         if let messageKey { operation.messageKey = messageKey }
@@ -69,7 +69,7 @@ enum BundleBuilder {
     }
 
     static func assertionSequence(_ inputs: [UInt32]) -> Node {
-        var operation = Libbusinessid_Ir_V1_AssertionOperation()
+        var operation = Entid_Ir_V1_AssertionOperation()
         operation.kind = .sequence
         var node = Node()
         node.outputType = .assertion
@@ -79,11 +79,11 @@ enum BundleBuilder {
     }
 
     static func canonical(
-        _ kind: Libbusinessid_Ir_V1_CanonicalizationOpKind,
+        _ kind: Entid_Ir_V1_CanonicalizationOpKind,
         inputs: [UInt32] = [],
-        configure: (inout Libbusinessid_Ir_V1_CanonicalizationOperation) -> Void = { _ in }
+        configure: (inout Entid_Ir_V1_CanonicalizationOperation) -> Void = { _ in }
     ) -> Node {
-        var operation = Libbusinessid_Ir_V1_CanonicalizationOperation()
+        var operation = Entid_Ir_V1_CanonicalizationOperation()
         operation.kind = kind
         configure(&operation)
         var node = Node()
@@ -93,8 +93,8 @@ enum BundleBuilder {
         return node
     }
 
-    static func checksum(_ kind: Libbusinessid_Ir_V1_ChecksumOpKind, inputs: [UInt32] = []) -> Node {
-        var operation = Libbusinessid_Ir_V1_ChecksumOperation()
+    static func checksum(_ kind: Entid_Ir_V1_ChecksumOpKind, inputs: [UInt32] = []) -> Node {
+        var operation = Entid_Ir_V1_ChecksumOperation()
         operation.kind = kind
         var node = Node()
         node.outputType = .checksumOutcome
@@ -104,11 +104,11 @@ enum BundleBuilder {
     }
 
     static func call(
-        _ kind: Libbusinessid_Ir_V1_CallOpKind,
+        _ kind: Entid_Ir_V1_CallOpKind,
         program: UInt32,
         input: UInt32
     ) -> Node {
-        var operation = Libbusinessid_Ir_V1_CallOperation()
+        var operation = Entid_Ir_V1_CallOperation()
         operation.kind = kind
         operation.programID = program
         var node = Node()
@@ -120,7 +120,7 @@ enum BundleBuilder {
 
     static func program(
         id: UInt32,
-        kind: Libbusinessid_Ir_V1_ProgramKind,
+        kind: Entid_Ir_V1_ProgramKind,
         nodes: [Node],
         root: UInt32
     ) -> Program {
@@ -137,7 +137,7 @@ enum BundleBuilder {
     /// Programs 1 (pre-canonicalization), 2 (canonicalization) and 3 (format);
     /// one GLOBAL definition of kind `test`; one dispatcher routing to it.
     static func minimal() -> Bundle {
-        var bundle = Libbusinessid_Ir_V1_RuleBundle()
+        var bundle = Entid_Ir_V1_RuleBundle()
         bundle.formatVersion = 1
         bundle.rulesVersion = "2026.08.17"
         bundle.requiredFeatureIds = [1, 2, 3, 5, 20, 21, 30, 40]
@@ -170,14 +170,14 @@ enum BundleBuilder {
             ),
         ]
 
-        var source = Libbusinessid_Ir_V1_Source()
+        var source = Entid_Ir_V1_Source()
         source.id = "test-authority"
         source.url = "https://example.invalid/spec"
         source.authority = "Test authority"
         source.title = "Test format"
         source.accessedAt = "2026-08-17"
 
-        var definition = Libbusinessid_Ir_V1_IdentifierDefinition()
+        var definition = Entid_Ir_V1_IdentifierDefinition()
         definition.id = 1
         definition.kind = "test"
         definition.canonicalizationProgram = 2
@@ -187,10 +187,10 @@ enum BundleBuilder {
         definition.absentChecksumReason = .checksumNotPublished
         bundle.identifiers = [definition]
 
-        var target = Libbusinessid_Ir_V1_DispatchTarget()
+        var target = Entid_Ir_V1_DispatchTarget()
         target.identifierDefinitionID = 1
 
-        var dispatcher = Libbusinessid_Ir_V1_IdentifierDispatcher()
+        var dispatcher = Entid_Ir_V1_IdentifierDispatcher()
         dispatcher.kind = "test"
         dispatcher.preCanonicalizationProgram = 1
         dispatcher.targets = [target]

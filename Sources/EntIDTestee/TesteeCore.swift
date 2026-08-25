@@ -13,9 +13,9 @@ internal import struct Foundation.Data
 /// is the whole of it.
 package enum TesteeCore {
     package static func respond(
-        to request: Libbusinessid_Testee_V1_TesteeRequest
-    ) -> Libbusinessid_Testee_V1_TesteeResponse {
-        var response = Libbusinessid_Testee_V1_TesteeResponse()
+        to request: Entid_Testee_V1_TesteeRequest
+    ) -> Entid_Testee_V1_TesteeResponse {
+        var response = Entid_Testee_V1_TesteeResponse()
         // The identifier is echoed so that a desynchronized exchange is
         // detected rather than silently scoring the wrong case. It is used for
         // nothing else.
@@ -56,7 +56,7 @@ package enum TesteeCore {
             // These address the generator, not the engine: a generated engine
             // loads no bundle. A truncated bundle or one carrying a call cycle
             // must make generation fail.
-            var load = Libbusinessid_Testee_V1_ObservedLoad()
+            var load = Entid_Testee_V1_ObservedLoad()
             do {
                 _ = try RuleBundleLoader.load([UInt8](request.rulesPayload))
                 load.accepted = true
@@ -78,7 +78,7 @@ package enum TesteeCore {
     /// `default_profile` apply, so it is never conflated with a profile named
     /// the empty string.
     private static func options(
-        for request: Libbusinessid_Testee_V1_TesteeRequest
+        for request: Entid_Testee_V1_TesteeRequest
     ) -> ValidationOptions? {
         guard request.hasProfile else { return ValidationOptions() }
         guard let profile = ValidationProfile(rawValue: request.profile) else { return nil }
@@ -89,8 +89,8 @@ package enum TesteeCore {
 
     private static func observed(
         _ result: CanonicalizationResult
-    ) -> Libbusinessid_Testee_V1_ObservedCanonicalization {
-        var observed = Libbusinessid_Testee_V1_ObservedCanonicalization()
+    ) -> Entid_Testee_V1_ObservedCanonicalization {
+        var observed = Entid_Testee_V1_ObservedCanonicalization()
         observed.kind = result.kind.rawValue
         observed.canonicalValue = result.canonicalValue
         if let country = result.countryCode { observed.countryCode = country }
@@ -101,8 +101,8 @@ package enum TesteeCore {
 
     private static func observed(
         _ report: ValidationReport
-    ) -> Libbusinessid_Testee_V1_ObservedValidationReport {
-        var observed = Libbusinessid_Testee_V1_ObservedValidationReport()
+    ) -> Entid_Testee_V1_ObservedValidationReport {
+        var observed = Entid_Testee_V1_ObservedValidationReport()
         observed.kind = report.kind.rawValue
         observed.canonicalValue = report.canonicalValue
         if let country = report.countryCode { observed.countryCode = country }
@@ -111,8 +111,8 @@ package enum TesteeCore {
         return observed
     }
 
-    private static func step(_ result: EntID.StepResult) -> Libbusinessid_Testee_V1_ObservedStep {
-        var observed = Libbusinessid_Testee_V1_ObservedStep()
+    private static func step(_ result: EntID.StepResult) -> Entid_Testee_V1_ObservedStep {
+        var observed = Entid_Testee_V1_ObservedStep()
         observed.status = wire(result.status)
         observed.reasonCode = wire(result.reasonCode)
         // Absent when the result was produced before any rule assertion.
@@ -121,16 +121,16 @@ package enum TesteeCore {
     }
 
     private static func failure(
-        _ kind: Libbusinessid_Testee_V1_FailureKind,
+        _ kind: Entid_Testee_V1_FailureKind,
         _ detail: String
-    ) -> Libbusinessid_Testee_V1_TesteeFailure {
-        var failure = Libbusinessid_Testee_V1_TesteeFailure()
+    ) -> Entid_Testee_V1_TesteeFailure {
+        var failure = Entid_Testee_V1_TesteeFailure()
         failure.kind = kind
         failure.detail = detail
         return failure
     }
 
-    private static func wire(_ status: EntID.StepStatus) -> Libbusinessid_Conformance_V1_StepStatus {
+    private static func wire(_ status: EntID.StepStatus) -> Entid_Conformance_V1_StepStatus {
         switch status {
         case .valid: .valid
         case .invalid: .invalid
@@ -139,7 +139,7 @@ package enum TesteeCore {
         }
     }
 
-    private static func wire(_ reason: EntID.ReasonCode) -> Libbusinessid_Ir_V1_ReasonCode {
+    private static func wire(_ reason: EntID.ReasonCode) -> Entid_Ir_V1_ReasonCode {
         switch reason {
         case .ok: .ok
         case .empty: .empty

@@ -23,9 +23,9 @@ package enum RuleBundleLoader {
         //    nothing more: an unresolved opcode is carried to check 10, an
         //    unknown field to check 5, and an unrecognised enum value to the
         //    check that owns its field.
-        let wire: Libbusinessid_Ir_V1_RuleBundle
+        let wire: Entid_Ir_V1_RuleBundle
         do {
-            wire = try Libbusinessid_Ir_V1_RuleBundle(serializedBytes: Data(bytes))
+            wire = try Entid_Ir_V1_RuleBundle(serializedBytes: Data(bytes))
         } catch {
             throw .invalidRuleset("bundle does not decode as a RuleBundle")
         }
@@ -115,7 +115,7 @@ package enum RuleBundleLoader {
     // MARK: - Programs, checks 8 to 15
 
     private static func loadPrograms(
-        _ wire: Libbusinessid_Ir_V1_RuleBundle
+        _ wire: Entid_Ir_V1_RuleBundle
     ) throws(LoadError) -> [IRProgram] {
         // 8. program ids unique and non zero, program kinds specified. The
         //    serialization order of section 9 is ascending id, and two equal
@@ -262,7 +262,7 @@ package enum RuleBundleLoader {
     // MARK: - Definitions, checks 17 and 18
 
     private static func loadDefinitions(
-        _ wire: Libbusinessid_Ir_V1_RuleBundle,
+        _ wire: Entid_Ir_V1_RuleBundle,
         programIndexByID: [UInt32: Int]
     ) throws(LoadError) -> [Definition] {
         guard wire.identifiers.count <= Limits.maximumIdentifiers else {
@@ -364,7 +364,7 @@ package enum RuleBundleLoader {
     private static func requireProgram(
         _ identifier: UInt32,
         of kind: ProgramKind,
-        in wire: Libbusinessid_Ir_V1_RuleBundle,
+        in wire: Entid_Ir_V1_RuleBundle,
         indexByID: [UInt32: Int]
     ) throws(LoadError) {
         guard let index = indexByID[identifier] else {
@@ -378,7 +378,7 @@ package enum RuleBundleLoader {
     /// `PROVENANCE_V1`: sources sorted by the UTF-8 bytes of their id, and
     /// every rule able to reject an input carries at least one.
     private static func loadSources(
-        _ raw: Libbusinessid_Ir_V1_IdentifierDefinition
+        _ raw: Entid_Ir_V1_IdentifierDefinition
     ) throws(LoadError) -> [Source] {
         guard !raw.sources.isEmpty else {
             throw .invalidRuleset("identifier \(raw.id) is able to reject an input and cites no source")
@@ -420,7 +420,7 @@ package enum RuleBundleLoader {
     // MARK: - Dispatchers, checks 19 to 23
 
     private static func loadDispatchers(
-        _ wire: Libbusinessid_Ir_V1_RuleBundle,
+        _ wire: Entid_Ir_V1_RuleBundle,
         definitions: [Definition],
         programs: [UInt32: Int]
     ) throws(LoadError) -> [Dispatcher] {
@@ -490,7 +490,7 @@ package enum RuleBundleLoader {
     }
 
     private static func loadTargets(
-        _ raw: Libbusinessid_Ir_V1_IdentifierDispatcher,
+        _ raw: Entid_Ir_V1_IdentifierDispatcher,
         definitions: [UInt32: Definition],
         claimed: inout [UInt32: String]
     ) throws(LoadError) -> [DispatchTarget] {
@@ -599,7 +599,7 @@ package enum RuleBundleLoader {
     /// Check 20: country aliases sorted, unique, never self mapping and never
     /// shadowing a target.
     private static func loadCountryAliases(
-        _ raw: Libbusinessid_Ir_V1_IdentifierDispatcher,
+        _ raw: Entid_Ir_V1_IdentifierDispatcher,
         targets: [DispatchTarget]
     ) throws(LoadError) -> [Dispatcher.CountryAlias] {
         let targetCountries = Set(targets.compactMap(\.countryCode))

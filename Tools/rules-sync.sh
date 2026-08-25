@@ -16,12 +16,12 @@ cd "$(dirname "$0")/.."
 
 SPEC_REPO="entid-org/spec"
 SIGNER_WORKFLOW=".github/workflows/release.yml"
-# The job of `.github/workflows/ci.yml` that runs the section 12.5 entry point.
+# The job of `.github/workflows/ci.yml` that runs the section 12.6 entry point.
 # Auto-merge follows the required checks of the branch, so this name is what
 # makes "merged" mean "make verify passed".
 REQUIRED_CHECK="Verify"
 
-die() { printf 'spec-sync: %s\n' "$*" >&2; exit 1; }
+die() { printf 'rules-sync: %s\n' "$*" >&2; exit 1; }
 
 # Global, not a local of cmd_sync: an EXIT trap runs after the function has
 # returned, and a `local` is out of scope by then -- which under `set -u` made
@@ -85,13 +85,13 @@ cmd_compare() {
   printf 'tag=%s\n' "${tag}"
   printf 'version=%s\n' "${version}"
   printf 'sync=%s\n' "${sync}"
-  printf 'spec-sync: release %s carries %s, rules.lock carries %s from %s, sync=%s\n' \
+  printf 'rules-sync: release %s carries %s, rules.lock carries %s from %s, sync=%s\n' \
     "${tag}" "${version}" "${locked_version}" "${locked_tag:-a local build}" "${sync}" >&2
 }
 
 cmd_sync() {
   local tag="$1" version="$2"
-  local work art staged manifest commit subject schema
+  local work art staged manifest commit subject schema package
 
   WORK="$(mktemp -d)"
   work="${WORK}"
@@ -107,7 +107,7 @@ cmd_sync() {
   # installed and sha256sum does not exist. --strict so a checksum line that
   # cannot be parsed is a failure rather than a skipped file.
   ( cd "${art}" && shasum -a 256 --check --strict SHA256SUMS >/dev/null )
-  echo "spec-sync: SHA256SUMS checks out"
+  echo "rules-sync: SHA256SUMS checks out"
 
   # SHA256SUMS is attested as well as the bundle, and it is what carries the
   # schemas, ir.md, features.md and the JSONL: attesting the three big files
@@ -125,29 +125,13 @@ cmd_sync() {
       --repo "${SPEC_REPO}" \
       --signer-workflow "${SPEC_REPO}/${SIGNER_WORKFLOW}" \
       --source-ref "refs/tags/${tag}"
-    echo "spec-sync: attested ${subject}"
+    echo "rules-sync: attested ${subject}"
   done
 
   manifest="${art}/entid-manifest-${version}.json"
   [ "$(jq -r .rulesVersion "${manifest}")" = "${version}" ] \
     || die "the manifest declares $(jq -r .rulesVersion "${manifest}"), not ${version}"
   commit="$(jq -r .sourceCommit "${manifest}")"
-
-  # spec/PROVENANCE.md has exactly one writer, and it lives in the specification
-  # repository: two writers drifted, and a released engine ended up naming one
-  # commit in its header and another in its lock (spec#84). It is pinned to the
-  # commit the attested manifest names, the same way the Makefile pins the
-  # conformance runner to the commit rules.lock records.
-  git init -q "${work}/spec-source"
-  git -C "${work}/spec-source" remote add origin "https://github.com/${SPEC_REPO}.git"
-  git -C "${work}/spec-source" fetch -q --depth 1 origin "${commit}"
-  git -C "${work}/spec-source" checkout -q FETCH_HEAD
-
-  [ -f "${work}/spec-source/tools/write_provenance.sh" ] || die \
-"release ${tag} was built from ${commit}, which carries no tools/write_provenance.sh.
-Section 11.4 requires spec/PROVENANCE.md to be written, and this engine will not
-become its second writer. Releases from a commit that predates spec#84 cannot be
-synchronized by this workflow."
 
   # 3. spec/, rules.lock and spec/PROVENANCE.md, staged first.
   mkdir -p "${staged}/spec"
@@ -165,6 +149,28 @@ synchronized by this workflow."
   for schema in rules.proto conformance.proto testee.proto ir.md features.md \
                 spec.md engine.md engine-swift.md; do
     cp "${art}/${schema}" "${staged}/spec/${schema}"
+  done
+
+  # The provenance note travels with the release since 2026.08.38, assembled,
+  # one per engine. It still has exactly one writer -- two writers drifted once,
+  # and a released engine named one commit in its header and another in its lock
+  # (spec#84) -- but that writer now runs in the release rather than here, so a
+  # workflow that has verified a release no longer clones the specification
+  # repository to write the last file of its synchronization. Measured before
+  # the clone was removed: on v2026.08.38 the two paths produce the same bytes.
+  cp "${art}/provenance-swift.md" "${staged}/spec/PROVENANCE.md"
+
+  # The generator compiles against copies under proto/, which protoc needs in a
+  # package shaped tree. The directory is the package the attested schema
+  # declares, and not a literal written here: the package moved from
+  # `libbusinessid.*` to `entid.*` in 2026.08.38 while the copies stayed where
+  # they were, and verify-lock refused the release at the end of a
+  # synchronization that had passed every digest and every attestation.
+  for schema in rules.proto conformance.proto testee.proto; do
+    package="$(sed -n 's/^package \(.*\);$/\1/p' "${art}/${schema}" | tr . /)"
+    [ -n "${package}" ] || die "${schema} declares no package"
+    mkdir -p "${staged}/proto/${package}"
+    cp "${art}/${schema}" "${staged}/proto/${package}/${schema}"
   done
 
   # Every field read from the attested manifest, in the order the released
@@ -187,33 +193,31 @@ synchronized by this workflow."
       "${SPEC_REPO}" "${SIGNER_WORKFLOW}" "${tag}"
   } > "${staged}/rules.lock"
 
-  # Needs Go, and GOTOOLCHAIN=auto: the spec module asks for a newer Go than a
-  # runner's default, and setup-go pins GOTOOLCHAIN to local.
-  bash "${work}/spec-source/tools/write_provenance.sh" \
-    "${work}/spec-source" "${art}" "${version}" "${commit}" \
-    entid-swift "${staged}/spec/PROVENANCE.md"
-
   cp "${staged}/rules.lock" rules.lock
   cp -R "${staged}/spec/." spec/
+  # Replaced and not merged: a package rename leaves the old tree in place, and
+  # `protoc -I proto` would then compile two copies of the same schema.
+  rm -rf proto
+  cp -R "${staged}/proto" proto
 
   # What was just written must match what was just attested. `make verify` runs
   # this too; running it here means a bad copy is caught by the step that made
   # it rather than four steps later.
   ./Tools/verify-lock.sh
-  echo "spec-sync: wrote rules ${version} from ${tag} (${commit})"
+  echo "rules-sync: wrote rules ${version} from ${tag} (${commit})"
 }
 
 cmd_pull_request() {
   local tag="$1" version="$2" outcome="$3"
   local branch="rules/${version}" url state body contexts repo failure verdict
   # Exactly what a synchronization is allowed to change: the release under
-  # spec/, the lock that attests it, and the code emitted from it. Not `add -A`,
-  # which would sweep in whatever `swift package resolve` touched on the way
-  # through.
-  local -a paths=(spec rules.lock Sources/EntID/Generated)
+  # spec/, the copies of its schemas under proto/, the lock that attests them,
+  # and the code emitted from the bundle. Not `add -A`, which would sweep in
+  # whatever `swift package resolve` touched on the way through.
+  local -a paths=(spec proto rules.lock Sources/EntID/Generated)
 
   if [ -z "$(git status --porcelain -- "${paths[@]}")" ]; then
-    echo "spec-sync: ${version} changes nothing here; no pull request to open"
+    echo "rules-sync: ${version} changes nothing here; no pull request to open"
     return 0
   fi
 
@@ -238,7 +242,7 @@ cmd_pull_request() {
 
   repo="${GITHUB_REPOSITORY:-$(gh repo view --json nameWithOwner -q .nameWithOwner)}"
 
-  # The verdict of the section 12.5 entry point, published as a commit status
+  # The verdict of the section 12.6 entry point, published as a commit status
   # under the name the branch protection requires.
   #
   # A pull request opened with a repository's own GITHUB_TOKEN starts no
@@ -255,7 +259,7 @@ cmd_pull_request() {
     -f "description=make verify on the synchronization runner" \
     -f "target_url=${GITHUB_SERVER_URL:-https://github.com}/${repo}/actions/runs/${GITHUB_RUN_ID:-0}" \
     --silent
-  echo "spec-sync: published ${REQUIRED_CHECK} = ${verdict} on $(git rev-parse --short HEAD)"
+  echo "rules-sync: published ${REQUIRED_CHECK} = ${verdict} on $(git rev-parse --short HEAD)"
 
   if [ "${outcome}" = "success" ]; then
     state="\`make verify\` passed on the runner that wrote this, and is published on the
@@ -289,7 +293,7 @@ BODY
   # reported below as the permission problem it is not.
   url="$(gh pr list --head "${branch}" --state open --json url -q '.[0].url')"
   if [ -n "${url}" ]; then
-    echo "spec-sync: ${branch} already has a pull request open"
+    echo "rules-sync: ${branch} already has a pull request open"
   else
     # --head and --base explicitly: gh otherwise infers them from the checkout,
     # and has refused with "you must first push the current branch to a remote"
@@ -304,7 +308,7 @@ for the repository second. GITHUB_TOKEN cannot set either: there is no repositor
 administration permission for a workflow to request. The branch ${branch} is
 pushed, so a re-run picks it up."
   fi
-  echo "spec-sync: ${url}"
+  echo "rules-sync: ${url}"
 
   # Auto-merge merges as soon as nothing *blocks* the pull request, which is not
   # the same as merging on green: without a required check on main it would
@@ -324,10 +328,10 @@ at ${url}."
   if contexts="$(gh api "repos/${repo}/branches/main/protection/required_status_checks" \
        --jq '[.checks[].context] | sort | join(",")' 2>"${failure}")"; then
     [ "${contexts}" = "${REQUIRED_CHECK}" ] || die \
-"main requires [${contexts:-nothing}] but auto-merge is only safe when the section 12.5
+"main requires [${contexts:-nothing}] but auto-merge is only safe when the section 12.6
 entry point is the one required check. Set the required status checks of main to
 exactly [${REQUIRED_CHECK}]. The pull request is open at ${url}."
-    echo "spec-sync: main requires ${contexts}, and nothing else"
+    echo "rules-sync: main requires ${contexts}, and nothing else"
   elif grep -qiE 'not protected|not enabled' "${failure}"; then
     # Protected, but requiring nothing to pass. Auto-merge would merge the moment
     # the pull request is mergeable, which is at once.
@@ -336,7 +340,7 @@ exactly [${REQUIRED_CHECK}]. The pull request is open at ${url}."
 green or red. Require exactly [${REQUIRED_CHECK}] on main first. The pull request is
 open at ${url}."
   else
-    echo "spec-sync: could not read main's branch protection ($(tr -d '\n' < "${failure}"))." \
+    echo "rules-sync: could not read main's branch protection ($(tr -d '\n' < "${failure}"))." \
          "Auto-merge is only safe if [${REQUIRED_CHECK}] is the one required check there."
   fi
   rm -f "${failure}"
@@ -347,12 +351,12 @@ open at ${url}."
 If gh reports that auto-merge is not allowed: Settings > General > Pull Requests >
 \"Allow auto-merge\". GITHUB_TOKEN cannot set it; there is no repository
 administration permission for it to request. A human has to click it once."
-  echo "spec-sync: auto-merge enabled on ${url}"
+  echo "rules-sync: auto-merge enabled on ${url}"
 }
 
 case "${1:-}" in
   compare)      shift; cmd_compare "$@" ;;
   sync)         shift; cmd_sync "$@" ;;
   pull-request) shift; cmd_pull_request "$@" ;;
-  *) die "usage: spec-sync.sh compare [tag] | sync <tag> <version> | pull-request <tag> <version> <outcome>" ;;
+  *) die "usage: rules-sync.sh compare [tag] | sync <tag> <version> | pull-request <tag> <version> <outcome>" ;;
 esac

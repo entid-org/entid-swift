@@ -16,10 +16,10 @@ struct Testee {
         let output = FileHandle.standardOutput
 
         while let payload = readFrame(input) {
-            let response: Libbusinessid_Testee_V1_TesteeResponse
+            let response: Entid_Testee_V1_TesteeResponse
             do {
                 response = TesteeCore.respond(
-                    to: try Libbusinessid_Testee_V1_TesteeRequest(serializedBytes: payload)
+                    to: try Entid_Testee_V1_TesteeRequest(serializedBytes: payload)
                 )
             } catch {
                 // A request that does not decode is a broken exchange, not a

@@ -121,7 +121,7 @@ struct LoadCheckTests {
     /// is a reference, so that program has a parent of a kind.
     static func withChecksumProgram(
         _ bundle: inout BundleBuilder.Bundle,
-        nodes: [Libbusinessid_Ir_V1_Node],
+        nodes: [Entid_Ir_V1_Node],
         root: UInt32
     ) {
         bundle.programs.append(BundleBuilder.program(id: 4, kind: .checksum, nodes: nodes, root: root))
@@ -283,7 +283,7 @@ struct LoadCheckTests {
     @Test("A capture naming a node outside the program is refused")
     func captureOutOfRange() throws {
         try expectRefused(.invalidRuleset(""), "capture nodes sit inside the program") {
-            var capture = Libbusinessid_Ir_V1_Capture()
+            var capture = Entid_Ir_V1_Capture()
             capture.name = "part"
             capture.node = 99
             $0.programs[2].captures = [capture]
@@ -293,7 +293,7 @@ struct LoadCheckTests {
     @Test("A canonicalization program declaring a capture is refused")
     func canonicalizationCapture() throws {
         try expectRefused(.invalidRuleset(""), "a canonicalization program declares no capture") {
-            var capture = Libbusinessid_Ir_V1_Capture()
+            var capture = Entid_Ir_V1_Capture()
             capture.name = "part"
             capture.node = 0
             $0.programs[0].captures = [capture]
@@ -497,7 +497,7 @@ struct LoadCheckTests {
         try expectRefused(.invalidRuleset(""), "an alias that maps to itself says nothing") {
             $0.dispatchers[0].targets[0].countryCode = "FR"
             $0.identifiers[0].countryCode = "FR"
-            var alias = Libbusinessid_Ir_V1_CountryAlias()
+            var alias = Entid_Ir_V1_CountryAlias()
             alias.alias = "UK"
             alias.countryCode = "UK"
             $0.dispatchers[0].countryAliases = [alias]
@@ -510,7 +510,7 @@ struct LoadCheckTests {
         try expectRefused(.invalidRuleset(""), "the alias would never be reached") {
             $0.dispatchers[0].targets[0].countryCode = "FR"
             $0.identifiers[0].countryCode = "FR"
-            var alias = Libbusinessid_Ir_V1_CountryAlias()
+            var alias = Entid_Ir_V1_CountryAlias()
             alias.alias = "FR"
             alias.countryCode = "BE"
             $0.dispatchers[0].countryAliases = [alias]
@@ -532,7 +532,7 @@ struct LoadCheckTests {
             second.id = 2
             second.countryCode = "FR"
             $0.identifiers.append(second)
-            var target = Libbusinessid_Ir_V1_DispatchTarget()
+            var target = Entid_Ir_V1_DispatchTarget()
             target.countryCode = "FR"
             target.identifierDefinitionID = 2
             $0.dispatchers[0].targets.append(target)

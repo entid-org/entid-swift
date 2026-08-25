@@ -12,7 +12,7 @@ rules update that changes no API is a patch release here.
 ### Added
 
 - **The engine fetches the release; the release no longer pushes into the
-  engine** (`engine.md` section 11.4). `.github/workflows/spec-sync.yml` runs on
+  engine** (`engine.md` section 11.4). `.github/workflows/rules-sync.yml` runs on
   a daily clock and on demand, compares the newest `entid-org/spec` release
   to `rules.lock`, and stops there when they concord. When they do not it
   downloads the artefacts, checks `SHA256SUMS`, verifies the provenance
@@ -71,6 +71,56 @@ rules update that changes no API is a patch release here.
   tree its own `import` statements name, and the Go module path of the
   conformance runner. Those follow `source_commit`, and they move when the
   synchronization moves it.
+
+- **Rules `2026.08.33` → `2026.08.38`, from the first release published under
+  the new name.** 94 definitions across 37 countries, and the whole shared
+  corpus of 676 cases passing. Synchronized by `Tools/rules-sync.sh`, not by
+  hand: `SHA256SUMS`, then the provenance attestation of the sums file, the
+  manifest, the bundle and the corpus against `entid-org/spec`, its release
+  workflow and the tag `v2026.08.38`, and only then anything on disk. The lock
+  it wrote now names an identity that resolves — `entid-org/spec/...@refs/tags/
+  v2026.08.38` — where the previous one still named `libbusinessid/spec` at
+  `v0.1.1`.
+
+  Every `*_source_sha256` in the manifest moved with the release: the
+  source-digest domain tag is now `ENTID-SOURCE-V1`. This engine copies those
+  digests and computes none of them, so a changed value here is a rename and not
+  a corruption.
+
+  Three things in the release changed what this repository does.
+
+  `engine.md` section 16 now publishes the twelve `rules.lock` fields, in order,
+  in a fenced `lock-fields` block. `RulesLockShapeTests` reads that block out of
+  the vendored contract and checks the lock against it, rather than repeating a
+  list that would go stale on the release that changes it —
+  `attestation_identity` included, which section 16 puts in thirteenth position
+  on an attested release and on one alone.
+
+  Section 11.4 step 3 now has the release publish the provenance note assembled,
+  one per engine. `Tools/rules-sync.sh` copies the attested `provenance-swift.md`
+  instead of cloning `spec` to run its writer; measured on `v2026.08.38`, the two
+  produce the same bytes. The note keeps exactly one writer, and a synchronization
+  now reads only attested bytes.
+
+  Reported upstream while doing it, with the measurement:
+  [spec#94](https://github.com/entid-org/spec/issues/94). Step 4 does not reach
+  schema-derived code, and the entry point is green on wire code generated from
+  a schema the release replaced — 11 lock checks, 261 tests and 676/676 cases,
+  measured on that tree. Regenerating it still needs `protoc`, which the
+  synchronization runner does not have; it was run by hand here.
+
+  `spec.md` also names the engine-side workflow now, and it names it
+  `rules-sync`. `.github/workflows/spec-sync.yml` and `Tools/spec-sync.sh` are
+  `rules-sync.yml` and `rules-sync.sh`, so the contract and this repository call
+  the same thing by the same name. Nothing about the required check changes: the
+  verdict is still published as `Verify`.
+
+  The Protobuf package moved from `libbusinessid.*` to `entid.*`, so the copies
+  under `proto/` moved to `proto/entid/` and the wire types protoc derives are
+  now `Entid_*`. The synchronization writes that tree itself, at the path the
+  attested schema declares, and `Tools/verify-lock.sh` derives the same path
+  instead of holding a literal: a hard coded one refused the release at the end
+  of a synchronization that had passed every digest and every attestation.
 
 - **The rules version moves backwards, from `2026.09.2` to `2026.08.32`.**
   `PATCH` in `YYYY.MM.PATCH` is a counter within a month with no upper bound,
@@ -225,7 +275,7 @@ rules update that changes no API is a patch release here.
 
 ### Added
 
-- **`make verify`, the single entry point `engine.md` section 12.5 requires.**
+- **`make verify`, the single entry point `engine.md` section 12.6 requires.**
   It runs the lock digests, the regenerated code, both build configurations, the
   tests, the conformance corpus judged by the runner from `spec`, lint, format,
   coverage against its thresholds, the dependency audit, the fuzz smoke run, the
@@ -239,7 +289,7 @@ rules update that changes no API is a patch release here.
   and the Protobuf round trip, which needs tools the engine's verification has
   no reason to require. The release workflow calls it too.
 
-  The rule lives in `CLAUDE.md`, which section 12.5 asks for: it addresses
+  The rule lives in `CLAUDE.md`, which section 12.6 asks for: it addresses
   whoever runs, not whoever reads.
 
   Its failure path was written wrong first and caught before it was trusted:

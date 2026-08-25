@@ -1,4 +1,4 @@
-name: Spec sync
+name: Rules sync
 
 # `engine.md` section 11.4: when `spec` publishes a release, the engine goes and
 # fetches it; the release does not come and find the engine.
@@ -24,7 +24,7 @@ permissions:
 # One synchronization at a time, and never cancelled halfway: a run cancelled
 # between the push and `gh pr create` leaves a branch behind and no pull request.
 concurrency:
-  group: spec-sync
+  group: rules-sync
   cancel-in-progress: false
 
 jobs:
@@ -48,7 +48,7 @@ jobs:
         # is `bash -e`, without pipefail, so a pipe would report the exit status
         # of `tee` and a failed comparison would look like an empty answer.
         run: |
-          ./Tools/spec-sync.sh compare "${TAG:-}" > "$RUNNER_TEMP/compare.env"
+          ./Tools/rules-sync.sh compare "${TAG:-}" > "$RUNNER_TEMP/compare.env"
           cat "$RUNNER_TEMP/compare.env"
           cat "$RUNNER_TEMP/compare.env" >> "$GITHUB_OUTPUT"
 
@@ -64,17 +64,17 @@ jobs:
       # compromise of `spec` stops at `spec`.
       contents: write
       pull-requests: write
-      # The verdict of the section 12.5 entry point is published as a commit
+      # The verdict of the section 12.6 entry point is published as a commit
       # status: a pull request opened with this token starts no `pull_request`
       # workflow, so the check the branch protection waits for would never start.
       statuses: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      # Go twice over: the figures `write_provenance.sh` reads out of the
-      # bundle, and the conformance runner `make verify` calls. `go-version:
-      # stable` with `GOTOOLCHAIN: auto`, for the reason ci.yml gives: setup-go
-      # pins GOTOOLCHAIN to local, and the binding condition is the `go` line of
-      # the spec module, not its `toolchain` line.
+      # For the conformance runner `make verify` calls, and for nothing else
+      # since the provenance note became a release asset. `go-version: stable`
+      # with `GOTOOLCHAIN: auto`, for the reason ci.yml gives: setup-go pins
+      # GOTOOLCHAIN to local, and the binding condition is the `go` line of the
+      # spec module, not its `toolchain` line.
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: stable
@@ -87,10 +87,9 @@ jobs:
       - name: Download the release and verify it before writing anything
         env:
           GH_TOKEN: ${{ github.token }}
-          GOTOOLCHAIN: auto
           TAG: ${{ needs.compare.outputs.tag }}
           VERSION: ${{ needs.compare.outputs.version }}
-        run: ./Tools/spec-sync.sh sync "$TAG" "$VERSION"
+        run: ./Tools/rules-sync.sh sync "$TAG" "$VERSION"
 
       - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
         with:
@@ -115,7 +114,7 @@ jobs:
       # Step 5. It is not allowed to stop the run: section 11.4 opens the pull
       # request green or red, and a red one is exactly the release that deserved
       # a human. It is never merged to unblock the chain.
-      - name: The section 12.5 entry point
+      - name: The section 12.6 entry point
         id: verify
         continue-on-error: true
         env:
@@ -131,7 +130,7 @@ jobs:
           TAG: ${{ needs.compare.outputs.tag }}
           VERSION: ${{ needs.compare.outputs.version }}
           OUTCOME: ${{ (steps.generate.outcome == 'success' && steps.verify.outcome == 'success') && 'success' || 'failure' }}
-        run: ./Tools/spec-sync.sh pull-request "$TAG" "$VERSION" "$OUTCOME"
+        run: ./Tools/rules-sync.sh pull-request "$TAG" "$VERSION" "$OUTCOME"
 
       # The pull request is open either way; this is what makes the run itself
       # red, so a failed synchronization is visible without opening it.

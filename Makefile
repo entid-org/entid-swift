@@ -5,7 +5,7 @@ GENERATED := Sources/EntID/Generated
 
 .DEFAULT_GOAL := verify
 
-# The single entry point of `engine.md` section 12.5: silent when everything
+# The single entry point of `engine.md` section 12.6: silent when everything
 # passes, the failing step's output and only that when one does not. CI calls it
 # too, so "green" never has two definitions.
 .PHONY: verify
@@ -30,9 +30,10 @@ test: ## Run every test
 # own comparator could declare itself conformant by comparing too weakly.
 SOURCE_COMMIT := $(shell sed -n 's/^source_commit = "\(.*\)"/\1/p' rules.lock)
 # The module path is a property of the pinned commit, not of the organisation
-# today: `go run` refuses a path the fetched `go.mod` does not declare. It
-# follows the release, so it moves with `source_commit` and not with a rename.
-RUNNER := github.com/libbusinessid/spec/cmd/conformance-runner@$(SOURCE_COMMIT)
+# today: `go run` refuses a path the fetched `go.mod` does not declare, which is
+# exactly how it refused `entid-org` while the lock still named a commit from
+# before the rename. It follows `source_commit`, and it moved with it here.
+RUNNER := github.com/entid-org/spec/cmd/conformance-runner@$(SOURCE_COMMIT)
 
 .PHONY: conformance
 conformance: ## Run the shared corpus through the testee, judged by the spec runner
@@ -54,9 +55,7 @@ proto: ## Regenerate the Protobuf code the generator reads (needs protoc and pro
 		--swift_out=Sources/EntIDWire/Generated \
 		--swift_opt=Visibility=Package \
 		--swift_opt=FileNaming=PathToUnderscores \
-		proto/libbusinessid/ir/v1/rules.proto \
-		proto/libbusinessid/conformance/v1/conformance.proto \
-		proto/libbusinessid/testee/v1/testee.proto
+		$(shell find proto -name '*.proto' | sort)
 
 .PHONY: format
 format: ## Apply the formatter

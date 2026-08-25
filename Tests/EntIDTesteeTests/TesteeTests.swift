@@ -18,10 +18,10 @@ import struct Foundation.Data
 @Suite("Testee")
 struct TesteeTests {
     private func request(
-        _ operation: Libbusinessid_Conformance_V1_Operation,
-        configure: (inout Libbusinessid_Testee_V1_TesteeRequest) -> Void = { _ in }
-    ) -> Libbusinessid_Testee_V1_TesteeRequest {
-        var request = Libbusinessid_Testee_V1_TesteeRequest()
+        _ operation: Entid_Conformance_V1_Operation,
+        configure: (inout Entid_Testee_V1_TesteeRequest) -> Void = { _ in }
+    ) -> Entid_Testee_V1_TesteeRequest {
+        var request = Entid_Testee_V1_TesteeRequest()
         request.caseID = "unit"
         request.operation = operation
         request.kind = "siren"
@@ -84,7 +84,7 @@ struct TesteeTests {
     @Test("Each operation answers with the shape the protocol declares")
     func responseShapes() {
         for operation in [
-            Libbusinessid_Conformance_V1_Operation.validate,
+            Entid_Conformance_V1_Operation.validate,
             .validateFormat,
             .validateChecksum,
         ] {

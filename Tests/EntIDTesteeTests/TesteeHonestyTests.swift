@@ -48,12 +48,12 @@ struct TesteeHonestyTests {
 
     static func request(
         _ caseID: String,
-        _ operation: Libbusinessid_Conformance_V1_Operation,
+        _ operation: Entid_Conformance_V1_Operation,
         kind: String,
         input: String,
         countryCode: String? = nil
-    ) -> Libbusinessid_Testee_V1_TesteeRequest {
-        var request = Libbusinessid_Testee_V1_TesteeRequest()
+    ) -> Entid_Testee_V1_TesteeRequest {
+        var request = Entid_Testee_V1_TesteeRequest()
         request.caseID = caseID
         request.operation = operation
         request.kind = kind
@@ -68,8 +68,8 @@ struct TesteeHonestyTests {
     /// It is deliberately varied — valid, invalid, unknown kind, explicit
     /// country, a bundle that cannot load — because a testee that adapted to
     /// the case would have more room to do so here than on one shape repeated.
-    static var invented: [Libbusinessid_Testee_V1_TesteeRequest] {
-        var requests: [Libbusinessid_Testee_V1_TesteeRequest] = [
+    static var invented: [Entid_Testee_V1_TesteeRequest] {
+        var requests: [Entid_Testee_V1_TesteeRequest] = [
             request("invented-1", .validate, kind: "siren", input: validSIREN),
             request("invented-2", .validate, kind: "siren", input: shortSIREN),
             request("invented-3", .validate, kind: "siren", input: badChecksumSIREN),
@@ -236,7 +236,7 @@ struct TesteeHonestyTests {
             "",
         ]
 
-        var disguises: [Libbusinessid_Testee_V1_TesteeRequest] = []
+        var disguises: [Entid_Testee_V1_TesteeRequest] = []
         for identifier in borrowed {
             var disguised = base
             disguised.caseID = identifier
@@ -261,7 +261,7 @@ struct TesteeHonestyTests {
         // in the order it happened to be given.
         let requests = Self.invented
 
-        var inOrder: [String: Libbusinessid_Testee_V1_TesteeResponse] = [:]
+        var inOrder: [String: Entid_Testee_V1_TesteeResponse] = [:]
         for response in try TesteeHarness.exchange(requests) { inOrder[response.caseID] = response }
         #expect(inOrder.count == requests.count, "the case identifiers are distinct")
 

@@ -75,7 +75,7 @@ struct ExpansionTests {
     @Test("The expansion fixture is refused by the count, not by the program shape")
     func expansionFixtureIsRefusedForItsCount() throws {
         let payload = try SpecCorpus.loaderCases().first { $0.id == "loader-program-expansion-036" }
-        let bundle = try Libbusinessid_Ir_V1_RuleBundle(
+        let bundle = try Entid_Ir_V1_RuleBundle(
             serializedBytes: [UInt8](try #require(payload).rulesPayload)
         )
         let bytes: [UInt8] = try bundle.serializedBytes()

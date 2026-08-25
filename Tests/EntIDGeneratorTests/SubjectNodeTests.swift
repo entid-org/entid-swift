@@ -10,15 +10,15 @@ import Testing
 /// remains here is what the fixture does not reach.
 @Suite("Circular subject node")
 struct SubjectNodeTests {
-    static func fixture() throws -> Libbusinessid_Ir_V1_RuleBundle {
+    static func fixture() throws -> Entid_Ir_V1_RuleBundle {
         let payload = try SpecCorpus.loaderCases()
             .first { $0.id == "loader-subject-node-circular-037" }
-        return try Libbusinessid_Ir_V1_RuleBundle(
+        return try Entid_Ir_V1_RuleBundle(
             serializedBytes: [UInt8](try #require(payload).rulesPayload)
         )
     }
 
-    static func load(_ bundle: Libbusinessid_Ir_V1_RuleBundle) throws -> LoadError? {
+    static func load(_ bundle: Entid_Ir_V1_RuleBundle) throws -> LoadError? {
         let bytes: [UInt8] = try bundle.serializedBytes()
         do {
             _ = try RuleBundleLoader.load(bytes)
@@ -44,10 +44,10 @@ struct SubjectNodeTests {
         // check that inspected only the subject node itself would pass it and
         // still recurse forever on this.
         var bundle = try Self.fixture()
-        var slice = Libbusinessid_Ir_V1_StringOperation()
+        var slice = Entid_Ir_V1_StringOperation()
         slice.kind = .sliceFrom
         slice.start = 0
-        var node = Libbusinessid_Ir_V1_Node()
+        var node = Entid_Ir_V1_Node()
         node.outputType = .string
         node.inputNodes = [6]
         node.stringOperation = slice
@@ -72,9 +72,9 @@ struct SubjectNodeTests {
 
         // Repair the circularity first, so the capability is the only thing
         // left to object to.
-        var value = Libbusinessid_Ir_V1_StringOperation()
+        var value = Entid_Ir_V1_StringOperation()
         value.kind = .value
-        var node = Libbusinessid_Ir_V1_Node()
+        var node = Entid_Ir_V1_Node()
         node.outputType = .string
         node.stringOperation = value
         bundle.programs[1].nodes[Int(bundle.programs[1].subjectNode)] = node
@@ -98,7 +98,7 @@ struct SubjectNodeTests {
         bundle.requiredFeatureIds.removeAll { $0 == Capability.capturesAndCallsV1 }
         #expect(try Self.load(bundle) == nil, "without either construct the capability is not used")
 
-        var capture = Libbusinessid_Ir_V1_Capture()
+        var capture = Entid_Ir_V1_Capture()
         capture.name = "whole"
         capture.node = 0
         bundle.programs[1].captures = [capture]

@@ -8,7 +8,7 @@ internal import EntIDWire
 /// other zero enum value, and an unrecognised number is refused as
 /// `invalid_ruleset` rather than silently defaulted.
 extension ValueType {
-    init?(wire: Libbusinessid_Ir_V1_ValueType) {
+    init?(wire: Entid_Ir_V1_ValueType) {
         switch wire {
         case .string: self = .string
         case .integer: self = .integer
@@ -22,7 +22,7 @@ extension ValueType {
 }
 
 extension ProgramKind {
-    init?(wire: Libbusinessid_Ir_V1_ProgramKind) {
+    init?(wire: Entid_Ir_V1_ProgramKind) {
         switch wire {
         case .canonicalization: self = .canonicalization
         case .format: self = .format
@@ -33,7 +33,7 @@ extension ProgramKind {
 }
 
 extension WeightAlignment {
-    init?(wire: Libbusinessid_Ir_V1_WeightAlignment) {
+    init?(wire: Entid_Ir_V1_WeightAlignment) {
         switch wire {
         case .left: self = .left
         case .right: self = .right
@@ -44,7 +44,7 @@ extension WeightAlignment {
 }
 
 extension CharMapping {
-    init?(wire: Libbusinessid_Ir_V1_CharMapping) {
+    init?(wire: Entid_Ir_V1_CharMapping) {
         switch wire {
         case .digitValue: self = .digitValue
         case .alnumBase36: self = .alnumBase36
@@ -63,7 +63,7 @@ extension SourceTier {
     /// input reports.
     /// `.stated(nil)` means the source states no tier; `nil` means the value
     /// lies outside the enumeration, which stays `invalid_ruleset`.
-    static func recognised(wire: Libbusinessid_Ir_V1_SourceTier) -> Stated? {
+    static func recognised(wire: Entid_Ir_V1_SourceTier) -> Stated? {
         switch wire {
         case .unspecified: Stated(tier: nil)
         case .primary: Stated(tier: .primary)
@@ -78,7 +78,7 @@ extension SourceTier {
 }
 
 extension ReasonCode {
-    init?(wire: Libbusinessid_Ir_V1_ReasonCode) {
+    init?(wire: Entid_Ir_V1_ReasonCode) {
         switch wire {
         case .ok: self = .ok
         case .empty: self = .empty

@@ -17,7 +17,7 @@ struct NodeLowering {
 
     // MARK: - Entry
 
-    func lower(_ node: Libbusinessid_Ir_V1_Node) throws(LoadError) -> IRNode {
+    func lower(_ node: Entid_Ir_V1_Node) throws(LoadError) -> IRNode {
         // Check 10: every operation known, with its declared output type. An
         // absent `oneof operation` is refused here rather than defaulted.
         guard let operation = node.operation else {
@@ -64,7 +64,7 @@ struct NodeLowering {
     }
 
     private func lower(
-        _ operation: Libbusinessid_Ir_V1_Node.OneOf_Operation
+        _ operation: Entid_Ir_V1_Node.OneOf_Operation
     ) throws(LoadError) -> Operation {
         switch operation {
         case .stringOperation(let payload): .string(try lowerString(payload))
@@ -151,7 +151,7 @@ struct NodeLowering {
     }
 
     private func checkedReasonCode(
-        _ raw: Libbusinessid_Ir_V1_ReasonCode,
+        _ raw: Entid_Ir_V1_ReasonCode,
         allowed: Set<ReasonCode>,
         label: String
     ) throws(LoadError) -> ReasonCode {
@@ -167,7 +167,7 @@ struct NodeLowering {
     // MARK: - String operations
 
     private func lowerString(
-        _ payload: Libbusinessid_Ir_V1_StringOperation
+        _ payload: Entid_Ir_V1_StringOperation
     ) throws(LoadError) -> StringOp {
         var present: Set<String> = []
         if payload.hasText { present.insert("text") }
@@ -219,7 +219,7 @@ struct NodeLowering {
     // MARK: - Integer operations
 
     private func lowerInteger(
-        _ payload: Libbusinessid_Ir_V1_IntegerOperation
+        _ payload: Entid_Ir_V1_IntegerOperation
     ) throws(LoadError) -> IntegerOp {
         var present: Set<String> = []
         if payload.hasModulus { present.insert("modulus") }
@@ -287,7 +287,7 @@ struct NodeLowering {
     /// code point would carry two values, and which one an engine returned
     /// would depend on how it searched.
     private func checkedAlphabet(
-        _ payload: Libbusinessid_Ir_V1_IntegerOperation,
+        _ payload: Entid_Ir_V1_IntegerOperation,
         mapping: CharMapping
     ) throws(LoadError) -> [Unicode.Scalar]? {
         guard mapping == .customAlphabet else {
@@ -312,7 +312,7 @@ struct NodeLowering {
     // MARK: - Predicate operations
 
     private func lowerPredicate(
-        _ payload: Libbusinessid_Ir_V1_PredicateOperation
+        _ payload: Entid_Ir_V1_PredicateOperation
     ) throws(LoadError) -> PredicateOp {
         var present: Set<String> = []
         if payload.hasText { present.insert("text") }
@@ -439,7 +439,7 @@ struct NodeLowering {
     // MARK: - Canonicalization operations
 
     private func lowerCanonical(
-        _ payload: Libbusinessid_Ir_V1_CanonicalizationOperation
+        _ payload: Entid_Ir_V1_CanonicalizationOperation
     ) throws(LoadError) -> CanonicalOp {
         var present: Set<String> = []
         if payload.hasText { present.insert("text") }
@@ -506,7 +506,7 @@ struct NodeLowering {
     // MARK: - Assertion operations
 
     private func lowerAssertion(
-        _ payload: Libbusinessid_Ir_V1_AssertionOperation
+        _ payload: Entid_Ir_V1_AssertionOperation
     ) throws(LoadError) -> AssertionOp {
         var present: Set<String> = []
         if payload.hasReasonCode { present.insert("reason_code") }
@@ -534,7 +534,7 @@ struct NodeLowering {
     // MARK: - Checksum operations
 
     private func lowerChecksum(
-        _ payload: Libbusinessid_Ir_V1_ChecksumOperation
+        _ payload: Entid_Ir_V1_ChecksumOperation
     ) throws(LoadError) -> ChecksumOp {
         var present: Set<String> = []
         if payload.hasIndex { present.insert("index") }
@@ -614,7 +614,7 @@ struct NodeLowering {
 
     // MARK: - Call operations
 
-    private func lowerCall(_ payload: Libbusinessid_Ir_V1_CallOperation) throws(LoadError) -> CallOp {
+    private func lowerCall(_ payload: Entid_Ir_V1_CallOperation) throws(LoadError) -> CallOp {
         switch payload.kind {
         case .format: .format(programID: payload.programID)
         case .checksum: .checksum(programID: payload.programID)

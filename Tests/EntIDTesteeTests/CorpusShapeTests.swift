@@ -25,7 +25,7 @@ struct CorpusShapeTests {
         #expect(corpus.rulesVersion == EntIDRulesVersion.locked)
         #expect(corpus.cases.count == 676)
 
-        var counts: [Libbusinessid_Conformance_V1_Operation: Int] = [:]
+        var counts: [Entid_Conformance_V1_Operation: Int] = [:]
         for testCase in corpus.cases { counts[testCase.operation, default: 0] += 1 }
         #expect(counts[.canonicalize] == 13)
         #expect(counts[.validate] == 621)

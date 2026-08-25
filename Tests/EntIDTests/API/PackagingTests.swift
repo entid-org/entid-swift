@@ -42,7 +42,7 @@ struct PackagingTests {
         // generator's work. Shipping any of it would put the whole validator
         // and a sixty three opcode execution machine in every caller's process.
         let forbidden = [
-            "SwiftProtobuf", "Libbusinessid_", "RuleBundle", "OpKind", "binpb", "serializedBytes",
+            "SwiftProtobuf", "Entid_", "RuleBundle", "OpKind", "binpb", "serializedBytes",
         ]
         for file in try Self.librarySources() {
             for token in forbidden {

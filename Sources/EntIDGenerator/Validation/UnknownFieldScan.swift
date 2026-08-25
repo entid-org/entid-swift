@@ -12,7 +12,7 @@ internal import EntIDWire
 /// legitimate version gap a forged bundle.
 enum UnknownFieldScan {
     /// The path of the first message carrying an unknown field, or `nil`.
-    static func run(_ bundle: Libbusinessid_Ir_V1_RuleBundle) -> String? {
+    static func run(_ bundle: Entid_Ir_V1_RuleBundle) -> String? {
         if !bundle.unknownFields.data.isEmpty { return "RuleBundle" }
 
         for (index, definition) in bundle.identifiers.enumerated() {
@@ -56,7 +56,7 @@ enum UnknownFieldScan {
     }
 
     private static func operationCarriesUnknownField(
-        _ operation: Libbusinessid_Ir_V1_Node.OneOf_Operation?
+        _ operation: Entid_Ir_V1_Node.OneOf_Operation?
     ) -> String? {
         switch operation {
         case .stringOperation(let payload):

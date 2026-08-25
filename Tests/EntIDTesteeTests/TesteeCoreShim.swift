@@ -13,8 +13,8 @@ package import EntIDWire
 /// how the framing is checked without a second implementation of the engine.
 enum TesteeCoreShim {
     static func respond(
-        to request: Libbusinessid_Testee_V1_TesteeRequest
-    ) -> Libbusinessid_Testee_V1_TesteeResponse {
+        to request: Entid_Testee_V1_TesteeRequest
+    ) -> Entid_Testee_V1_TesteeResponse {
         TesteeCore.respond(to: request)
     }
 }

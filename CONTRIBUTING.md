@@ -126,15 +126,17 @@ Check `git status` before staging when `spec/` is in the tree.
 
 ## A rules update arrives on its own
 
-`.github/workflows/spec-sync.yml` implements `engine.md` section 11.4. Every
+`.github/workflows/rules-sync.yml` implements `engine.md` section 11.4. Every
 morning, and on demand, it compares the newest `entid-org/spec` release to
 `rules.lock` and stops there when they concord. Otherwise it downloads the
 artefacts, checks `SHA256SUMS`, verifies the provenance attestation — repository,
-signing workflow, tag — and only then writes `spec/`, `rules.lock` and
+signing workflow, tag — and only then writes `spec/`, `proto/`, `rules.lock` and
 `spec/PROVENANCE.md`, regenerates the emitted code, runs `make verify` and opens
 a pull request. Nothing reaches the working tree before the attestation passes.
+Since `2026.08.38` the provenance note is a release asset, so the whole
+synchronization reads attested bytes and clones nothing.
 
-So a rules update is not something anyone does by hand. `Tools/spec-sync.sh
+So a rules update is not something anyone does by hand. `Tools/rules-sync.sh
 compare` answers what the workflow would decide today.
 
 The pull request is opened green or red, and auto-merge is enabled on it. That
@@ -146,7 +148,7 @@ a workflow to request, so a human clicks them once:
   `gh pr merge --auto` is refused and the synchronization run goes red with the
   pull request already open.
 - **A branch protection on `main` requiring exactly one status check, `Verify`** —
-  the name under which the section 12.5 entry point reports. Auto-merge merges as
+  the name under which the section 12.6 entry point reports. Auto-merge merges as
   soon as nothing *blocks*, which is not the same as merging on green: with no
   required check it would merge a red synchronization immediately. And `Verify`
   has to be the only required check, or "green" has two definitions and

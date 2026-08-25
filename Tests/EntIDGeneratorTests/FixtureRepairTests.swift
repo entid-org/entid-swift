@@ -26,7 +26,7 @@ import struct Foundation.Data
 ///   missing.
 @Suite("Loader fixture repairs")
 struct FixtureRepairTests {
-    typealias Bundle = Libbusinessid_Ir_V1_RuleBundle
+    typealias Bundle = Entid_Ir_V1_RuleBundle
 
     /// One fixture, and the smallest change that fixes what its name says is
     /// wrong with it.
@@ -98,9 +98,9 @@ struct FixtureRepairTests {
             // The subject node stays declared. Repairing it means giving it
             // something to be built from that is not the subject it defines.
             mutateProgram(&$0, id: 2) { program in
-                var value = Libbusinessid_Ir_V1_StringOperation()
+                var value = Entid_Ir_V1_StringOperation()
                 value.kind = .value
-                var node = Libbusinessid_Ir_V1_Node()
+                var node = Entid_Ir_V1_Node()
                 node.outputType = .string
                 node.stringOperation = value
                 program.nodes[Int(program.subjectNode)] = node
@@ -152,7 +152,7 @@ struct FixtureRepairTests {
             for program in $0.programs.indices {
                 for node in $0.programs[program].nodes.indices
                 where $0.programs[program].nodes[node].operation == nil {
-                    var predicate = Libbusinessid_Ir_V1_PredicateOperation()
+                    var predicate = Entid_Ir_V1_PredicateOperation()
                     predicate.kind = .lengthEq
                     predicate.length = 4
                     $0.programs[program].nodes[node].predicateOperation = predicate
@@ -166,7 +166,7 @@ struct FixtureRepairTests {
     static func mutateProgram(
         _ bundle: inout Bundle,
         id: UInt32,
-        _ body: (inout Libbusinessid_Ir_V1_Program) -> Void
+        _ body: (inout Entid_Ir_V1_Program) -> Void
     ) {
         for index in bundle.programs.indices where bundle.programs[index].id == id {
             body(&bundle.programs[index])
@@ -175,7 +175,7 @@ struct FixtureRepairTests {
 
     static func mutateAssertions(
         _ bundle: inout Bundle,
-        _ body: (inout Libbusinessid_Ir_V1_AssertionOperation) -> Void
+        _ body: (inout Entid_Ir_V1_AssertionOperation) -> Void
     ) {
         forEachNode(&bundle) { node in
             guard case .assertionOperation(var operation) = node.operation else { return }
@@ -186,7 +186,7 @@ struct FixtureRepairTests {
 
     static func mutatePredicates(
         _ bundle: inout Bundle,
-        _ body: (inout Libbusinessid_Ir_V1_PredicateOperation) -> Void
+        _ body: (inout Entid_Ir_V1_PredicateOperation) -> Void
     ) {
         forEachNode(&bundle) { node in
             guard case .predicateOperation(var operation) = node.operation else { return }
@@ -197,7 +197,7 @@ struct FixtureRepairTests {
 
     static func mutateIntegers(
         _ bundle: inout Bundle,
-        _ body: (inout Libbusinessid_Ir_V1_IntegerOperation) -> Void
+        _ body: (inout Entid_Ir_V1_IntegerOperation) -> Void
     ) {
         forEachNode(&bundle) { node in
             guard case .integerOperation(var operation) = node.operation else { return }
@@ -208,7 +208,7 @@ struct FixtureRepairTests {
 
     static func mutateCanonicalizations(
         _ bundle: inout Bundle,
-        _ body: (inout Libbusinessid_Ir_V1_CanonicalizationOperation) -> Void
+        _ body: (inout Entid_Ir_V1_CanonicalizationOperation) -> Void
     ) {
         forEachNode(&bundle) { node in
             guard case .canonicalizationOperation(var operation) = node.operation else { return }
@@ -217,7 +217,7 @@ struct FixtureRepairTests {
         }
     }
 
-    static func forEachNode(_ bundle: inout Bundle, _ body: (inout Libbusinessid_Ir_V1_Node) -> Void) {
+    static func forEachNode(_ bundle: inout Bundle, _ body: (inout Entid_Ir_V1_Node) -> Void) {
         for program in bundle.programs.indices {
             for node in bundle.programs[program].nodes.indices {
                 body(&bundle.programs[program].nodes[node])
