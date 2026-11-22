@@ -75,7 +75,7 @@ jobs:
       # with `GOTOOLCHAIN: auto`, for the reason ci.yml gives: setup-go pins
       # GOTOOLCHAIN to local, and the binding condition is the `go` line of the
       # spec module, not its `toolchain` line.
-      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version: stable
           cache: false
